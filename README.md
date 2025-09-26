@@ -25,15 +25,16 @@ Make sure you have installed:
 ### 🔹 Frontend Setup (React + Vite)  
 ```bash
 cd frontend
-
+#to install tailwind
+npm install tailwindcss @tailwindcss/vite
 # Install dependencies
 npm install
 
 # Start development server
 npm run dev
-
+```
 ### 🔹 Backend Setup (Node +Express)
-
+```bash
   cd backend
 
 # Initialize project
@@ -44,3 +45,4 @@ npm install express
 
 # Start server
 npm start
+```
