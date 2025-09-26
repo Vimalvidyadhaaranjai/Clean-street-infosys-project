@@ -1,14 +1,11 @@
 import React from 'react'
-import Navbar from './components/Navbar'
-import Hero from './Components/Hero'
-import Footer from './Components/Footer'
+
+import LandingPage from './pages/LandingPage'
 
 const App = () => {
   return (
     <div>
-      <Navbar/>
-      <Hero />
-      <Footer />
+      <LandingPage/>
     </div>
   )
 }
