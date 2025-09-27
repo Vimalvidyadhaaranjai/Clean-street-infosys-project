@@ -1,6 +1,36 @@
-import React from "react";
+import React,{useState} from "react";
 import Navbar from "../Components/Navbar";
+
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("http://localhost:3002/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Login failed");
+      localStorage.setItem("token", data.token);
+    alert("Login successful!");
+setTimeout(() => {
+  window.location.href = "/";
+}, 500);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
 
@@ -24,7 +54,7 @@ export default function Login() {
           </p>
 
           {/* Login Form */}
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSubmit}>
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -36,6 +66,9 @@ export default function Login() {
                   type="email"
                   placeholder="Enter your Email"
                   className="w-full outline-none text-gray-700 text-sm"
+                  value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
                 />
               </div>
             </div>
@@ -51,17 +84,21 @@ export default function Login() {
                   type="password"
                   placeholder="Enter Your Password"
                   className="w-full outline-none text-gray-700 text-sm"
+                   value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
                 />
               </div>
             </div>
 
             {/* Login Button */}
-            <button
-              type="submit"
-              className="w-full bg-[#0a2463] text-white font-medium py-2 rounded-md shadow hover:bg-[#081b4a] transition"
-            >
-              Login
-            </button>
+          <button
+    type="submit"
+    className="w-full bg-[#0a2463] text-white font-medium py-2 rounded-md shadow hover:bg-[#081b4a] transition"
+    disabled={loading}
+  >
+    {loading ? "Logging in..." : "Login"}
+  </button>
           </form>
 
           {/* Divider */}
