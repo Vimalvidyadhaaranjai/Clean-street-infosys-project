@@ -1,6 +1,43 @@
-import React from "react";
+import React,{useState} from "react";
 import Navbar from "../Components/Navbar";
 export default function Register() {
+  const [form, setForm] = useState({
+    name: "",
+    location: "",
+    role: "",
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("http://localhost:3002/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Registration failed");
+      localStorage.setItem("token", data.token);
+    alert("Registration successful!");
+setTimeout(() => {
+  window.location.href = "/";
+}, 500);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       {/* Navbar */}
@@ -23,7 +60,7 @@ export default function Register() {
           </p>
 
           {/* Register Form */}
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSubmit}>
             {/* Full Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -33,8 +70,12 @@ export default function Register() {
                 <span className="text-gray-400 mr-2">👤</span>
                 <input
                   type="text"
+                  name="name"
                   placeholder="Enter your Full Name"
                   className="w-full outline-none text-gray-700 text-sm"
+                    value={form.name}
+        onChange={handleChange}
+        required
                 />
               </div>
             </div>
@@ -48,8 +89,12 @@ export default function Register() {
                 <span className="text-gray-400 mr-2">📍</span>
                 <input
                   type="text"
+                  name="location"
                   placeholder="Enter your City or Area"
                   className="w-full outline-none text-gray-700 text-sm"
+                   value={form.location}
+        onChange={handleChange}
+        required
                 />
               </div>
             </div>
@@ -61,12 +106,17 @@ export default function Register() {
               </label>
               <div className="flex items-center border rounded-md px-3 py-2">
                 <span className="text-gray-400 mr-2">💼</span>
-                <select className="w-full outline-none text-gray-700 text-sm bg-transparent">
-                  <option>Select your Role</option>
-                  <option>User</option>
-                  <option>Volunteer</option>
-                  <option>Admin</option>
-                </select>
+                <select 
+                name="role"
+                className="w-full outline-none text-gray-700 text-sm bg-transparent" value={form.role}
+        onChange={handleChange}
+        required
+      >
+        <option value="">Select your Role</option>
+        <option value="user">User</option>
+        <option value="volunteer">Volunteer</option>
+        <option value="admin">Admin</option>
+      </select>
               </div>
             </div>
 
@@ -79,8 +129,12 @@ export default function Register() {
                 <span className="text-gray-400 mr-2">📧</span>
                 <input
                   type="email"
+                  name="email"
                   placeholder="Enter your Email"
                   className="w-full outline-none text-gray-700 text-sm"
+                  value={form.email}
+        onChange={handleChange}
+        required
                 />
               </div>
             </div>
@@ -94,8 +148,12 @@ export default function Register() {
                 <span className="text-gray-400 mr-2">🔒</span>
                 <input
                   type="password"
+                  name="password" 
                   placeholder="Enter your Password"
                   className="w-full outline-none text-gray-700 text-sm"
+                  value={form.password}
+        onChange={handleChange}
+        required
                 />
               </div>
             </div>
@@ -104,8 +162,9 @@ export default function Register() {
             <button
               type="submit"
               className="w-full bg-[#0a2463] text-white font-medium py-2 rounded-md shadow hover:bg-[#081b4a] transition"
+              disabled={loading}
             >
-              Sign Up
+               {loading ? "Signing up..." : "Sign Up"}
             </button>
           </form>
 
