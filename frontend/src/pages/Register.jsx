@@ -33,6 +33,9 @@ setTimeout(() => {
   window.location.href = "/";
 }, 500);
     } catch (err) {
+      if (err.message && err.message.toLowerCase().includes("user already exists")) {
+      alert("User already exists!");
+      }
       setError(err.message);
     } finally {
       setLoading(false);
