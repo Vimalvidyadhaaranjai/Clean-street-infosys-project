@@ -17,21 +17,21 @@ const Hero = () => {
                             Report issues, track progress, and collaborate with local authorities to create the change you want to see. </p>
                     </div>
                     <div className='flex flex-col gap-5 w-1/3 '>
-                        <div className="  bg-white/10 backdrop-blur-xl border-white border-1 text-white  p-6 rounded-3xl">
+                        <div className="  bg-white/10 backdrop-blur-xl border-white border-1 text-white  p-6 rounded-3xl  transform transition-transform duration-300 hover:scale-105">
                             <div className='flex gap-2'>
                                 <img className='h-6' src="images/icons/icon1.png" alt="" />
                                 <h3 className='text-2xl mb-1'>Smart Reporting</h3>
                             </div>
                             <p>Use advance tools to report issues with precise location tracking and photo evidence.</p>
                         </div>
-                        <div className="  bg-white/10 backdrop-blur-xl border-white border-1 text-white  p-6 rounded-3xl">
+                        <div className="  bg-white/10 backdrop-blur-xl border-white border-1 text-white  p-6 rounded-3xl  transform transition-transform duration-300 hover:scale-105">
                             <div className='flex gap-2'>
                                 <img className=' h-6' src="images/icons/icon2.png" alt="" />
                                 <h3 className='text-2xl mb-1'>Role Based Access</h3>
                             </div>
                             <p>Citizens, Volunteers and administrators working together using centralized platform </p>
                         </div>
-                        <div className="  bg-white/10 backdrop-blur-xl border-white border-1 text-white  p-6 rounded-3xl">
+                        <div className="  bg-white/10 backdrop-blur-xl border-white border-1 text-white  p-6 rounded-3xl  transform transition-transform duration-300 hover:scale-105">
                             <div className='flex gap-2'>
                                 <img className=' h-6' src="images/icons/icon3.png" alt="" />
                                 <h3 className='text-2xl mb-1'>Real-Time Updates</h3>
