@@ -50,7 +50,7 @@ setTimeout(() => {
             Welcome Back
           </h2>
           <p className="text-center text-gray-600 text-sm mb-8">
-            sign in to your account to continue reporting issues
+            Sign in to your account to continue reporting issues
           </p>
 
           {/* Login Form */}
