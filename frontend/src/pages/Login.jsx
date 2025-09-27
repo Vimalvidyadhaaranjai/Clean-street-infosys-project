@@ -1,20 +1,11 @@
 import React from "react";
-
+import Navbar from "../Components/Navbar";
 export default function Login() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
 
       {/* Navbar */}
-      <header className="w-full bg-white shadow-sm px-8 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">cleanStreet</h1>
-        <div className="space-x-6 flex items-center">
-          <button className="px-5 py-2 bg-[#0a2463] text-white font-medium rounded-md hover:bg-[#081b4a] transition">
-            Sign in
-          </button>
-          <button className="text-gray-900 font-medium">Register</button>
-        </div>
-      </header>
-
+      <Navbar/>
       {/* Page Content */}
 
       <main className="flex-1 flex flex-col items-center justify-center px-4">
@@ -92,7 +83,7 @@ export default function Login() {
 
           {/* Sign Up Link */}
           <p className="text-center text-sm text-gray-600 mt-6">
-  Don’t have an account?{" "}
+  Don't have an account?{" "}
   <a href="/register" className="text-[#0a2463] font-medium hover:underline">
     Sign Up
   </a>
