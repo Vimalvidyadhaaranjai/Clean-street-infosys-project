@@ -18,14 +18,11 @@ app.use("/api/auth", authRoutes);
 
 
 
-mongoose.connect(config.MONGO_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log("✅ MongoDB Connected"))
-.catch((err) => console.error("❌ MongoDB connection error:", err));
-
+mongoose.connect(config.MONGO_URL)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 app.listen(config.PORT, () => {
   console.log(`🚀 Server running on http://localhost:${config.PORT}`);
 });
+
