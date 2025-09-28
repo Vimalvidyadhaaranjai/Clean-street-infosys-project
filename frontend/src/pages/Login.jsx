@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React, { useState } from "react";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 
@@ -21,10 +21,10 @@ export default function Login() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Login failed");
       localStorage.setItem("token", data.token);
-    alert("Login successful!");
-setTimeout(() => {
-  window.location.href = "/";
-}, 500);
+      alert("Login successful!");
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 500);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -34,9 +34,8 @@ setTimeout(() => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
-
       {/* Navbar */}
-      <Navbar/>
+      <Navbar />
       {/* Page Content */}
 
       <main className="flex-1 flex flex-col items-center justify-center px-4">
@@ -68,8 +67,8 @@ setTimeout(() => {
                   placeholder="Enter your Email"
                   className="w-full outline-none text-gray-700 text-sm"
                   value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
               </div>
             </div>
@@ -85,21 +84,24 @@ setTimeout(() => {
                   type="password"
                   placeholder="Enter Your Password"
                   className="w-full outline-none text-gray-700 text-sm"
-                   value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
                 />
               </div>
             </div>
-
+            {/* Error message */}
+            {error && (
+              <p className="text-red-500 text-sm mb-2 text-center">{error}</p>
+            )}
             {/* Login Button */}
-          <button
-    type="submit"
-    className="w-full bg-[#0a2463] text-white font-medium py-2 rounded-md shadow hover:bg-[#081b4a] transition"
-    disabled={loading}
-  >
-    {loading ? "Logging in..." : "Login"}
-  </button>
+            <button
+              type="submit"
+              className="w-full bg-[#0a2463] text-white font-medium py-2 rounded-md shadow hover:bg-[#081b4a] transition"
+              disabled={loading}
+            >
+              {loading ? "Logging in..." : "Login"}
+            </button>
           </form>
 
           {/* Divider */}
@@ -121,19 +123,17 @@ setTimeout(() => {
 
           {/* Sign Up Link */}
           <p className="text-center text-sm text-gray-600 mt-6">
-  Don't have an account?{" "}
-  <a href="/register" className="text-[#0a2463] font-medium hover:underline">
-    Sign Up
-  </a>
-</p>
-
-        
-            
-          
+            Don't have an account?{" "}
+            <a
+              href="/register"
+              className="text-[#0a2463] font-medium hover:underline"
+            >
+              Sign Up
+            </a>
+          </p>
         </div>
       </main>
-    <Footer/>
-
+      <Footer />
     </div>
   );
 }
