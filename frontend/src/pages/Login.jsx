@@ -1,5 +1,6 @@
 import React,{useState} from "react";
 import Navbar from "../Components/Navbar";
+import Footer from "../Components/Footer";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -131,6 +132,8 @@ setTimeout(() => {
           
         </div>
       </main>
+    <Footer/>
+
     </div>
   );
 }
