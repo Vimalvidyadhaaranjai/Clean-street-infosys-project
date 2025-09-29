@@ -29,6 +29,7 @@ export default function Register() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Registration failed");
       localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user)); // save user for navbar/avatar
     alert("Registration successful!");
 setTimeout(() => {
   window.location.href = "/";

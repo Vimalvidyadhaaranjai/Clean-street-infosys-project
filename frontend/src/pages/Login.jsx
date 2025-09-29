@@ -21,6 +21,7 @@ export default function Login() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Login failed");
       localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user)); // save user for navbar/avatar
       alert("Login successful!");
       setTimeout(() => {
         window.location.href = "/";
