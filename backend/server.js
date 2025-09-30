@@ -1,8 +1,10 @@
 import express from "express";
 import mongoose from "mongoose";
 import config from "./.config/config.js"; // your config file
-import authRoutes from "./routes/auth.routes.js"; // auth routes
+import authRoutes from "./routes/auth.routes.js";
+import userRoutes from "./routes/user.routes.js" // auth routes
 import cors from "cors";
+import cookieParser from 'cookie-parser';
 const app = express();
 app.use(cors({
   origin: "http://localhost:5173", 
@@ -11,9 +13,9 @@ app.use(cors({
 
 
 app.use(express.json());
-
-
+app.use(cookieParser);
 app.use("/api/auth", authRoutes);
+app.use("/api/user/",userRoutes);
 
 
 

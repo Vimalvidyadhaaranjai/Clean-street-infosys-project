@@ -1,13 +1,13 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
-import { JWT_USER_SECRET, JWT_ADMIN_SECRET } from "../.config/config.js";
+import config from "../.config/config.js";
+const{ JWT_USER_SECRET, JWT_ADMIN_SECRET }= config; 
 
 export const protect = async (req, res, next) => {
   let token;
 
-  if (req.headers.authorization?.startsWith("Bearer")) {
-    token = req.headers.authorization.split(" ")[1];
-  }
+
+  token = req.cookies.token;
 
   if (!token) {
     return res.status(401).json({ message: "Not authorized, no token" });
@@ -16,11 +16,10 @@ export const protect = async (req, res, next) => {
   try {
     let decoded;
 
-
+    
     try {
       decoded = jwt.verify(token, JWT_USER_SECRET);
     } catch (err) {
-     
       decoded = jwt.verify(token, JWT_ADMIN_SECRET);
     }
 
@@ -40,7 +39,9 @@ export const authorize = (...roles) => {
   return (req, res, next) => {
     if (!req.user || !roles.includes(req.user.role)) {
       return res.status(403).json({
-        message: `User role '${req.user?.role || "unknown"}' is not authorized to access this route.`,
+        message: `User role '${
+          req.user?.role || "unknown"
+        }' is not authorized to access this route.`,
       });
     }
     next();
