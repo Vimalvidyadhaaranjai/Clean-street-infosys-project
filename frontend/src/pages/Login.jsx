@@ -40,8 +40,8 @@ export default function Login() {
       <Navbar />
       {/* Page Content */}
 
-      <main className="flex-1 flex flex-col items-center justify-center px-4">
-        <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-8">
+      <main className="flex-1 flex flex-col items-center justify-center py-24 px-4">
+        <div className="w-full max-w-xl bg-white shadow-lg rounded-xl lg:p-16 p-8">
           {/* Back link */}
           <a href="/" className="text-sm text-gray-500 flex items-center mb-6">
             ← Back to Home

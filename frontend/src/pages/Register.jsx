@@ -44,15 +44,15 @@ setTimeout(() => {
     }
   };
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
+    <div className="min-h-screen  flex flex-col bg-gray-100">
       {/* Navbar */}
       <Navbar/>
 
       {/* Page Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4">
-        <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-8">
+      <main className="flex-1 flex flex-col items-center justify-center py-24 px-4">
+        <div className="w-full max-w-xl bg-white shadow-lg rounded-xl lg:p-16 p-8">
           {/* Back link */}
-          <a href="/" className="text-sm text-gray-500 flex items-center mb-6">
+          <a href="/" className="text-sm text-gray-700 flex items-center mb-6">
             ← Back to Home
           </a>
 
@@ -60,7 +60,7 @@ setTimeout(() => {
           <h2 className="text-center text-2xl font-bold text-[#0a2463] mb-2">
             Join cleanStreet
           </h2>
-          <p className="text-center text-gray-600 text-sm mb-8">
+          <p className="text-center text-gray-700 text-sm mb-8">
             Create your account to start making difference
           </p>
 

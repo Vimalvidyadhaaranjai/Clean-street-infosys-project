@@ -9,7 +9,7 @@ const Navbar = () => {
         try {
             const stored = localStorage.getItem("user");
             if (stored) setUser(JSON.parse(stored));
-        } catch {}
+        } catch { }
     }, []);
 
     const handleLogout = () => {
@@ -22,11 +22,10 @@ const Navbar = () => {
     const initial = user?.name ? user.name.trim().charAt(0).toUpperCase() : 'U';
 
     return (
-        <nav className=' mx-auto bg-gray-200/60 px-20 w-full h-18 fixed top-0 z-15 backdrop-blur-2xl flex justify-between '>
+        <nav className='lg:mx-auto bg-gray-200/70 lg:px-20 px-5 w-full h-16 fixed top-0 z-50 backdrop-blur-2xl flex items-center justify-between'>
 
             <Link to="/" className="logo flex flex-row justify-center items-center">
-                <img className="w-20 flex" src="images/logo.png" alt="logo" />
-                <p className="text-2xl uppercase font-bold">Clean Street</p>
+                <img className="h-20 lg:h-25 w-auto" src="images/logo.png" alt="logo" />
             </Link>
 
             {user ? (
@@ -52,10 +51,22 @@ const Navbar = () => {
                     </button>
                 </div>
             ) : (
-                <div className='flex items-center gap-4 '>
-                    <button className='  border-1 border-white px-4 py-2 rounded-xl bg-gradient-to-r from-[#ffffff] to-[#dad4d4]  transform transition-transform duration-100 hover:scale-108' onClick={() => navigate('/login')}>Login</button>
-                    <button className='bg-gradient-to-r from-[#14213D] to-[#4695d9] text-white px-4 py-2 rounded-xl  transform transition-transform duration-100 hover:scale-108' onClick={() => navigate('/register')}>Register</button>
+                <div className="flex items-center gap-3">
+                    <button
+                        className="border border-gray-400 px-3 py-1.5 text-sm sm:px-4 sm:py-2 sm:text-base rounded-xl bg-gradient-to-r from-[#ffffff] to-[#dad4d4] transform transition-transform duration-100 hover:scale-105"
+                        onClick={() => navigate('/login')}
+                    >
+                        Login
+                    </button>
+
+                    <button
+                        className="bg-gradient-to-r from-[#14213D] to-[#4d9fe8] text-white px-3 py-1.5 text-sm sm:px-4 sm:py-2 sm:text-base rounded-xl transform transition-transform duration-100 hover:scale-105"
+                        onClick={() => navigate('/register')}
+                    >
+                        Register
+                    </button>
                 </div>
+
             )}
         </nav>
     )

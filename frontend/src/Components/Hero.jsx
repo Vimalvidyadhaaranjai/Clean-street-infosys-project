@@ -2,41 +2,46 @@ import React from 'react'
 
 const Hero = () => {
     return (
-        <div>
-            <div className='relative'>
-                <img className=' w-screen h-screen ' src="images/hero.png" alt="Hero" />
-                <div className="absolute inset-0 bg-black opacity-50"></div>
-            </div>
-            <div className=" px-10 mt-20 absolute top-20 hero  ">
-                <div className=' flex gap-10 '>
-                    <div className='   w-2/3 h-full '>
-                        <h1 className=' text-white justify-center text-7xl font-bold'>Transform Your <br />
-                            Streets
+        <div className="relative min-h-[100dvh] pt-25">
+            <img
+                src="images/hero.png"
+                alt="Hero"
+                className="absolute inset-0 w-full h-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-black/50 md:bg-black/40 pointer-events-none"></div>
+
+            <div className="relative z-10 px-5 sm:px-10 py-10">
+                <div className="flex flex-col md:flex-row gap-6 md:gap-10">
+                    <div className="w-full md:w-2/3 lg:w-2/3">
+                        <h1 className="text-white text-4xl sm:text-5xl md:text-7xl font-bold leading-tight">
+                            Transform Your <br /> Streets
                         </h1>
-                        <p className='mt-4 top-60 left-20 text-white text-2xl'>Join thousands of citizens in building better neighborhoods.
-                            Report issues, track progress, and collaborate with local authorities to create the change you want to see. </p>
+                        <p className="mt-4 text-white text-base sm:text-lg md:text-2xl max-w-5xl">
+                            Join thousands of citizens in building better neighborhoods. Report issues, track progress, and collaborate with local authorities to create the change you want to see.
+                        </p>
                     </div>
-                    <div className='flex flex-col gap-5 w-1/3 '>
-                        <div className="  bg-white/10 backdrop-blur-xl border-white border-1 text-white  p-6 rounded-3xl  transform transition-transform duration-300 hover:scale-105">
-                            <div className='flex gap-2'>
-                                <img className='h-6' src="images/icons/icon1.png" alt="" />
-                                <h3 className='text-2xl mb-1'>Smart Reporting</h3>
+
+                    <div className="w-full md:w-1/3  lg:w-1/3 grid grid-cols-1 gap-4">
+                        <div className="bg-white/10 backdrop-blur-xl border border-white/20 text-white p-5 rounded-2xl transform transition-transform duration-300 hover:scale-[1.02]">
+                            <div className="flex gap-2 items-center mb-1">
+                                <img className="h-6" src="images/icons/icon1.png" alt="" />
+                                <h3 className="text-lg sm:text-xl">Smart Reporting</h3>
                             </div>
-                            <p>Use advance tools to report issues with precise location tracking and photo evidence.</p>
+                            <p className="text-sm sm:text-base">Use advanced tools to report issues with precise location tracking and photo evidence.</p>
                         </div>
-                        <div className="  bg-white/10 backdrop-blur-xl border-white border-1 text-white  p-6 rounded-3xl  transform transition-transform duration-300 hover:scale-105">
-                            <div className='flex gap-2'>
-                                <img className=' h-6' src="images/icons/icon2.png" alt="" />
-                                <h3 className='text-2xl mb-1'>Role Based Access</h3>
+                        <div className="bg-white/10 backdrop-blur-xl border border-white/20 text-white p-5 rounded-2xl transform transition-transform duration-300 hover:scale-[1.02]">
+                            <div className="flex gap-2 items-center mb-1">
+                                <img className="h-6" src="images/icons/icon2.png" alt="" />
+                                <h3 className="text-lg sm:text-xl">Role Based Access</h3>
                             </div>
-                            <p>Citizens, Volunteers and administrators working together using centralized platform </p>
+                            <p className="text-sm sm:text-base">Citizens, Volunteers and administrators working together using a centralized platform.</p>
                         </div>
-                        <div className="  bg-white/10 backdrop-blur-xl border-white border-1 text-white  p-6 rounded-3xl  transform transition-transform duration-300 hover:scale-105">
-                            <div className='flex gap-2'>
-                                <img className=' h-6' src="images/icons/icon3.png" alt="" />
-                                <h3 className='text-2xl mb-1'>Real-Time Updates</h3>
+                        <div className="bg-white/10 backdrop-blur-xl border border-white/20 text-white p-5 rounded-2xl transform transition-transform duration-300 hover:scale-[1.02]">
+                            <div className="flex gap-2 items-center mb-1">
+                                <img className="h-6" src="images/icons/icon3.png" alt="" />
+                                <h3 className="text-lg sm:text-xl">Real-Time Updates</h3>
                             </div>
-                            <p>Get instant Notifications and track resolution progress in your personalized dashboard.</p>
+                            <p className="text-sm sm:text-base">Get instant notifications and track resolution progress in your personalized dashboard.</p>
                         </div>
                     </div>
                 </div>
