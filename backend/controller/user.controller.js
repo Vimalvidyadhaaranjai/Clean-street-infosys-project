@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 export const getUserProfile = async (req, res) => {
   try { 
-    const user = await User.findById(req.user.id).select("-password"); // Exclude password from the result
+    const user = await User.findById(req.user._id).select("-password"); // Exclude password from the result
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -15,7 +15,7 @@ export const getUserProfile = async (req, res) => {
 };
 export const updateUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user._id);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -25,6 +25,9 @@ export const updateUserProfile = async (req, res) => {
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
     user.location = req.body.location || user.location;
+    if (req.body.profilePhoto) {
+      user.profilePhoto = req.body.profilePhoto;
+    }
 
     if (req.body.password) {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -47,7 +50,7 @@ export const updateUserProfile = async (req, res) => {
 };
 export const updateProfilePhoto = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user._id);
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -77,7 +80,7 @@ export const updatePassword = async (req, res) => {
         return res.status(400).json({ message: "Please provide both old and new passwords." });
     }
 
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user._id);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

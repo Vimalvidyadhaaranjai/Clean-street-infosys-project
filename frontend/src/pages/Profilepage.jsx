@@ -1,274 +1,279 @@
-import React, { useState } from "react";
-
-
-const states = [
-  "Tamil Nadu",
-  "Karnataka",
-  "Kerala",
-  "Maharashtra",
-  "Delhi",
-];
-const countryCodes = [
-  { code: "+1", country: "USA" },
-  { code: "+44", country: "UK" },
-  { code: "+91", country: "India" },
-  { code: "+61", country: "Australia" },
-  { code: "+81", country: "Japan" },
-];
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Navbar from "../Components/Navbar";
+import Footer from "../Components/Footer";
 
 export default function Profilepage() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState({
-    username: "demo_user",
-    email: "demo@cleanstreet.com",
-    fullName: "Demo User",
-    phoneCode: "+1",
-    phoneNumber: "555-123-4567",
-    location: "Downtown District",
-    bio: "Active citizen helping to improve our community through CleanStreet reporting.",
-    memberSince: "2025-07-03",
-  });
+  const [form, setForm] = useState({ name: "", email: "", location: "" });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("user");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setUser(parsed);
+        setForm({
+          name: parsed.name || "",
+          email: parsed.email || "",
+          location: parsed.location || "",
+        });
+      } else {
+        navigate("/login");
+      }
+    } catch {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  const getInitials = (name) =>
+    name ? name.split(" ").map((n) => n[0]).join("").toUpperCase() : "U";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProfile((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Avatar initials
-  const getInitials = (name) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    setSelectedFile(file || null);
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    } else {
+      setPreviewUrl("");
+    }
   };
+
+  const handleUploadPhoto = async () => {
+    if (!selectedFile) return;
+    setUploading(true);
+    setError("");
+    try {
+      const formData = new FormData();
+      formData.append("photo", selectedFile);
+
+      const res = await fetch("http://localhost:3002/api/user/profile/photo", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to upload photo");
+
+      const updated = { ...user, profilePhoto: data.profilePhoto };
+      setUser(updated);
+      localStorage.setItem("user", JSON.stringify(updated));
+      setSelectedFile(null);
+      setPreviewUrl("");
+      alert("Profile photo updated");
+    } catch (e) {
+      setError(e.message);
+      alert(e.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setError("");
+    try {
+      const res = await fetch("http://localhost:3002/api/user/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to update profile");
+      // Update local user and storage
+      const updated = {
+        ...user,
+        name: data.name,
+        email: data.email,
+        location: data.location,
+        role: data.role,
+        profilePhoto: data.profilePhoto,
+      };
+      setUser(updated);
+      localStorage.setItem("user", JSON.stringify(updated));
+      setIsEditing(false);
+      alert("Profile updated successfully");
+    } catch (e) {
+      setError(e.message);
+      alert(e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    // reset form to current user values
+    setForm({
+      name: user?.name || "",
+      email: user?.email || "",
+      location: user?.location || "",
+    });
+    setIsEditing(false);
+    setError("");
+  };
+
+  if (!user) return null;
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Navbar />
 
-      {/* Navbar */}
-      <header className="w-full bg-white shadow-sm px-8 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">cleanStreet</h1>
-        <div className="space-x-6 flex items-center">
-          <a href="/login" className="text-gray-900 font-medium">
-            Sign out
-          </a>
-          <button className="px-5 py-2 bg-[#0a2463] text-white font-medium rounded-md hover:bg-[#081b4a] transition">
-            Register
-          </button>
-        </div>
-      </header>
-
-      {/* Profile Section */}
-      <div className="p-10">
-        <h1 className="text-4xl font-bold mb-2">Profile</h1>
-        <p className="text-gray-600 mb-8 text-lg">
-          Manage your account information and preferences
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-          {/* Left Sidebar */}
-          <div className="bg-white p-8 rounded-xl shadow-md flex flex-col items-center">
-            <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center text-3xl font-bold text-blue-600 mb-5 relative">
-              {getInitials(profile.fullName)}
-              <button className="absolute bottom-0 right-0 bg-white border rounded-full p-2 shadow">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-gray-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M15.232 5.232l3.536 3.536M9 13l6.293-6.293a1 1 0 011.414 0L21 10.586a1 1 0 010 1.414L14.707 18H9v-5z"
-                  />
-                </svg>
+      <main className="flex-1 pt-24 px-4 sm:px-6 lg:px-10">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-1">Profile</h1>
+            <p className="text-gray-600 mb-4 text-base sm:text-lg">Your account information</p>
+          </div>
+          <div className="flex items-center gap-2">
+            {!isEditing ? (
+              <button
+                className="px-4 py-2 rounded-md bg-[#0a2463] text-white hover:bg-[#081b4a]"
+                onClick={() => setIsEditing(true)}
+              >
+                Edit
               </button>
+            ) : (
+              <>
+                <button
+                  className="px-4 py-2 rounded-md border border-gray-300 bg-white hover:bg-gray-100"
+                  onClick={handleCancel}
+                  disabled={saving}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 rounded-md bg-[#0a2463] text-white hover:bg-[#081b4a] disabled:opacity-60"
+                  onClick={handleSave}
+                  disabled={saving}
+                >
+                  {saving ? "Saving..." : "Save"}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+        {error && (
+          <p className="text-red-600 text-sm mt-2">{error}</p>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Left: Avatar and summary */}
+          <div className="bg-white p-8 rounded-xl shadow-md flex flex-col items-center text-center">
+            {user.profilePhoto ? (
+              <img
+                src={user.profilePhoto}
+                alt="avatar"
+                className="w-32 h-32 rounded-full object-cover mb-6"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            ) : (
+              <div className="w-32 h-32 rounded-full bg-blue-100 flex items-center justify-center text-4xl font-bold text-blue-600 mb-6">
+                {getInitials(user.name)}
+              </div>
+            )}
+            <div className="w-full flex flex-col items-center gap-4 mt-2">
+              <label className="text-lg font-medium text-gray-700">Upload profile photo</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+                id="profile-photo-input"
+              />
+              <label
+                htmlFor="profile-photo-input"
+                className="inline-flex items-center px-6 py-2.5 bg-blue-50 text-blue-700 font-medium text-sm rounded-full hover:bg-blue-100 cursor-pointer transition-colors duration-200"
+              >
+                Choose File
+              </label>
+              <span className="text-gray-500 text-sm mt-2">{selectedFile?.name || 'No file chosen'}</span>
+              {previewUrl && (
+                <img src={previewUrl} alt="preview" className="w-24 h-24 rounded-lg object-cover border" />
+              )}
+              <button
+                className="px-6 py-2.5 rounded-full bg-[#0a2463] text-white hover:bg-[#081b4a] disabled:opacity-60 font-medium text-sm transition-colors duration-200 mt-4"
+                onClick={handleUploadPhoto}
+                disabled={!selectedFile || uploading}
+              >
+                {uploading ? "Uploading..." : "Upload Photo"}
+              </button>
+              <p className="text-sm text-gray-500 mt-3">Accepted: images (JPG, PNG). Max ~5MB.</p>
             </div>
-            <h2 className="text-2xl font-semibold">{profile.fullName}</h2>
-            <p className="text-gray-500">@{profile.username}</p>
-            <span className="mt-3 bg-blue-100 text-blue-600 text-sm font-medium px-4 py-1 rounded-full">
-              Citizen
+            <h2 className="text-2xl font-semibold">{user.name}</h2>
+            <p className="text-gray-500 text-sm">{user.email}</p>
+            <span className="mt-3 bg-blue-100 text-blue-700 text-xs font-medium px-3 py-1 rounded-full capitalize">
+              {user.role || "user"}
             </span>
-            <p className="text-center text-gray-600 mt-4 text-sm">
-              {profile.bio}
-            </p>
-            <p className="text-gray-400 text-sm mt-3">
-              Member since {profile.memberSince}
-            </p>
           </div>
 
-          {/* Right Section */}
-          <div className="md:col-span-2 bg-white p-8 rounded-xl shadow-md">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold">Account Information</h2>
-              <button
-                className="flex items-center gap-2 px-4 py-2 text-sm border rounded-md hover:bg-gray-100"
-                onClick={() => setIsEditing(!isEditing)}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M15.232 5.232l3.536 3.536M9 13l6.293-6.293a1 1 0 011.414 0L21 10.586a1 1 0 010 1.414L14.707 18H9v-5z"
-                  />
-                </svg>
-                {isEditing ? "Save" : "Edit"}
-              </button>
-            </div>
-
-            {/* Account Info Form */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-              {/* Username */}
+          {/* Right: Details */}
+          <div className="md:col-span-2 bg-white p-6 rounded-xl shadow-md">
+            <h3 className="text-xl font-semibold mb-4">Account Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Username</label>
+                <label className="block text-sm text-gray-600 mb-1">Full Name</label>
                 <input
                   type="text"
-                  name="username"
-                  value={profile.username}
-                  onChange={handleChange}
+                  name="name"
+                  value={isEditing ? form.name : user.name}
+                  onChange={isEditing ? handleChange : undefined}
                   readOnly={!isEditing}
-                  className={`w-full p-3 border rounded-md text-lg ${
-                    isEditing ? "bg-white" : "bg-gray-100"
-                  }`}
+                  className={`w-full p-3 border rounded-md ${isEditing ? "bg-white" : "bg-gray-100"}`}
                 />
               </div>
-
-              {/* Email */}
               <div>
-                <label className="block text-sm font-medium mb-2">Email</label>
+                <label className="block text-sm text-gray-600 mb-1">Email</label>
                 <input
                   type="email"
                   name="email"
-                  value={profile.email}
-                  onChange={handleChange}
+                  value={isEditing ? form.email : user.email}
+                  onChange={isEditing ? handleChange : undefined}
                   readOnly={!isEditing}
-                  className={`w-full p-3 border rounded-md text-lg ${
-                    isEditing ? "bg-white" : "bg-gray-100"
-                  }`}
+                  className={`w-full p-3 border rounded-md ${isEditing ? "bg-white" : "bg-gray-100"}`}
                 />
               </div>
-
-              {/* Full Name */}
               <div>
-                <label className="block text-sm font-medium mb-2">Full Name</label>
+                <label className="block text-sm text-gray-600 mb-1">Role</label>
                 <input
                   type="text"
-                  name="fullName"
-                  value={profile.fullName}
-                  onChange={handleChange}
-                  readOnly={!isEditing}
-                  className={`w-full p-3 border rounded-md text-lg ${
-                    isEditing ? "bg-white" : "bg-gray-100"
-                  }`}
+                  value={user.role || "user"}
+                  readOnly
+                  className="w-full p-3 border rounded-md bg-gray-100 capitalize"
                 />
               </div>
-
-              {/* Phone */}
               <div>
-                <label className="block text-sm font-medium mb-2">Phone Number</label>
-                <div className="flex">
-                  <select
-                    name="phoneCode"
-                    value={profile.phoneCode}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={`p-3 border rounded-l-md text-lg ${
-                      isEditing ? "bg-white" : "bg-gray-100"
-                    }`}
-                  >
-                    {countryCodes.map((c) => (
-                      <option key={c.code} value={c.code}>
-                        {c.code} ({c.country})
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    type="text"
-                    name="phoneNumber"
-                    value={profile.phoneNumber}
-                    onChange={handleChange}
-                    readOnly={!isEditing}
-                    className={`w-full p-3 border rounded-r-md text-lg ${
-                      isEditing ? "bg-white" : "bg-gray-100"
-                    }`}
-                  />
-                </div>
-              </div>
-
-              {/* Location */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Location</label>
-                {isEditing ? (
-                  <select
-                    name="location"
-                    value={profile.location}
-                    onChange={handleChange}
-                    className="w-full p-3 border rounded-md text-lg bg-white"
-                  >
-                    {states.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    type="text"
-                    value={profile.location}
-                    readOnly
-                    className="w-full p-3 border rounded-md text-lg bg-gray-100"
-                  />
-                )}
-              </div>
-
-              {/* Member Since */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Member Since</label>
+                <label className="block text-sm text-gray-600 mb-1">Location</label>
                 <input
-                  type="date"
-                  name="memberSince"
-                  value={profile.memberSince}
-                  onChange={handleChange}
+                  type="text"
+                  name="location"
+                  value={isEditing ? form.location : user.location || ""}
+                  onChange={isEditing ? handleChange : undefined}
                   readOnly={!isEditing}
-                  className={`w-full p-3 border rounded-md text-lg ${
-                    isEditing ? "bg-white" : "bg-gray-100"
-                  }`}
+                  className={`w-full p-3 border rounded-md ${isEditing ? "bg-white" : "bg-gray-100"}`}
                 />
               </div>
-            </div>
-
-            {/* Bio */}
-            <div className="mt-6">
-              <label className="block text-sm font-medium mb-2">Bio</label>
-              <textarea
-                name="bio"
-                value={profile.bio}
-                onChange={handleChange}
-                readOnly={!isEditing}
-                className={`w-full p-3 border rounded-md h-28 text-lg ${
-                  isEditing ? "bg-white" : "bg-gray-100"
-                }`}
-              />
             </div>
           </div>
         </div>
-      </div>
+      </main>
+
+      <Footer />
     </div>
   );
 }
