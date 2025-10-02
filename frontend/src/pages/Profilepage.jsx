@@ -13,6 +13,10 @@ export default function Profilepage() {
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
+  const [passwordForm, setPasswordForm] = useState({ oldPassword: "", newPassword: "", confirmPassword: "" });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [isSubmittingPassword, setIsSubmittingPassword] = useState(false);
 
   useEffect(() => {
     try {
@@ -126,6 +130,52 @@ export default function Profilepage() {
     setError("");
   };
 
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setPasswordError("");
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError("New passwords don't match");
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      setPasswordError("Password must be at least 6 characters long");
+      return;
+    }
+
+    setIsSubmittingPassword(true);
+    try {
+      const res = await fetch("http://localhost:3002/api/user/profile/password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          oldPassword: passwordForm.oldPassword,
+          newPassword: passwordForm.newPassword,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to update password");
+
+      // Reset form and show success
+      setPasswordForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
+      setIsChangingPassword(false);
+      alert("Password updated successfully");
+    } catch (e) {
+      setPasswordError(e.message);
+    } finally {
+      setIsSubmittingPassword(false);
+    }
+  };
+
+  const handleCancelPassword = () => {
+    setIsChangingPassword(false);
+    setPasswordForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
+    setPasswordError("");
+  };
+
   if (!user) return null;
 
   return (
@@ -223,51 +273,126 @@ export default function Profilepage() {
           </div>
 
           {/* Right: Details */}
-          <div className="md:col-span-2 bg-white p-6 rounded-xl shadow-md">
-            <h3 className="text-xl font-semibold mb-4">Account Details</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Full Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={isEditing ? form.name : user.name}
-                  onChange={isEditing ? handleChange : undefined}
-                  readOnly={!isEditing}
-                  className={`w-full p-3 border rounded-md ${isEditing ? "bg-white" : "bg-gray-100"}`}
-                />
+          <div className="md:col-span-2">
+            {/* Account Details Section */}
+            <div className="bg-white p-6 rounded-xl shadow-md mb-6">
+              <h3 className="text-xl font-semibold mb-4">Account Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Full Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={isEditing ? form.name : user.name}
+                    onChange={isEditing ? handleChange : undefined}
+                    readOnly={!isEditing}
+                    className={`w-full p-3 border rounded-md ${isEditing ? "bg-white" : "bg-gray-100"}`}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={isEditing ? form.email : user.email}
+                    onChange={isEditing ? handleChange : undefined}
+                    readOnly={!isEditing}
+                    className={`w-full p-3 border rounded-md ${isEditing ? "bg-white" : "bg-gray-100"}`}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Role</label>
+                  <input
+                    type="text"
+                    value={user.role || "user"}
+                    readOnly
+                    className="w-full p-3 border rounded-md bg-gray-100 capitalize"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Location</label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={isEditing ? form.location : user.location || ""}
+                    onChange={isEditing ? handleChange : undefined}
+                    readOnly={!isEditing}
+                    className={`w-full p-3 border rounded-md ${isEditing ? "bg-white" : "bg-gray-100"}`}
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={isEditing ? form.email : user.email}
-                  onChange={isEditing ? handleChange : undefined}
-                  readOnly={!isEditing}
-                  className={`w-full p-3 border rounded-md ${isEditing ? "bg-white" : "bg-gray-100"}`}
-                />
+            </div>
+
+            {/* Password Section */}
+            <div className="bg-white p-6 rounded-xl shadow-md">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold">Password</h3>
+                {!isChangingPassword && (
+                  <button
+                    className="px-4 py-2 rounded-md bg-[#0a2463] text-white hover:bg-[#081b4a]"
+                    onClick={() => setIsChangingPassword(true)}
+                  >
+                    Change Password
+                  </button>
+                )}
               </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Role</label>
-                <input
-                  type="text"
-                  value={user.role || "user"}
-                  readOnly
-                  className="w-full p-3 border rounded-md bg-gray-100 capitalize"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Location</label>
-                <input
-                  type="text"
-                  name="location"
-                  value={isEditing ? form.location : user.location || ""}
-                  onChange={isEditing ? handleChange : undefined}
-                  readOnly={!isEditing}
-                  className={`w-full p-3 border rounded-md ${isEditing ? "bg-white" : "bg-gray-100"}`}
-                />
-              </div>
+
+              {isChangingPassword && (
+                <form onSubmit={handlePasswordChange} className="space-y-4">
+                  {passwordError && (
+                    <p className="text-red-600 text-sm">{passwordError}</p>
+                  )}
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Current Password</label>
+                    <input
+                      type="password"
+                      value={passwordForm.oldPassword}
+                      onChange={(e) => setPasswordForm(prev => ({ ...prev, oldPassword: e.target.value }))}
+                      className="w-full p-3 border rounded-md"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">New Password</label>
+                    <input
+                      type="password"
+                      value={passwordForm.newPassword}
+                      onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                      className="w-full p-3 border rounded-md"
+                      required
+                      minLength={6}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Confirm New Password</label>
+                    <input
+                      type="password"
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      className="w-full p-3 border rounded-md"
+                      required
+                      minLength={6}
+                    />
+                  </div>
+                  <div className="flex gap-2 justify-end mt-4">
+                    <button
+                      type="button"
+                      onClick={handleCancelPassword}
+                      className="px-4 py-2 rounded-md border border-gray-300 bg-white hover:bg-gray-100"
+                      disabled={isSubmittingPassword}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-md bg-[#0a2463] text-white hover:bg-[#081b4a] disabled:opacity-60"
+                      disabled={isSubmittingPassword}
+                    >
+                      {isSubmittingPassword ? "Updating..." : "Update Password"}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         </div>
