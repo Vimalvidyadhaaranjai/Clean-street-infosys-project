@@ -17,6 +17,7 @@ const generateTokenAndSetCookie = (res, user) => {
     sameSite: "strict", 
     maxAge: 60 * 60 * 1000,
   });
+  return token;
 };
 
 //Register
@@ -41,16 +42,18 @@ export const register = async (req, res) => {
 
     await newUser.save();
 
-    generateTokenAndSetCookie(res, newUser);
+    const token = generateTokenAndSetCookie(res, newUser);
 
     res.status(201).json({
       message: "User registered successfully",
+      token,
       user: {
         id: newUser._id,
         name: newUser.name,
         email: newUser.email,
         role: newUser.role,
         location: newUser.location,
+        profilePhoto:newUser.profilePhoto,
       },
     });
   } catch (err) {
@@ -70,11 +73,19 @@ export const login = async (req, res) => {
     if (!isMatch)
       return res.status(401).json({ message: "Invalid credentials" });
 
-    generateTokenAndSetCookie(res, user);
+    const token = generateTokenAndSetCookie(res, user);
 
     res.status(200).json({
       message: "Login successful",
-      user: { id: user._id, name: user.name, role: user.role },
+      token,
+      user: { 
+        id: user._id,
+         name: user.name, 
+         email: user.email, 
+         role: user.role, 
+         location: user.location,
+        profilePhoto:user.profilePhoto,
+        },
     });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });

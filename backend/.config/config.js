@@ -14,7 +14,7 @@ const config = {
   PORT: process.env.PORT || 3002,
   JWT_USER_SECRET: process.env.JWT_USER_SECRET || process.env.JWT_SECRET || null,
   JWT_ADMIN_SECRET: process.env.JWT_ADMIN_SECRET || process.env.JWT_SECRET || null,
-  NODE_ENV : process.env.NODE_ENV ||null
+  NODE_ENV : process.env.NODE_ENV || 'development'
 };
 
 export default config;

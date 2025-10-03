@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 export const getUserProfile = async (req, res) => {
   try { 
-    const user = await User.findById(req.user.id).select("-password"); // Exclude password from the result
+    const user = await User.findById(req.user._id).select("-password"); // Exclude password from the result
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -15,7 +15,7 @@ export const getUserProfile = async (req, res) => {
 };
 export const updateUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user._id);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -25,6 +25,9 @@ export const updateUserProfile = async (req, res) => {
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
     user.location = req.body.location || user.location;
+    if (req.body.profilePhoto) {
+      user.profilePhoto = req.body.profilePhoto;
+    }
 
     if (req.body.password) {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -47,25 +50,34 @@ export const updateUserProfile = async (req, res) => {
 };
 export const updateProfilePhoto = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user._id);
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-          if (!req.file) {
+        
+        if (!req.file) {
             return res.status(400).json({ message: 'Please upload a file' });
         }
         
-       
-user.profilePhoto = req.file.path;
+        user.profilePhoto = req.file.path;
         await user.save();
 
         res.status(200).json({
             message: "Profile photo updated successfully",
-            profilePhoto: user.profilePhoto
+            profilePhoto: user.profilePhoto,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                location: user.location,
+                profilePhoto: user.profilePhoto,
+            }
         });
 
     } catch (error) {
+        console.error("Error updating profile photo:", error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
@@ -77,7 +89,7 @@ export const updatePassword = async (req, res) => {
         return res.status(400).json({ message: "Please provide both old and new passwords." });
     }
 
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user._id);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

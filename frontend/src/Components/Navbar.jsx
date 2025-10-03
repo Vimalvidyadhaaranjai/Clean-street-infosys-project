@@ -30,16 +30,20 @@ const Navbar = () => {
 
             {user ? (
                 <div className='flex items-center gap-3'>
-                    {user.avatar ? (
+                    {user.profilePhoto ? (
                         <img
-                            src={user.avatar}
+                            src={user.profilePhoto}
                             alt="avatar"
-                            className="w-10 h-10 rounded-full object-cover"
+                            className="w-10 h-10 rounded-full object-cover cursor-pointer"
+                            onClick={() => navigate('/profile')}
                             onError={(e) => { e.currentTarget.style.display = 'none'; }}
                         />
                     ) : null}
-                    {!user.avatar ? (
-                        <div className='w-10 h-10 rounded-full bg-[#14213D] text-white flex items-center justify-center text-sm uppercase'>
+                    {!user.profilePhoto ? (
+                        <div
+                            className='w-10 h-10 rounded-full bg-[#14213D] text-white flex items-center justify-center text-sm uppercase cursor-pointer'
+                            onClick={() => navigate('/profile')}
+                        >
                             {initial}
                         </div>
                     ) : null}
