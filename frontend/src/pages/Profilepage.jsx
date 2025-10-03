@@ -74,7 +74,7 @@ export default function Profilepage() {
 
       const updated = { ...user, profilePhoto: data.profilePhoto };
       setUser(updated);
-      localStorage.setItem("user", JSON.stringify(updated));
+      localStorage.setItem("user", JSON.stringify(data.user));
       setSelectedFile(null);
       setPreviewUrl("");
       alert("Profile photo updated");

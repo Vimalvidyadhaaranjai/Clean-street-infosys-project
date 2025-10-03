@@ -53,6 +53,7 @@ export const register = async (req, res) => {
         email: newUser.email,
         role: newUser.role,
         location: newUser.location,
+        profilePhoto:newUser.profilePhoto,
       },
     });
   } catch (err) {
@@ -77,7 +78,14 @@ export const login = async (req, res) => {
     res.status(200).json({
       message: "Login successful",
       token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role, location: user.location },
+      user: { 
+        id: user._id,
+         name: user.name, 
+         email: user.email, 
+         role: user.role, 
+         location: user.location,
+        profilePhoto:user.profilePhoto,
+        },
     });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });

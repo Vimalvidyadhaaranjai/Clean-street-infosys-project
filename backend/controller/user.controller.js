@@ -65,7 +65,8 @@ user.profilePhoto = req.file.path;
 
         res.status(200).json({
             message: "Profile photo updated successfully",
-            profilePhoto: user.profilePhoto
+            profilePhoto: user.profilePhoto,
+            user // add this line
         });
 
     } catch (error) {
