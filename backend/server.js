@@ -11,6 +11,10 @@ app.use(cors({
   credentials: true
 }));
 
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
+
 app.use("/api/user/profile/photo", userRoutes);
 app.use(express.json());
 app.use(cookieParser());
