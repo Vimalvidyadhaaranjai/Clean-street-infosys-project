@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
-// Import icons from react-icons, including the new eye icons
-import { FiUser, FiMail, FiMapPin, FiLock, FiCamera, FiEdit3, FiSave, FiShield, FiX, FiEye, FiEyeOff } from "react-icons/fi";
+// Import icons from react-icons, including the new eye icons and arrow left
+import { FiUser, FiMail, FiMapPin, FiLock, FiCamera, FiEdit3, FiSave, FiShield, FiX, FiEye, FiEyeOff, FiArrowLeft } from "react-icons/fi";
 
 export default function Profilepage() {
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ export default function Profilepage() {
   };
 
   const getInitials = (name) => (name ? name.split(" ").map((n) => n[0]).join("").toUpperCase() : "U");
-  const handleChange = (e) => setForm((prev) => ({ ...prev, [name]: e.target.value }));
+  const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -124,7 +124,7 @@ export default function Profilepage() {
         method: "POST", 
         headers: { "Content-Type": "application/json" }, 
         credentials: "include", 
-        body: JSON.stringify({ // <-- Add JSON.stringify here
+        body: JSON.stringify({
           oldPassword: passwordForm.oldPassword, 
           newPassword: passwordForm.newPassword 
         })
@@ -146,6 +146,17 @@ export default function Profilepage() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
       <main className="flex-1 container mx-auto pt-24 px-4 sm:px-6 lg:px-8">
+        {/* Back to Dashboard Button */}
+        <div className="mb-6">
+          <button
+            onClick={() => navigate("/UserDashboard")}
+            className="flex items-center gap-2 px-4 py-2 text-[#0a2463] hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <FiArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Back to Dashboard</span>
+          </button>
+        </div>
+
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">Profile Settings</h1>
           <p className="text-gray-500 mt-1">Manage your personal and security details.</p>
