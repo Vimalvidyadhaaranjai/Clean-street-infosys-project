@@ -48,20 +48,16 @@ const Navbar = () => {
                     {user ? (
                         <div className="flex flex-col lg:flex-row items-start lg:items-center lg:gap-6">
                             <div className="w-full lg:w-auto border-b border-gray-300 lg:border-none">
-                                <Link to="/dashboard" className="block w-full px-6 py-3 lg:px-4 lg:py-2 text-gray-700 hover:bg-gray-300/50 lg:hover:bg-black lg:hover:text-white lg:rounded-md font-medium">
+                                <Link to="/UserDashboard" className="block w-full px-6 py-3 lg:px-4 lg:py-2 text-gray-700 hover:bg-gray-300/50 lg:hover:bg-black lg:hover:text-white lg:rounded-md font-medium">
                                     Dashboard
                                 </Link>
                             </div>
                             <div className="w-full lg:w-auto border-b border-gray-300 lg:border-none">
-                                <Link to="/report" className="block w-full px-6 py-3 lg:px-4 lg:py-2 text-gray-700 hover:bg-gray-300/50 lg:hover:bg-black lg:hover:text-white lg:rounded-md font-medium">
+                                <Link to="/ReportIssue" className="block w-full px-6 py-3 lg:px-4 lg:py-2 text-gray-700 hover:bg-gray-300/50 lg:hover:bg-black lg:hover:text-white lg:rounded-md font-medium">
                                     Report Issue
                                 </Link>
                             </div>
-                            <div className="w-full lg:w-auto border-b border-gray-300 lg:border-none">
-                                <Link to="/complaints" className="block w-full px-6 py-3 lg:px-4 lg:py-2 text-gray-700 hover:bg-gray-300/50 lg:hover:bg-black lg:hover:text-white lg:rounded-md font-medium">
-                                    View Complaints
-                                </Link>
-                            </div>
+
                             {/* Mobile profile options */}
                             <div className="lg:hidden w-full">
                                 <div className="w-full border-b border-gray-300">
