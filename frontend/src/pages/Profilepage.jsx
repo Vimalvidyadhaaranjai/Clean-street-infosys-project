@@ -13,7 +13,11 @@ export default function Profilepage() {
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
-  const [passwordForm, setPasswordForm] = useState({ oldPassword: "", newPassword: "", confirmPassword: "" });
+  const [passwordForm, setPasswordForm] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [isSubmittingPassword, setIsSubmittingPassword] = useState(false);
@@ -38,7 +42,13 @@ export default function Profilepage() {
   }, [navigate]);
 
   const getInitials = (name) =>
-    name ? name.split(" ").map((n) => n[0]).join("").toUpperCase() : "U";
+    name
+      ? name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+      : "U";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -146,21 +156,28 @@ export default function Profilepage() {
 
     setIsSubmittingPassword(true);
     try {
-      const res = await fetch("http://localhost:3002/api/user/profile/password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          oldPassword: passwordForm.oldPassword,
-          newPassword: passwordForm.newPassword,
-        }),
-      });
+      const res = await fetch(
+        "http://localhost:3002/api/user/profile/password",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            oldPassword: passwordForm.oldPassword,
+            newPassword: passwordForm.newPassword,
+          }),
+        }
+      );
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to update password");
 
       // Reset form and show success
-      setPasswordForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
+      setPasswordForm({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
       setIsChangingPassword(false);
       alert("Password updated successfully");
     } catch (e) {
@@ -183,10 +200,35 @@ export default function Profilepage() {
       <Navbar />
 
       <main className="flex-1 pt-24 px-4 sm:px-6 lg:px-10">
-        <div className="flex items-start justify-between gap-4">
+        <button
+          className="flex gap-1 text-gray-500 text-sm"
+           onClick={() => navigate("/UserDashboard")}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1"
+            stroke="currentColor"
+            class="size-6"
+            className="size-6 -translate-y-0.5"
+            
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h15"
+            />
+ 
+          </svg>
+         Back to dashboard
+        </button>
+        <div className="flex items-start justify-between gap-4 mt-5">
           <div>
             <h1 className="text-3xl sm:text-4xl font-bold mb-1">Profile</h1>
-            <p className="text-gray-600 mb-4 text-base sm:text-lg">Your account information</p>
+            <p className="text-gray-600 mb-4 text-base sm:text-lg">
+              Your account information
+            </p>
           </div>
           <div className="flex items-center gap-2">
             {!isEditing ? (
@@ -216,9 +258,7 @@ export default function Profilepage() {
             )}
           </div>
         </div>
-        {error && (
-          <p className="text-red-600 text-sm mt-2">{error}</p>
-        )}
+        {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Left: Avatar and summary */}
@@ -238,7 +278,9 @@ export default function Profilepage() {
               </div>
             )}
             <div className="w-full flex flex-col items-center gap-4 mt-2">
-              <label className="text-lg font-medium text-gray-700">Upload profile photo</label>
+              <label className="text-lg font-medium text-gray-700">
+                Upload profile photo
+              </label>
               <input
                 type="file"
                 accept="image/*"
@@ -252,9 +294,15 @@ export default function Profilepage() {
               >
                 Choose File
               </label>
-              <span className="text-gray-500 text-sm mt-2">{selectedFile?.name || 'No file chosen'}</span>
+              <span className="text-gray-500 text-sm mt-2">
+                {selectedFile?.name || "No file chosen"}
+              </span>
               {previewUrl && (
-                <img src={previewUrl} alt="preview" className="w-24 h-24 rounded-lg object-cover border" />
+                <img
+                  src={previewUrl}
+                  alt="preview"
+                  className="w-24 h-24 rounded-lg object-cover border"
+                />
               )}
               <button
                 className="px-6 py-2.5 rounded-full bg-[#0a2463] text-white hover:bg-[#081b4a] disabled:opacity-60 font-medium text-sm transition-colors duration-200 mt-4"
@@ -263,7 +311,9 @@ export default function Profilepage() {
               >
                 {uploading ? "Uploading..." : "Upload Photo"}
               </button>
-              <p className="text-sm text-gray-500 mt-3">Accepted: images (JPG, PNG). Max ~5MB.</p>
+              <p className="text-sm text-gray-500 mt-3">
+                Accepted: images (JPG, PNG). Max ~5MB.
+              </p>
             </div>
             <h2 className="text-2xl font-semibold">{user.name}</h2>
             <p className="text-gray-500 text-sm">{user.email}</p>
@@ -279,29 +329,39 @@ export default function Profilepage() {
               <h3 className="text-xl font-semibold mb-4">Account Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Full Name</label>
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Full Name
+                  </label>
                   <input
                     type="text"
                     name="name"
                     value={isEditing ? form.name : user.name}
                     onChange={isEditing ? handleChange : undefined}
                     readOnly={!isEditing}
-                    className={`w-full p-3 border rounded-md ${isEditing ? "bg-white" : "bg-gray-100"}`}
+                    className={`w-full p-3 border rounded-md ${
+                      isEditing ? "bg-white" : "bg-gray-100"
+                    }`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Email</label>
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Email
+                  </label>
                   <input
                     type="email"
                     name="email"
                     value={isEditing ? form.email : user.email}
                     onChange={isEditing ? handleChange : undefined}
                     readOnly={!isEditing}
-                    className={`w-full p-3 border rounded-md ${isEditing ? "bg-white" : "bg-gray-100"}`}
+                    className={`w-full p-3 border rounded-md ${
+                      isEditing ? "bg-white" : "bg-gray-100"
+                    }`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Role</label>
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Role
+                  </label>
                   <input
                     type="text"
                     value={user.role || "user"}
@@ -310,14 +370,18 @@ export default function Profilepage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Location</label>
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Location
+                  </label>
                   <input
                     type="text"
                     name="location"
                     value={isEditing ? form.location : user.location || ""}
                     onChange={isEditing ? handleChange : undefined}
                     readOnly={!isEditing}
-                    className={`w-full p-3 border rounded-md ${isEditing ? "bg-white" : "bg-gray-100"}`}
+                    className={`w-full p-3 border rounded-md ${
+                      isEditing ? "bg-white" : "bg-gray-100"
+                    }`}
                   />
                 </div>
               </div>
@@ -343,32 +407,53 @@ export default function Profilepage() {
                     <p className="text-red-600 text-sm">{passwordError}</p>
                   )}
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">Current Password</label>
+                    <label className="block text-sm text-gray-600 mb-1">
+                      Current Password
+                    </label>
                     <input
                       type="password"
                       value={passwordForm.oldPassword}
-                      onChange={(e) => setPasswordForm(prev => ({ ...prev, oldPassword: e.target.value }))}
+                      onChange={(e) =>
+                        setPasswordForm((prev) => ({
+                          ...prev,
+                          oldPassword: e.target.value,
+                        }))
+                      }
                       className="w-full p-3 border rounded-md"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">New Password</label>
+                    <label className="block text-sm text-gray-600 mb-1">
+                      New Password
+                    </label>
                     <input
                       type="password"
                       value={passwordForm.newPassword}
-                      onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                      onChange={(e) =>
+                        setPasswordForm((prev) => ({
+                          ...prev,
+                          newPassword: e.target.value,
+                        }))
+                      }
                       className="w-full p-3 border rounded-md"
                       required
                       minLength={6}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">Confirm New Password</label>
+                    <label className="block text-sm text-gray-600 mb-1">
+                      Confirm New Password
+                    </label>
                     <input
                       type="password"
                       value={passwordForm.confirmPassword}
-                      onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      onChange={(e) =>
+                        setPasswordForm((prev) => ({
+                          ...prev,
+                          confirmPassword: e.target.value,
+                        }))
+                      }
                       className="w-full p-3 border rounded-md"
                       required
                       minLength={6}

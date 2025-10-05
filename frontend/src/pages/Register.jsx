@@ -1,7 +1,10 @@
 import React,{useState} from "react";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
+import { useNavigate } from "react-router-dom";
+
 export default function Register() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
     location: "",
@@ -33,7 +36,7 @@ export default function Register() {
       localStorage.setItem("user", JSON.stringify(data.user)); // save user for navbar/avatar
     alert("Registration successful!");
 setTimeout(() => {
-  window.location.href = "/";
+  navigate("/UserDashboard")
 }, 500);
     } catch (err) {
       if (err.message && err.message.toLowerCase().includes("user already exists")) {
