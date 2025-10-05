@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
-
+import { useNavigate } from "react-router-dom";
 export default function Login() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -25,7 +26,7 @@ export default function Login() {
       localStorage.setItem("user", JSON.stringify(data.user)); // save user for navbar/avatar
       alert("Login successful!");
       setTimeout(() => {
-        window.location.href = "/";
+        navigate("/UserDashboard");
       }, 500);
     } catch (err) {
       setError(err.message);
