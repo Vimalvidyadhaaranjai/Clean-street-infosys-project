@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
+// Import icons from react-icons, including the new eye icons
+import { FiUser, FiMail, FiMapPin, FiLock, FiCamera, FiEdit3, FiSave, FiShield, FiX, FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function Profilepage() {
   const navigate = useNavigate();
@@ -21,6 +23,16 @@ export default function Profilepage() {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [isSubmittingPassword, setIsSubmittingPassword] = useState(false);
+  
+  // NEW: State to manage password visibility for each field
+  const [passwordVisibility, setPasswordVisibility] = useState({
+    current: false,
+    new: false,
+    confirm: false,
+  });
+
+  // State to manage the active tab ('personal' or 'security')
+  const [activeTab, setActiveTab] = useState("personal");
 
   useEffect(() => {
     try {
@@ -28,11 +40,8 @@ export default function Profilepage() {
       if (stored) {
         const parsed = JSON.parse(stored);
         setUser(parsed);
-        setForm({
-          name: parsed.name || "",
-          email: parsed.email || "",
-          location: parsed.location || "",
-        });
+        setForm({ name: parsed.name || "", email: parsed.email || "", location: parsed.location || "" });
+        setPreviewUrl(parsed.profilePhoto || "");
       } else {
         navigate("/login");
       }
@@ -41,28 +50,18 @@ export default function Profilepage() {
     }
   }, [navigate]);
 
-  const getInitials = (name) =>
-    name
-      ? name
-          .split(" ")
-          .map((n) => n[0])
-          .join("")
-          .toUpperCase()
-      : "U";
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
 
+  const getInitials = (name) => (name ? name.split(" ").map((n) => n[0]).join("").toUpperCase() : "U");
+  const handleChange = (e) => setForm((prev) => ({ ...prev, [name]: e.target.value }));
+ const togglePasswordVisibility = (field) => {
+    setPasswordVisibility(prev => ({ ...prev, [field]: !prev[field] }));
+ }
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
-    setSelectedFile(file || null);
     if (file) {
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-    } else {
-      setPreviewUrl("");
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
     }
   };
 
@@ -73,24 +72,22 @@ export default function Profilepage() {
     try {
       const formData = new FormData();
       formData.append("photo", selectedFile);
-
-      const res = await fetch("http://localhost:3002/api/user/profile/photo", {
-        method: "POST",
-        credentials: "include",
-        body: formData,
+      const res = await fetch("http://localhost:3002/api/user/profile/photo", { 
+        method: "POST", 
+        credentials: "include", 
+        body: formData 
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to upload photo");
-
-      const updated = { ...user, profilePhoto: data.profilePhoto };
-      setUser(updated);
-      localStorage.setItem("user", JSON.stringify(updated));
+      
+      // Use the returned user object
+      setUser(data.user);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      setPreviewUrl(data.user.profilePhoto);
       setSelectedFile(null);
-      setPreviewUrl("");
       alert("Profile photo updated");
     } catch (e) {
       setError(e.message);
-      alert(e.message);
     } finally {
       setUploading(false);
     }
@@ -100,42 +97,23 @@ export default function Profilepage() {
     setSaving(true);
     setError("");
     try {
-      const res = await fetch("http://localhost:3002/api/user/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(form),
-      });
+      const res = await fetch("http://localhost:3002/api/user/profile", { method: "PUT", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify(form) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to update profile");
-      // Update local user and storage
-      const updated = {
-        ...user,
-        name: data.name,
-        email: data.email,
-        location: data.location,
-        role: data.role,
-        profilePhoto: data.profilePhoto,
-      };
+      const updated = { ...user, ...data };
       setUser(updated);
       localStorage.setItem("user", JSON.stringify(updated));
       setIsEditing(false);
       alert("Profile updated successfully");
     } catch (e) {
       setError(e.message);
-      alert(e.message);
     } finally {
       setSaving(false);
     }
   };
 
   const handleCancel = () => {
-    // reset form to current user values
-    setForm({
-      name: user?.name || "",
-      email: user?.email || "",
-      location: user?.location || "",
-    });
+    setForm({ name: user?.name || "", email: user?.email || "", location: user?.location || "" });
     setIsEditing(false);
     setError("");
   };
@@ -143,17 +121,8 @@ export default function Profilepage() {
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     setPasswordError("");
-
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setPasswordError("New passwords don't match");
-      return;
-    }
-
-    if (passwordForm.newPassword.length < 6) {
-      setPasswordError("Password must be at least 6 characters long");
-      return;
-    }
-
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) return setPasswordError("New passwords don't match");
+    if (passwordForm.newPassword.length < 6) return setPasswordError("Password must be at least 6 characters long");
     setIsSubmittingPassword(true);
     try {
       const res = await fetch(
@@ -185,12 +154,6 @@ export default function Profilepage() {
     } finally {
       setIsSubmittingPassword(false);
     }
-  };
-
-  const handleCancelPassword = () => {
-    setIsChangingPassword(false);
-    setPasswordForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
-    setPasswordError("");
   };
 
   if (!user) return null;
@@ -315,11 +278,6 @@ export default function Profilepage() {
                 Accepted: images (JPG, PNG). Max ~5MB.
               </p>
             </div>
-            <h2 className="text-2xl font-semibold">{user.name}</h2>
-            <p className="text-gray-500 text-sm">{user.email}</p>
-            <span className="mt-3 bg-blue-100 text-blue-700 text-xs font-medium px-3 py-1 rounded-full capitalize">
-              {user.role || "user"}
-            </span>
           </div>
 
           {/* Right: Details */}
@@ -385,27 +343,9 @@ export default function Profilepage() {
                   />
                 </div>
               </div>
-            </div>
-
-            {/* Password Section */}
-            <div className="bg-white p-6 rounded-xl shadow-md">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold">Password</h3>
-                {!isChangingPassword && (
-                  <button
-                    className="px-4 py-2 rounded-md bg-[#0a2463] text-white hover:bg-[#081b4a]"
-                    onClick={() => setIsChangingPassword(true)}
-                  >
-                    Change Password
-                  </button>
-                )}
-              </div>
-
-              {isChangingPassword && (
-                <form onSubmit={handlePasswordChange} className="space-y-4">
-                  {passwordError && (
-                    <p className="text-red-600 text-sm">{passwordError}</p>
-                  )}
+              <div className="p-6">
+                {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+                {activeTab === "personal" && (
                   <div>
                     <label className="block text-sm text-gray-600 mb-1">
                       Current Password
@@ -441,6 +381,8 @@ export default function Profilepage() {
                       minLength={6}
                     />
                   </div>
+                )}
+                {activeTab === "security" && (
                   <div>
                     <label className="block text-sm text-gray-600 mb-1">
                       Confirm New Password
@@ -459,31 +401,38 @@ export default function Profilepage() {
                       minLength={6}
                     />
                   </div>
-                  <div className="flex gap-2 justify-end mt-4">
-                    <button
-                      type="button"
-                      onClick={handleCancelPassword}
-                      className="px-4 py-2 rounded-md border border-gray-300 bg-white hover:bg-gray-100"
-                      disabled={isSubmittingPassword}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 rounded-md bg-[#0a2463] text-white hover:bg-[#081b4a] disabled:opacity-60"
-                      disabled={isSubmittingPassword}
-                    >
-                      {isSubmittingPassword ? "Updating..." : "Update Password"}
-                    </button>
-                  </div>
-                </form>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );
 }
+
+// UPDATED: InputField component now handles password visibility toggling
+const InputField = ({ label, icon, name, value, onChange, isEditing, type = "text", readOnly = false, isVisible, onToggleVisibility }) => (
+  <div>
+    <label htmlFor={name} className="block text-sm font-medium text-gray-600 mb-1">{label}</label>
+    <div className="relative">
+      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">{icon}</span>
+      <input
+        type={type === 'password' && isVisible ? 'text' : type}
+        id={name}
+        name={name}
+        value={value || ""}
+        onChange={isEditing ? onChange : undefined}
+        readOnly={!isEditing || readOnly}
+        className={`w-full pl-10 pr-10 p-3 border rounded-md transition-colors ${isEditing && !readOnly ? "bg-white border-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500" : "bg-gray-100 border-gray-200 cursor-not-allowed"}`}
+        required={isEditing && name.includes('Password')}
+      />
+      {type === 'password' && (
+        <button type="button" onClick={onToggleVisibility} className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600">
+          {isVisible ? <FiEyeOff /> : <FiEye />}
+        </button>
+      )}
+    </div>
+  </div>
+);
