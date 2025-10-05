@@ -15,12 +15,7 @@ export default function Profilepage() {
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
-  const [passwordForm, setPasswordForm] = useState({
-    oldPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ oldPassword: "", newPassword: "", confirmPassword: "" });
   const [passwordError, setPasswordError] = useState("");
   const [isSubmittingPassword, setIsSubmittingPassword] = useState(false);
   
@@ -50,20 +45,13 @@ export default function Profilepage() {
     }
   }, [navigate]);
 
-  const getInitials = (name) =>
-    name
-      ? name
-          .split(" ")
-          .map((n) => n[0])
-          .join("")
-          .toUpperCase()
-      : "U";
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+  // NEW: Function to toggle password visibility
+  const togglePasswordVisibility = (field) => {
+    setPasswordVisibility(prev => ({ ...prev, [field]: !prev[field] }));
   };
 
+  const getInitials = (name) => (name ? name.split(" ").map((n) => n[0]).join("").toUpperCase() : "U");
+  const handleChange = (e) => setForm((prev) => ({ ...prev, [name]: e.target.value }));
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -132,29 +120,18 @@ export default function Profilepage() {
     if (passwordForm.newPassword.length < 6) return setPasswordError("Password must be at least 6 characters long");
     setIsSubmittingPassword(true);
     try {
-      const res = await fetch(
-        "http://localhost:3002/api/user/profile/password",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({
-            oldPassword: passwordForm.oldPassword,
-            newPassword: passwordForm.newPassword,
-          }),
-        }
-      );
-
+      const res = await fetch("http://localhost:3002/api/user/profile/password", { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" }, 
+        credentials: "include", 
+        body: JSON.stringify({ // <-- Add JSON.stringify here
+          oldPassword: passwordForm.oldPassword, 
+          newPassword: passwordForm.newPassword 
+        })
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to update password");
-
-      // Reset form and show success
-      setPasswordForm({
-        oldPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-      setIsChangingPassword(false);
+      setPasswordForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
       alert("Password updated successfully");
     } catch (e) {
       setPasswordError(e.message);
@@ -168,266 +145,64 @@ export default function Profilepage() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
-
-      <main className="flex-1 pt-24 px-4 sm:px-6 lg:px-10">
-        <button
-          className="flex gap-1 text-gray-500 text-sm"
-           onClick={() => navigate("/UserDashboard")}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1"
-            stroke="currentColor"
-            class="size-6"
-            className="size-6 -translate-y-0.5"
-            
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h15"
-            />
- 
-          </svg>
-         Back to dashboard
-        </button>
-        <div className="flex items-start justify-between gap-4 mt-5">
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-bold mb-1">Profile</h1>
-            <p className="text-gray-600 mb-4 text-base sm:text-lg">
-              Your account information
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            {!isEditing ? (
-              <button
-                className="px-4 py-2 rounded-md bg-[#0a2463] text-white hover:bg-[#081b4a]"
-                onClick={() => setIsEditing(true)}
-              >
-                Edit
-              </button>
-            ) : (
-              <>
-                <button
-                  className="px-4 py-2 rounded-md border border-gray-300 bg-white hover:bg-gray-100"
-                  onClick={handleCancel}
-                  disabled={saving}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="px-4 py-2 rounded-md bg-[#0a2463] text-white hover:bg-[#081b4a] disabled:opacity-60"
-                  onClick={handleSave}
-                  disabled={saving}
-                >
-                  {saving ? "Saving..." : "Save"}
-                </button>
-              </>
-            )}
-          </div>
+      <main className="flex-1 container mx-auto pt-24 px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">Profile Settings</h1>
+          <p className="text-gray-500 mt-1">Manage your personal and security details.</p>
         </div>
-        {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Left: Avatar and summary */}
-          <div className="bg-white p-8 rounded-xl shadow-md flex flex-col items-center text-center">
-            {user.profilePhoto ? (
-              <img
-                src={user.profilePhoto}
-                alt="avatar"
-                className="w-32 h-32 rounded-full object-cover mb-6"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                }}
-              />
-            ) : (
-              <div className="w-32 h-32 rounded-full bg-blue-100 flex items-center justify-center text-4xl font-bold text-blue-600 mb-6">
-                {getInitials(user.name)}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-1">
+            <div className="bg-white p-6 rounded-xl shadow-md text-center flex flex-col items-center">
+              <div className="relative mb-4">
+                {previewUrl ? <img src={previewUrl} alt="avatar" className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-sm" /> : <div className="w-32 h-32 rounded-full bg-blue-100 flex items-center justify-center text-4xl font-bold text-blue-600">{getInitials(user.name)}</div>}
+                <label htmlFor="profile-photo-input" className="absolute -bottom-2 -right-2 bg-[#0a2463] text-white p-2.5 rounded-full cursor-pointer hover:bg-[#081b4a] transition-colors">
+                  <FiCamera className="w-5 h-5" />
+                  <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" id="profile-photo-input" />
+                </label>
               </div>
-            )}
-            <div className="w-full flex flex-col items-center gap-4 mt-2">
-              <label className="text-lg font-medium text-gray-700">
-                Upload profile photo
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-                id="profile-photo-input"
-              />
-              <label
-                htmlFor="profile-photo-input"
-                className="inline-flex items-center px-6 py-2.5 bg-blue-50 text-blue-700 font-medium text-sm rounded-full hover:bg-blue-100 cursor-pointer transition-colors duration-200"
-              >
-                Choose File
-              </label>
-              <span className="text-gray-500 text-sm mt-2">
-                {selectedFile?.name || "No file chosen"}
-              </span>
-              {previewUrl && (
-                <img
-                  src={previewUrl}
-                  alt="preview"
-                  className="w-24 h-24 rounded-lg object-cover border"
-                />
-              )}
-              <button
-                className="px-6 py-2.5 rounded-full bg-[#0a2463] text-white hover:bg-[#081b4a] disabled:opacity-60 font-medium text-sm transition-colors duration-200 mt-4"
-                onClick={handleUploadPhoto}
-                disabled={!selectedFile || uploading}
-              >
-                {uploading ? "Uploading..." : "Upload Photo"}
-              </button>
-              <p className="text-sm text-gray-500 mt-3">
-                Accepted: images (JPG, PNG). Max ~5MB.
-              </p>
+              {selectedFile && <button onClick={handleUploadPhoto} disabled={uploading} className="mb-4 text-sm font-semibold text-blue-600 hover:underline disabled:opacity-50">{uploading ? "Uploading..." : `Upload ${selectedFile.name}`}</button>}
+              <h2 className="text-2xl font-semibold text-gray-800">{user.name}</h2>
+              <p className="text-gray-500 text-sm">{user.email}</p>
+              <span className="mt-3 bg-blue-100 text-blue-700 text-xs font-medium px-3 py-1 rounded-full capitalize">{user.role || "user"}</span>
             </div>
           </div>
-
-          {/* Right: Details */}
-          <div className="md:col-span-2">
-            {/* Account Details Section */}
-            <div className="bg-white p-6 rounded-xl shadow-md mb-6">
-              <h3 className="text-xl font-semibold mb-4">Account Details</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={isEditing ? form.name : user.name}
-                    onChange={isEditing ? handleChange : undefined}
-                    readOnly={!isEditing}
-                    className={`w-full p-3 border rounded-md ${
-                      isEditing ? "bg-white" : "bg-gray-100"
-                    }`}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={isEditing ? form.email : user.email}
-                    onChange={isEditing ? handleChange : undefined}
-                    readOnly={!isEditing}
-                    className={`w-full p-3 border rounded-md ${
-                      isEditing ? "bg-white" : "bg-gray-100"
-                    }`}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">
-                    Role
-                  </label>
-                  <input
-                    type="text"
-                    value={user.role || "user"}
-                    readOnly
-                    className="w-full p-3 border rounded-md bg-gray-100 capitalize"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">
-                    Location
-                  </label>
-                  <input
-                    type="text"
-                    name="location"
-                    value={isEditing ? form.location : user.location || ""}
-                    onChange={isEditing ? handleChange : undefined}
-                    readOnly={!isEditing}
-                    className={`w-full p-3 border rounded-md ${
-                      isEditing ? "bg-white" : "bg-gray-100"
-                    }`}
-                  />
-                </div>
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl shadow-md">
+              <div className="border-b border-gray-200">
+                <nav className="flex space-x-2 px-6">
+                  <button onClick={() => setActiveTab("personal")} className={`flex items-center gap-2 py-4 px-1 font-medium ${activeTab === "personal" ? "border-b-2 border-[#0a2463] text-[#0a2463]" : "text-gray-500 hover:text-gray-700"}`}><FiUser /> Personal Details</button>
+                  <button onClick={() => setActiveTab("security")} className={`flex items-center gap-2 py-4 px-1 font-medium ${activeTab === "security" ? "border-b-2 border-[#0a2463] text-[#0a2463]" : "text-gray-500 hover:text-gray-700"}`}><FiShield /> Security</button>
+                </nav>
               </div>
               <div className="p-6">
                 {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
                 {activeTab === "personal" && (
-                  <>
-                    <div>
-                      <label className="block text-sm text-gray-600 mb-1">
-                        Current Password
-                      </label>
-                      <input
-                        type="password"
-                        value={passwordForm.oldPassword}
-                        onChange={(e) =>
-                          setPasswordForm((prev) => ({
-                            ...prev,
-                            oldPassword: e.target.value,
-                          }))
-                        }
-                        className="w-full p-3 border rounded-md"
-                        required
-                      />
+                  <div>
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="text-xl font-semibold text-gray-800">Your Information</h3>
+                      {!isEditing ? <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 px-4 py-2 rounded-md bg-[#0a2463] text-white hover:bg-[#081b4a] transition-colors"><FiEdit3 /> Edit</button> : <div className="flex items-center gap-2"><button onClick={handleCancel} disabled={saving} className="flex items-center gap-2 px-4 py-2 rounded-md border border-gray-300 bg-white hover:bg-gray-100 transition-colors"><FiX /> Cancel</button><button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-60 transition-colors"><FiSave /> {saving ? "Saving..." : "Save"}</button></div>}
                     </div>
-                    <div>
-                      <label className="block text-sm text-gray-600 mb-1">
-                        New Password
-                      </label>
-                      <input
-                        type="password"
-                        value={passwordForm.newPassword}
-                        onChange={(e) =>
-                          setPasswordForm((prev) => ({
-                            ...prev,
-                            newPassword: e.target.value,
-                          }))
-                        }
-                        className="w-full p-3 border rounded-md"
-                        required
-                        minLength={6}
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <InputField label="Full Name" icon={<FiUser />} name="name" value={form.name} onChange={handleChange} isEditing={isEditing} />
+                      <InputField label="Email Address" icon={<FiMail />} name="email" value={form.email} onChange={handleChange} isEditing={isEditing} type="email" />
+                      <InputField label="Location" icon={<FiMapPin />} name="location" value={form.location} onChange={handleChange} isEditing={isEditing} />
+                      <InputField label="Role" icon={<FiUser />} name="role" value={user.role || 'user'} isEditing={false} readOnly />
                     </div>
-                  </>
+                  </div>
                 )}
                 {activeTab === "security" && (
                   <div>
-                    <div>
-                      <label className="block text-sm text-gray-600 mb-1">
-                        Confirm New Password
-                      </label>
-                      <input
-                        type="password"
-                        value={passwordForm.confirmPassword}
-                        onChange={(e) =>
-                          setPasswordForm((prev) => ({
-                            ...prev,
-                            confirmPassword: e.target.value,
-                          }))
-                        }
-                        className="w-full p-3 border rounded-md"
-                        required
-                        minLength={6}
-                      />
-                    </div>
-                    <div className="flex gap-2 justify-end mt-4">
-                      <button
-                        type="button"
-                        onClick={handleCancelPassword}
-                        className="px-4 py-2 rounded-md border border-gray-300 bg-white hover:bg-gray-100"
-                        disabled={isSubmittingPassword}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-4 py-2 rounded-md bg-[#0a2463] text-white hover:bg-[#081b4a] disabled:opacity-60"
-                        disabled={isSubmittingPassword}
-                      >
-                        {isSubmittingPassword ? "Updating..." : "Update Password"}
-                      </button>
-                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-6">Change Password</h3>
+                    {passwordError && <p className="text-red-500 text-sm mb-4">{passwordError}</p>}
+                    <form onSubmit={handlePasswordChange} className="space-y-4">
+                      {/* UPDATED: Pass visibility state and toggle function to password fields */}
+                      <InputField label="Current Password" icon={<FiLock />} name="oldPassword" value={passwordForm.oldPassword} onChange={(e) => setPasswordForm(prev => ({ ...prev, oldPassword: e.target.value }))} type="password" required isEditing isVisible={passwordVisibility.current} onToggleVisibility={() => togglePasswordVisibility('current')} />
+                      <InputField label="New Password" icon={<FiLock />} name="newPassword" value={passwordForm.newPassword} onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))} type="password" required isEditing isVisible={passwordVisibility.new} onToggleVisibility={() => togglePasswordVisibility('new')} />
+                      <InputField label="Confirm New Password" icon={<FiLock />} name="confirmPassword" value={passwordForm.confirmPassword} onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))} type="password" required isEditing isVisible={passwordVisibility.confirm} onToggleVisibility={() => togglePasswordVisibility('confirm')} />
+                      <div className="flex justify-end pt-2">
+                        <button type="submit" disabled={isSubmittingPassword} className="px-5 py-2.5 rounded-md bg-[#0a2463] text-white font-semibold hover:bg-[#081b4a] disabled:opacity-60 transition-colors">{isSubmittingPassword ? "Updating..." : "Update Password"}</button>
+                      </div>
+                    </form>
                   </div>
                 )}
               </div>
