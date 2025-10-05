@@ -55,20 +55,29 @@ export const updateProfilePhoto = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-          if (!req.file) {
+        
+        if (!req.file) {
             return res.status(400).json({ message: 'Please upload a file' });
         }
         
-       
-user.profilePhoto = req.file.path;
+        user.profilePhoto = req.file.path;
         await user.save();
 
         res.status(200).json({
             message: "Profile photo updated successfully",
-            profilePhoto: user.profilePhoto
+            profilePhoto: user.profilePhoto,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                location: user.location,
+                profilePhoto: user.profilePhoto,
+            }
         });
 
     } catch (error) {
+        console.error("Error updating profile photo:", error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
