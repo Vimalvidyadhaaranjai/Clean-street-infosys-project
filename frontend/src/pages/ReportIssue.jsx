@@ -59,12 +59,9 @@ const ReportIssue = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:3002/api/report/create", {
+      const res = await fetch("http://localhost:3002/api/complaints/create", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" }, credentials: "include",
         body: JSON.stringify({
           ...form,
           latitude: position.lat,
