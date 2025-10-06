@@ -51,7 +51,8 @@ export default function Profilepage() {
   };
 
   const getInitials = (name) => (name ? name.split(" ").map((n) => n[0]).join("").toUpperCase() : "U");
-  const handleChange = (e) => setForm((prev) => ({ ...prev, [name]: e.target.value }));
+  const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChangeLocation = (e) => setForm((prev) => ({ ...prev, location: e.target.value }));
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -185,7 +186,7 @@ export default function Profilepage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <InputField label="Full Name" icon={<FiUser />} name="name" value={form.name} onChange={handleChange} isEditing={isEditing} />
                       <InputField label="Email Address" icon={<FiMail />} name="email" value={form.email} onChange={handleChange} isEditing={isEditing} type="email" />
-                      <InputField label="Location" icon={<FiMapPin />} name="location" value={form.location} onChange={handleChange} isEditing={isEditing} />
+                      <InputField label="Location" icon={<FiMapPin />} name="location" value={form.location} onChange={handleChangeLocation} isEditing={isEditing} />
                       <InputField label="Role" icon={<FiUser />} name="role" value={user.role || 'user'} isEditing={false} readOnly />
                     </div>
                   </div>
