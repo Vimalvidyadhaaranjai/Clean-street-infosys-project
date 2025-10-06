@@ -40,13 +40,13 @@ const Navbar = () => {
     }, []);
 
     return (
-            <nav className="bg-gray-200/70 px-4 lg:px-20 w-full h-16 fixed top-0 z-50 backdrop-blur-2xl flex items-center justify-between">
+            <nav className="bg-gray-200/70 px-4 lg:px-20 w-full h-16 fixed top-0 z-50 backdrop-blur-2xl flex items-center justify-between gap-5">
                 <Link to="/" className="flex items-center h-full">
                     <img className="h-18 w-auto" src="/images/logo.png" alt="logo" />
                 </Link>
-                <div className={`lg:flex-1 lg:flex lg:items-center lg:justify-center ${isMenuOpen ? 'block' : 'hidden'} absolute top-16 left-0 w-full bg-gray-200/95 lg:static lg:bg-transparent lg:w-auto z-40`}>
+                <div className={`lg:flex-1 lg:flex lg:items-center lg:justify-end  ${isMenuOpen ? 'block' : 'hidden'} absolute top-16 left-0 w-full bg-gray-200/95 lg:static lg:bg-transparent lg:w-auto z-40`}>
                     {user ? (
-                        <div className="flex flex-col lg:flex-row items-start lg:items-center lg:gap-6">
+                        <div className="flex flex-col lg:flex-row items-start lg:items-center lg:gap-2">
                             <div className="w-full lg:w-auto border-b border-gray-300 lg:border-none">
                                 <Link to="/UserDashboard" className="block w-full px-6 py-3 lg:px-4 lg:py-2 text-gray-700 hover:bg-gray-300/50 lg:hover:bg-black lg:hover:text-white lg:rounded-md font-medium">
                                     Dashboard
@@ -94,7 +94,7 @@ const Navbar = () => {
                                     <img
                                         src={user.profilePhoto}
                                         alt="avatar"
-                                        className="w-10 h-10 rounded-full object-cover cursor-pointer"
+                                        className="w-10 h-10 rounded-full  object-cover cursor-pointer"
                                         onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                                         onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                     />
