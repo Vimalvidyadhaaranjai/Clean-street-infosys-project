@@ -117,9 +117,9 @@ const UserDashboard = () => {
                 {/* Card 1 */}
                 <div className="bg-white rounded-lg shadow p-4">
                   <img
-                    src="https://via.placeholder.com/150"
+                    src="images/pothole.jpeg"
                     alt="issue"
-                    className="rounded-lg mb-3"
+                    className="rounded-lg w-full mb-3"
                   />
                   <p>
                     <strong>Issue:</strong> Pothole on Main St
@@ -135,9 +135,9 @@ const UserDashboard = () => {
                 {/* Card 2 */}
                 <div className="bg-white rounded-lg shadow p-4">
                   <img
-                    src="https://via.placeholder.com/150"
+                    src="images/broken_light.jpeg"
                     alt="issue"
-                    className="rounded-lg mb-3"
+                    className="rounded-lg w-full mb-3"
                   />
                   <p>
                     <strong>Issue:</strong> Broken StreetLight
@@ -153,9 +153,9 @@ const UserDashboard = () => {
                 {/* Card 3 */}
                 <div className="bg-white rounded-lg shadow p-4">
                   <img
-                    src="https://via.placeholder.com/150"
+                    src="images/drinage.jpeg"
                     alt="issue"
-                    className="rounded-lg mb-3"
+                    className="rounded-lg w-full mb-3"
                   />
                   <p>
                     <strong>Issue:</strong> Drainage Recovery
