@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { useNavigate } from "react-router-dom";
+import { FaArrowLeft } from "react-icons/fa";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -21,6 +23,7 @@ const LocationMarker = ({ setPosition }) => {
 };
 
 const ReportIssue = () => {
+  const navigate = useNavigate();
   const [position, setPosition] = useState(null);
   const [form, setForm] = useState({
     title: "",
@@ -81,6 +84,7 @@ const ReportIssue = () => {
           description: "",
         });
         setPosition(null);
+         navigate("/UserDashboard");
       } else {
         alert(data.message || "Failed to submit report.");
       }
@@ -93,7 +97,15 @@ const ReportIssue = () => {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
       <Navbar />
-
+ <div className="fixed top-20 left-4 z-50">
+        <button
+          onClick={() => navigate("/UserDashboard")}
+          className="bg-white shadow-lg hover:shadow-xl text-gray-700 hover:text-blue-600 p-3 rounded-full transition-all duration-300 flex items-center justify-center group"
+          title="Back to Dashboard"
+        >
+          <FaArrowLeft className="text-lg group-hover:transform group-hover:-translate-x-1 transition-transform duration-300" />
+        </button>
+      </div>
       <div className="flex-grow pt-24 px-4 sm:px-8 lg:px-20">
         <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
           Report a Civic Issue
