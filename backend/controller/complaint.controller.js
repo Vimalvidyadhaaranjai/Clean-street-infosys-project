@@ -128,3 +128,85 @@ export const updateComplaint = async (req, res) => {
         res.status(500).json({ message: "Server error. Could not update the complaint." });
     }
 };
+/**
+ * @desc    Get user's complaints and stats
+ * @route   GET /api/complaints/my-reports
+ * @access  Private
+ */
+export const getUserComplaints = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    // Get all complaints for the user
+    const complaints = await Complaint.find({ user_id: userId })
+      .sort({ createdAt: -1 })
+      .populate('assigned_to', 'name email');
+
+    // Calculate statistics
+    const totalReports = complaints.length;
+    const resolvedReports = complaints.filter(c => c.status === 'resolved').length;
+    const pendingReports = complaints.filter(c => c.status === 'received').length;
+    const inProgressReports = complaints.filter(c => c.status === 'in_review').length;
+
+    // Get recent complaints (last 3)
+    const recentComplaints = complaints.slice(0, 3);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        complaints: recentComplaints,
+        stats: {
+          totalReports,
+          resolvedReports,
+          pendingReports,
+          inProgressReports
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error("Error fetching user complaints:", error);
+    res.status(500).json({ message: "Server error. Could not fetch reports." });
+  }
+};
+
+/**
+ * @desc    Get all complaints for the user (paginated)
+ * @route   GET /api/complaints/all
+ * @access  Private
+ */
+export const getAllUserComplaints = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const complaints = await Complaint.find({ user_id: userId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('assigned_to', 'name email');
+
+    const totalComplaints = await Complaint.countDocuments({ user_id: userId });
+    const totalPages = Math.ceil(totalComplaints / limit);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        complaints,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          totalComplaints,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error("Error fetching all user complaints:", error);
+    res.status(500).json({ message: "Server error. Could not fetch all reports." });
+  }
+};

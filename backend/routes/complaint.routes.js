@@ -1,5 +1,5 @@
 import express from "express";
-import { createComplaint, updateComplaint } from "../controller/complaint.controller.js";
+import { createComplaint, updateComplaint,getUserComplaints, getAllUserComplaints } from "../controller/complaint.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
@@ -17,5 +17,6 @@ router.post("/create", protect, createComplaint);
  * @access  Private (requires authentication)
  */
 router.patch("/:id", protect, updateComplaint);
-
+router.get("/my-reports", protect, getUserComplaints);
+router.get("/all", protect, getAllUserComplaints);
 export default router;
