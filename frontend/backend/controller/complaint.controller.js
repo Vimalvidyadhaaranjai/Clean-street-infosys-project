@@ -210,3 +210,28 @@ export const getAllUserComplaints = async (req, res) => {
     res.status(500).json({ message: "Server error. Could not fetch all reports." });
   }
 };
+/**
+ * @desc    Get complaint statistics (total, pending, completed)
+ * @route   GET /api/complaints/stats
+ * @access  Private/Admin (adjust as needed)
+ */
+export const getComplaintStats = async (req, res) => {
+  try {
+    const totalReports = await Complaint.countDocuments();
+    // Adjust status labels if your schema uses different ones
+    const totalPending = await Complaint.countDocuments({ status: { $in: ['received', 'in_review'] } });
+    const totalCompleted = await Complaint.countDocuments({ status: 'resolved' });
+
+    res.status(200).json({
+      success: true,
+      stats: {
+        totalReports,
+        totalPending,
+        totalCompleted
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching complaint stats:", error);
+    res.status(500).json({ message: "Server error. Could not fetch stats." });
+  }
+};

@@ -1,5 +1,5 @@
 import express from "express";
-import { createComplaint, updateComplaint,getUserComplaints, getAllUserComplaints } from "../controller/complaint.controller.js";
+import { createComplaint, updateComplaint, getUserComplaints, getAllUserComplaints, getComplaintStats } from "../controller/complaint.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
@@ -19,4 +19,6 @@ router.post("/create", protect, createComplaint);
 router.patch("/:id", protect, updateComplaint);
 router.get("/my-reports", protect, getUserComplaints);
 router.get("/all", protect, getAllUserComplaints);
+router.get("/stats", protect, getComplaintStats);
+
 export default router;
