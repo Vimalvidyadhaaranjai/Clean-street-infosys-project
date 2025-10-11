@@ -7,6 +7,7 @@ import Profilepage from "./pages/Profilepage";
 import UserDashboard from "./pages/UserDashboard";
 import ReportIssue from "./pages/ReportIssue";
 import Navbar from "./Components/Navbar";
+import ViewCompliaint from "./pages/ViewCompliaint";
 export default function App() {
   return (
     <>
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/profile" element={<Profilepage />} />   
         <Route path="/UserDashboard" element={<UserDashboard/>}/>
         <Route path="/ReportIssue" element={<ReportIssue/>}/>
+        <Route path="/ViewComplaints" element={<ViewCompliaint/>}/>
       </Routes>
     </Router>
     
