@@ -5,12 +5,21 @@ import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import complaintRoutes from "./routes/complaint.routes.js" // auth routes
 import cors from "cors";
+import path from 'path'; 
+import { fileURLToPath } from 'url'; 
 import cookieParser from 'cookie-parser';
+
+
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
 app.use(cors({
   origin: "http://localhost:5173", 
   credentials: true
 }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Middleware must be defined before routes
 app.use(express.json());

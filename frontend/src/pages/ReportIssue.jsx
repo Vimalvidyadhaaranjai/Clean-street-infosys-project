@@ -3,7 +3,7 @@ import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import { useNavigate } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaUpload, FaTimes } from "react-icons/fa"; // Added FaUpload and FaTimes
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -25,6 +25,7 @@ const LocationMarker = ({ setPosition }) => {
 const ReportIssue = () => {
   const navigate = useNavigate();
   const [position, setPosition] = useState(null);
+  const [photo, setPhoto] = useState(null); // State for the image file
   const [form, setForm] = useState({
     title: "",
     type: "",
@@ -52,6 +53,13 @@ const ReportIssue = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Handler for file input change
+  const handlePhotoChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setPhoto(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -59,17 +67,27 @@ const ReportIssue = () => {
       alert("Please select a location on the map.");
       return;
     }
+    
+    // Use FormData to send both form data and the image file
+    const formData = new FormData();
+    formData.append("title", form.title);
+    formData.append("type", form.type);
+    formData.append("priority", form.priority);
+    formData.append("address", form.address);
+    formData.append("landmark", form.landmark);
+    formData.append("description", form.description);
+    formData.append("latitude", position.lat);
+    formData.append("longitude", position.lng);
+    if (photo) {
+      formData.append("photo", photo); // Append the image file if it exists
+    }
 
     try {
-      const token = localStorage.getItem("token");
+      // The browser will automatically set the 'Content-Type' to 'multipart/form-data'
       const res = await fetch("http://localhost:3002/api/complaints/create", {
         method: "POST",
-        headers: { "Content-Type": "application/json" }, credentials: "include",
-        body: JSON.stringify({
-          ...form,
-          latitude: position.lat,
-          longitude: position.lng,
-        }),
+        credentials: "include",
+        body: formData, // Send formData instead of JSON
       });
 
       const data = await res.json();
@@ -84,7 +102,8 @@ const ReportIssue = () => {
           description: "",
         });
         setPosition(null);
-         navigate("/UserDashboard");
+        setPhoto(null); // Clear the photo state
+        navigate("/UserDashboard");
       } else {
         alert(data.message || "Failed to submit report.");
       }
@@ -97,7 +116,7 @@ const ReportIssue = () => {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
       <Navbar />
- <div className="fixed top-20 left-4 z-50">
+      <div className="fixed top-20 left-4 z-50">
         <button
           onClick={() => navigate("/UserDashboard")}
           className="bg-white shadow-lg hover:shadow-xl text-gray-700 hover:text-blue-600 p-3 rounded-full transition-all duration-300 flex items-center justify-center group"
@@ -120,6 +139,7 @@ const ReportIssue = () => {
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+            {/* ... Your existing input fields for title, type, priority, address ... */}
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
                 Issue Title
@@ -216,11 +236,62 @@ const ReportIssue = () => {
             ></textarea>
           </div>
 
+          {/* NEW: Image Upload Section */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-600 mb-2">
+              Upload an Image (Optional)
+            </label>
+            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+              <div className="space-y-1 text-center">
+                {photo ? (
+                  <div className="relative">
+                    <img
+                      src={URL.createObjectURL(photo)}
+                      alt="Preview"
+                      className="mx-auto h-40 w-auto rounded-lg object-cover"
+                    />
+                     <button
+                        type="button"
+                        onClick={() => setPhoto(null)}
+                        className="absolute top-0 right-0 m-1 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 focus:outline-none"
+                        title="Remove image"
+                      >
+                        <FaTimes className="h-3 w-3" />
+                      </button>
+                  </div>
+                ) : (
+                  <>
+                    <FaUpload className="mx-auto h-12 w-12 text-gray-400" />
+                    <div className="flex text-sm text-gray-600">
+                      <label
+                        htmlFor="file-upload"
+                        className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none"
+                      >
+                        <span>Upload a file</span>
+                        <input
+                          id="file-upload"
+                          name="file-upload"
+                          type="file"
+                          className="sr-only"
+                          accept="image/*"
+                          onChange={handlePhotoChange}
+                        />
+                      </label>
+                      <p className="pl-1">or drag and drop</p>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      PNG, JPG, GIF up to 10MB
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-600 mb-2">
               Location on Map
             </label>
-
             <div className="h-80 w-full rounded-lg overflow-hidden">
               {position ? (
                 <MapContainer
@@ -241,7 +312,6 @@ const ReportIssue = () => {
                 </p>
               )}
             </div>
-
             <p className="text-sm text-gray-500 mt-2">
               Click on the map to mark the exact location.
             </p>
@@ -255,7 +325,6 @@ const ReportIssue = () => {
           </button>
         </form>
       </div>
-
       <Footer />
     </div>
   );
