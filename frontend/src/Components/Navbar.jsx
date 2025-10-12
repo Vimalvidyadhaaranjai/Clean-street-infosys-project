@@ -42,7 +42,7 @@ const Navbar = () => {
     return (
             <nav className="bg-white/80 backdrop-blur-md px-4 lg:px-20 w-full h-20 fixed top-0 z-50 shadow-sm flex items-center justify-between gap-5 transition-all duration-300">
                 <Link to="/" className="flex items-center h-full">
-                    <img className="h-16 w-auto" src="/images/logo.png" alt="logo" />
+                    <img className="h-22 w-auto" src="/images/logo.png" alt="logo" />
                 </Link>
                 <div className={`lg:flex-1 lg:flex lg:items-center lg:justify-end  ${isMenuOpen ? 'block' : 'hidden'} absolute top-20 left-0 w-full bg-white/95 lg:static lg:bg-transparent lg:w-auto z-40 shadow-lg lg:shadow-none rounded-b-lg lg:rounded-none`}>
                     {user ? (
