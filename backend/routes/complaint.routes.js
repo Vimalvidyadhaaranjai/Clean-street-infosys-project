@@ -2,7 +2,7 @@
 
 import express from "express";
 import multer from 'multer'; // 1. Import multer
-import { createComplaint, updateComplaint, getUserComplaints, getAllUserComplaints, deleteComplaint } from "../controller/complaint.controller.js";
+import { createComplaint, updateComplaint, getUserComplaints, getAllUserComplaints, deleteComplaint} from "../controller/complaint.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
@@ -28,11 +28,14 @@ router.post("/create", protect, upload.single('photo'), createComplaint);
 router.patch("/:id", protect, updateComplaint);
 router.get("/my-reports", protect, getUserComplaints);
 router.get("/all", protect, getAllUserComplaints);
+
+// 2. ADD THIS NEW ROUTE FOR DELETING A COMPLAINT
 /**
  * @route   DELETE /api/complaints/:id
  * @desc    Delete a user's own complaint
  * @access  Private
  */
 router.delete("/:id", protect, deleteComplaint);
+
 
 export default router;

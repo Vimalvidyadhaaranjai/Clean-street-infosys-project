@@ -20,12 +20,12 @@ export const createComplaint = async (req, res) => {
       longitude,
     } = req.body;
 
-    // ADDED: Handle the uploaded file from multer
-    let photoUrl = null;
-    if (req.file) {
-      // Construct the full URL for the image
-      photoUrl = `http://localhost:3002/${req.file.path.replace(/\\/g, "/")}`;
-    }
+    // ADDED: Handle the uploaded file from multer
+    let photoUrl = null;
+    if (req.file) {
+      // Construct the full URL for the image
+      photoUrl = `http://localhost:3002/${req.file.path.replace(/\\/g, "/")}`;
+    }
 
     // Basic validation to ensure all required fields are present
     if (
@@ -46,7 +46,7 @@ export const createComplaint = async (req, res) => {
       address,
       landmark,
       description,
-      photo: photoUrl, // ADDED: Include the photo URL in the new complaint document
+      photo: photoUrl, // ADDED: Include the photo URL in the new complaint document
       location_coords: {
         type: "Point",
         // GeoJSON format requires [longitude, latitude]
@@ -156,13 +156,11 @@ export const getUserComplaints = async (req, res) => {
     const pendingReports = complaints.filter(c => c.status === 'received').length;
     const inProgressReports = complaints.filter(c => c.status === 'in_review').length;
 
-    // Get recent complaints (last 3)
-    const recentComplaints = complaints.slice(0, 3);
-
+    // This now returns ALL complaints, not just 3. The frontend will slice it.
     res.status(200).json({
       success: true,
       data: {
-        complaints: recentComplaints,
+        complaints: complaints, // Send all complaints
         stats: {
           totalReports,
           resolvedReports,
@@ -217,4 +215,43 @@ export const getAllUserComplaints = async (req, res) => {
     console.error("Error fetching all user complaints:", error);
     res.status(500).json({ message: "Server error. Could not fetch all reports." });
   }
+};
+
+
+/**
+ * @desc    Delete a complaint
+ * @route   DELETE /api/complaints/:id
+ * @access  Private
+ */
+export const deleteComplaint = async (req, res) => {
+  try {
+    const complaintId = req.params.id;
+    const userId = req.user._id;
+
+    // Check for a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(complaintId)) {
+      return res.status(400).json({ message: "Invalid complaint ID." });
+    }
+
+    const complaint = await Complaint.findById(complaintId);
+
+    // Check if the complaint exists
+    if (!complaint) {
+      return res.status(404).json({ message: "Complaint not found." });
+    }
+
+    // SECURITY CHECK: Ensure the user owns this complaint
+    if (complaint.user_id.toString() !== userId.toString()) {
+      return res.status(403).json({ message: "Forbidden: You are not authorized to delete this report." });
+    }
+
+    // If all checks pass, delete the complaint
+    await Complaint.findByIdAndDelete(complaintId);
+
+    res.status(200).json({ success: true, message: "Complaint deleted successfully." });
+
+  } catch (error) {
+    console.error("Error deleting complaint:", error);
+    res.status(500).json({ message: "Server error. Could not delete the complaint." });
+  }
 };

@@ -92,7 +92,7 @@ const ReportIssue = () => {
 
       const data = await res.json();
       if (res.ok) {
-        alert("✅ Report submitted successfully!");
+        alert(" Report submitted successfully!");
         setForm({
           title: "",
           type: "",
