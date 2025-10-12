@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Navbar from "../Components/Navbar";
-import Footer from "../Components/Footer";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { FiMail, FiLock, FiLogIn } from "react-icons/fi";
+
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -37,39 +37,38 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
-      {/* Navbar */}
-      <Navbar />
-      {/* Page Content */}
+    <div className="min-h-screen flex bg-gray-50">
+      {/* Left Column - Image and Welcome Text */}
+      <div className="hidden lg:flex w-1/2 bg-cover bg-center relative" style={{ backgroundImage: "url('/images/hero.png')" }}>
+        <div className="absolute inset-0 bg-blue-900 bg-opacity-70"></div>
+        <div className="relative z-10 flex flex-col justify-center items-center text-white p-12 text-center">
+          <img src="/images/logo.png" alt="Clean Street Logo" className="w-48 mb-6 animate-fade-in-down" />
+          <h1 className="text-4xl font-bold mb-4 animate-fade-in-up">Welcome Back!</h1>
+          <p className="text-lg animate-fade-in-up animation-delay-300">Let's continue our mission to create cleaner, better communities together.</p>
+        </div>
+      </div>
 
-      <main className="flex-1 flex flex-col items-center justify-center py-24 px-4">
-        <div className="w-full max-w-xl bg-white shadow-lg rounded-xl lg:p-16 p-8">
-          {/* Back link */}
-          <a href="/" className="text-sm text-gray-500 flex items-center mb-6">
-            ← Back to Home
-          </a>
+      {/* Right Column - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
+        <div className="w-full max-w-md">
+          <div className="text-center lg:text-left mb-10 animate-fade-in-down">
+            <h2 className="text-3xl font-bold text-gray-800">Sign In</h2>
+            <p className="text-gray-500 mt-2">Enter your credentials to access your account.</p>
+          </div>
 
-          {/* Welcome Text */}
-          <h2 className="text-center text-2xl font-bold text-[#0a2463] mb-2">
-            Welcome Back
-          </h2>
-          <p className="text-center text-gray-600 text-sm mb-8">
-            Sign in to your account to continue reporting issues
-          </p>
-
-          {/* Login Form */}
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            {/* Email */}
+          <form className="space-y-6 animate-fade-in-up" onSubmit={handleSubmit}>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email
               </label>
-              <div className="flex items-center border rounded-md px-3 py-2">
-                <span className="text-gray-400 mr-2">📧</span>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                  <FiMail />
+                </span>
                 <input
                   type="email"
-                  placeholder="Enter your Email"
-                  className="w-full outline-none text-gray-700 text-sm"
+                  placeholder="you@example.com"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -77,67 +76,49 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
-              <div className="flex items-center border rounded-md px-3 py-2">
-                <span className="text-gray-400 mr-2">🔒</span>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                  <FiLock />
+                </span>
                 <input
                   type="password"
-                  placeholder="Enter Your Password"
-                  className="w-full outline-none text-gray-700 text-sm"
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
               </div>
             </div>
-            {/* Error message */}
+
             {error && (
-              <p className="text-red-500 text-sm mb-2 text-center">{error}</p>
+              <p className="text-red-500 text-sm text-center">{error}</p>
             )}
-            {/* Login Button */}
+
             <button
               type="submit"
-              className="w-full bg-[#0a2463] text-white font-medium py-2 rounded-md shadow hover:bg-[#081b4a] transition"
+              className="w-full flex justify-center items-center gap-2 bg-blue-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50"
               disabled={loading}
             >
+              <FiLogIn />
               {loading ? "Logging in..." : "Login"}
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="flex items-center my-6">
-            <div className="flex-1 h-px bg-gray-300"></div>
-            <span className="px-2 text-gray-500 text-sm">Or With</span>
-            <div className="flex-1 h-px bg-gray-300"></div>
+          <div className="text-center mt-8 animate-fade-in-up animation-delay-300">
+            <p className="text-sm text-gray-600">
+              Don't have an account?{" "}
+              <Link to="/register" className="font-semibold text-blue-600 hover:underline">
+                Sign Up
+              </Link>
+            </p>
           </div>
-
-          {/* Google Login */}
-          <button className="w-full flex items-center justify-center border border-gray-300 rounded-md py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-            <img
-              src="https://www.svgrepo.com/show/355037/google.svg"
-              alt="Google"
-              className="w-5 h-5 mr-2"
-            />
-            Login with Google
-          </button>
-
-          {/* Sign Up Link */}
-          <p className="text-center text-sm text-gray-600 mt-6">
-            Don't have an account?{" "}
-            <a
-              href="/register"
-              className="text-[#0a2463] font-medium hover:underline"
-            >
-              Sign Up
-            </a>
-          </p>
         </div>
-      </main>
-      <Footer />
+      </div>
     </div>
   );
 }

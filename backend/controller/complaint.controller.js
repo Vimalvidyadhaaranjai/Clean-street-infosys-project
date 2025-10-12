@@ -255,3 +255,23 @@ export const deleteComplaint = async (req, res) => {
     res.status(500).json({ message: "Server error. Could not delete the complaint." });
   }
 };
+/**
+ * @desc    Get all complaints for the community view
+ * @route   GET /api/complaints/community
+ * @access  Public
+ */
+export const getCommunityComplaints = async (req, res) => {
+  try {
+    const complaints = await Complaint.find({})
+      .sort({ createdAt: -1 })
+      .populate('user_id', 'name'); // Gets the name of the user who reported
+
+    res.status(200).json({
+      success: true,
+      data: complaints,
+    });
+  } catch (error) {
+    console.error("Error fetching community complaints:", error);
+    res.status(500).json({ message: "Server error. Could not fetch reports." });
+  }
+};

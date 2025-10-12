@@ -1,7 +1,6 @@
-import React,{useState} from "react";
-import Navbar from "../Components/Navbar";
-import Footer from "../Components/Footer";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { FiUser, FiMail, FiMapPin, FiLock, FiBriefcase } from "react-icons/fi";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -33,178 +32,103 @@ export default function Register() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Registration failed");
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user)); // save user for navbar/avatar
-    alert("Registration successful!");
-setTimeout(() => {
-  navigate("/UserDashboard")
-}, 500);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      alert("Registration successful!");
+      setTimeout(() => {
+        navigate("/UserDashboard")
+      }, 500);
     } catch (err) {
       if (err.message && err.message.toLowerCase().includes("user already exists")) {
-      alert("User already exists!");
+        alert("User already exists!");
       }
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
+
   return (
-    <div className="min-h-screen  flex flex-col bg-gray-100">
-      {/* Navbar */}
-      <Navbar/>
+    <div className="min-h-screen flex bg-gray-50">
+      {/* Left Column - Image and Welcome Text */}
+      <div className="hidden lg:flex w-1/2 bg-cover bg-center relative" style={{ backgroundImage: "url('/images/hero.png')" }}>
+        <div className="absolute inset-0 bg-blue-900 bg-opacity-70"></div>
+        <div className="relative z-10 flex flex-col justify-center items-center text-white p-12 text-center">
+          <img src="/images/logo.png" alt="Clean Street Logo" className="w-48 mb-6 animate-fade-in-down" />
+          <h1 className="text-4xl font-bold mb-4 animate-fade-in-up">Join the Movement</h1>
+          <p className="text-lg animate-fade-in-up animation-delay-300">Create an account to start making a real difference in your community.</p>
+        </div>
+      </div>
 
-      {/* Page Content */}
-      <main className="flex-1 flex flex-col items-center justify-center py-24 px-4">
-        <div className="w-full max-w-xl bg-white shadow-lg rounded-xl lg:p-16 p-8">
-          {/* Back link */}
-          <a href="/" className="text-sm text-gray-700 flex items-center mb-6">
-            ← Back to Home
-          </a>
+      {/* Right Column - Registration Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
+        <div className="w-full max-w-md">
+          <div className="text-center lg:text-left mb-10 animate-fade-in-down">
+            <h2 className="text-3xl font-bold text-gray-800">Create an Account</h2>
+            <p className="text-gray-500 mt-2">It's quick and easy to get started.</p>
+          </div>
 
-          {/* Title */}
-          <h2 className="text-center text-2xl font-bold text-[#0a2463] mb-2">
-            Join cleanStreet
-          </h2>
-          <p className="text-center text-gray-700 text-sm mb-8">
-            Create your account to start making difference
-          </p>
-
-          {/* Register Form */}
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            {/* Full Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name
-              </label>
-              <div className="flex items-center border rounded-md px-3 py-2">
-                <span className="text-gray-400 mr-2">👤</span>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Enter your Full Name"
-                  className="w-full outline-none text-gray-700 text-sm"
-                    value={form.name}
-        onChange={handleChange}
-        required
-                />
+          <form className="space-y-5 animate-fade-in-up" onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><FiUser /></span>
+                  <input type="text" name="name" placeholder="John Doe" className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" value={form.name} onChange={handleChange} required />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><FiMapPin /></span>
+                  <input type="text" name="location" placeholder="Your City" className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" value={form.location} onChange={handleChange} required />
+                </div>
               </div>
             </div>
 
-            {/* Location */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Location
-              </label>
-              <div className="flex items-center border rounded-md px-3 py-2">
-                <span className="text-gray-400 mr-2">📍</span>
-                <input
-                  type="text"
-                  name="location"
-                  placeholder="Enter your City or Area"
-                  className="w-full outline-none text-gray-700 text-sm"
-                   value={form.location}
-        onChange={handleChange}
-        required
-                />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><FiBriefcase /></span>
+                <select name="role" className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none" value={form.role} onChange={handleChange} required>
+                  <option value="">Select your Role</option>
+                  <option value="user">User</option>
+                  <option value="volunteer">Volunteer</option>
+                  <option value="admin">Admin</option>
+                </select>
               </div>
             </div>
 
-            {/* Role */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Role
-              </label>
-              <div className="flex items-center border rounded-md px-3 py-2">
-                <span className="text-gray-400 mr-2">💼</span>
-                <select 
-                name="role"
-                className="w-full outline-none text-gray-700 text-sm bg-transparent" value={form.role}
-        onChange={handleChange}
-        required
-      >
-        <option value="">Select your Role</option>
-        <option value="user">User</option>
-        <option value="volunteer">Volunteer</option>
-        <option value="admin">Admin</option>
-      </select>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><FiMail /></span>
+                <input type="email" name="email" placeholder="you@example.com" className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" value={form.email} onChange={handleChange} required />
               </div>
             </div>
 
-            {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <div className="flex items-center border rounded-md px-3 py-2">
-                <span className="text-gray-400 mr-2">📧</span>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Enter your Email"
-                  className="w-full outline-none text-gray-700 text-sm"
-                  value={form.email}
-        onChange={handleChange}
-        required
-                />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><FiLock /></span>
+                <input type="password" name="password" placeholder="••••••••" className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" value={form.password} onChange={handleChange} required />
               </div>
             </div>
 
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <div className="flex items-center border rounded-md px-3 py-2">
-                <span className="text-gray-400 mr-2">🔒</span>
-                <input
-                  type="password"
-                  name="password" 
-                  placeholder="Enter your Password"
-                  className="w-full outline-none text-gray-700 text-sm"
-                  value={form.password}
-        onChange={handleChange}
-        required
-                />
-              </div>
-            </div>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              className="w-full bg-[#0a2463] text-white font-medium py-2 rounded-md shadow hover:bg-[#081b4a] transition"
-              disabled={loading}
-            >
-               {loading ? "Signing up..." : "Sign Up"}
+            <button type="submit" className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50" disabled={loading}>
+              {loading ? "Creating Account..." : "Sign Up"}
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="flex items-center my-6">
-            <div className="flex-1 h-px bg-gray-300"></div>
-            <span className="px-2 text-gray-500 text-sm">Or With</span>
-            <div className="flex-1 h-px bg-gray-300"></div>
+          <div className="text-center mt-8 animate-fade-in-up animation-delay-300">
+            <p className="text-sm text-gray-600">
+              Already have an account?{" "}
+              <Link to="/login" className="font-semibold text-blue-600 hover:underline">
+                Login
+              </Link>
+            </p>
           </div>
-
-          {/* Google Signup */}
-          <button className="w-full flex items-center justify-center border border-gray-300 rounded-md py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-            <img
-              src="https://www.svgrepo.com/show/355037/google.svg"
-              alt="Google"
-              className="w-5 h-5 mr-2"
-            />
-            Sign Up with Google
-          </button>
-
-          {/* Footer */}
-          <p className="text-center text-sm text-gray-600 mt-6">
-  Already have an account?{" "}
-  <a href="/login" className="text-[#0a2463] font-medium hover:underline">
-    Login
-  </a>
-</p>
-
         </div>
-      </main>
-      <Footer/>
+      </div>
     </div>
   );
 }

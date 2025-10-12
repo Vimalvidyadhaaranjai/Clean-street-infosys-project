@@ -2,7 +2,7 @@
 
 import express from "express";
 import multer from 'multer'; // 1. Import multer
-import { createComplaint, updateComplaint, getUserComplaints, getAllUserComplaints, deleteComplaint} from "../controller/complaint.controller.js";
+import { createComplaint, updateComplaint, getUserComplaints, getAllUserComplaints, deleteComplaint, getCommunityComplaints} from "../controller/complaint.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
@@ -36,6 +36,16 @@ router.get("/all", protect, getAllUserComplaints);
  * @access  Private
  */
 router.delete("/:id", protect, deleteComplaint);
+
+// ... (keep all your existing routes)
+
+/**
+ * @route   GET /api/complaints/community
+ * @desc    Get all complaints for public view
+ * @access  Public
+ */
+// ADD THIS NEW LINE AT THE END OF THE FILE
+router.get("/community", getCommunityComplaints);
 
 
 export default router;
