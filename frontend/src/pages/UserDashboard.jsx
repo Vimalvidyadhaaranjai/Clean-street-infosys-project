@@ -10,6 +10,7 @@ import {
   FaTrash,
   FaPlus,
 } from "react-icons/fa";
+import Footer from "../Components/Footer";
 
 const UserDashboard = () => {
   const navigate = useNavigate();
@@ -199,6 +200,7 @@ const UserDashboard = () => {
           </div>
         )}
       </main>
+      <Footer/>
     </div>
   );
 };

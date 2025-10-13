@@ -39,10 +39,12 @@ export default function Login() {
   return (
     <div className="min-h-screen flex bg-gray-50">
       {/* Left Column - Image and Welcome Text */}
-      <div className="hidden lg:flex w-1/2 bg-cover bg-center relative" style={{ backgroundImage: "url('/images/hero.png')" }}>
-        <div className="absolute inset-0 bg-blue-900 bg-opacity-70"></div>
+      <div className="hidden lg:flex w-1/2 bg-cover bg-center  relative" style={{ backgroundImage: "url('/images/hero.png')" }}>
+        <div className="absolute inset-0 bg-blue-900/10"></div>
         <div className="relative z-10 flex flex-col justify-center items-center text-white p-12 text-center">
-          <img src="/images/logo.png" alt="Clean Street Logo" className="w-48 mb-6 animate-fade-in-down" />
+          <Link to="/" className="flex ">
+            <img src="/images/white_logo.png" alt="Clean Street Logo" className="w-72 mb-4 animate-fade-in-down" />
+          </Link>
           <h1 className="text-4xl font-bold mb-4 animate-fade-in-up">Welcome Back!</h1>
           <p className="text-lg animate-fade-in-up animation-delay-300">Let's continue our mission to create cleaner, better communities together.</p>
         </div>
