@@ -20,11 +20,8 @@ const ViewComplaints = () => {
         if (res.ok && data.success) {
           setComplaints(data.data);
         } else if (res.status === 401) {
-          // If the user is not authorized, you can handle it here
-          // For now, we'll just show the error
           throw new Error("You must be logged in to view complaints.");
-        } 
-        else {
+        } else {
           throw new Error(data.message || "Failed to fetch complaints");
         }
       } catch (err) {
@@ -65,9 +62,9 @@ const ViewComplaints = () => {
         </div>
         
         {error ? (
-           <div className="text-center bg-red-50 text-red-700 rounded-xl shadow-md p-12">
-             <p className="text-lg">{error}</p>
-           </div>
+          <div className="text-center bg-red-50 text-red-700 rounded-xl shadow-md p-12">
+            <p className="text-lg">{error}</p>
+          </div>
         ) : (
           <div className="space-y-6">
             {complaints.length > 0 ? (
@@ -97,50 +94,50 @@ const ViewComplaints = () => {
 };
 
 const ComplaintCard = ({ complaint, onClick }) => {
-    const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' });
-    
-    const getStatusBadge = (status) => {
-        const styles = {
-          received: "bg-yellow-100 text-yellow-800",
-          in_review: "bg-blue-100 text-blue-800",
-          resolved: "bg-green-100 text-green-800",
-          rejected: "bg-red-100 text-red-800",
-        };
-        const labels = {
-          received: "Pending", in_review: "In Review", resolved: "Resolved", rejected: "Rejected",
-        };
-        return <span className={`px-3 py-1 text-sm font-semibold rounded-full ${styles[status]}`}>{labels[status] || 'Unknown'}</span>;
+  const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' });
+  
+  const getStatusBadge = (status) => {
+    const styles = {
+      received: "bg-yellow-100 text-yellow-800",
+      in_review: "bg-blue-100 text-blue-800",
+      resolved: "bg-green-100 text-green-800",
+      rejected: "bg-red-100 text-red-800",
     };
+    const labels = {
+      received: "Pending", in_review: "In Review", resolved: "Resolved", rejected: "Rejected",
+    };
+    return <span className={`px-3 py-1 text-sm font-semibold rounded-full ${styles[status]}`}>{labels[status] || 'Unknown'}</span>;
+  };
 
-    return (
-      <div
-        className="bg-white rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] animate-fade-in-up cursor-pointer"
-        onClick={onClick}
-      >
-        <div className="flex flex-col sm:flex-row items-start gap-6">
-          {complaint.photo && (
-            <img src={complaint.photo} alt={complaint.title} className="w-full sm:w-48 h-40 object-cover rounded-lg" />
-          )}
-          <div className="flex-1">
-              <div className="flex items-center gap-4 mb-3">
-                  {getStatusBadge(complaint.status)}
-                  <p className="text-sm text-gray-500">{formatDate(complaint.createdAt)}</p>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">{complaint.title}</h2>
-              <p className="text-gray-600 mb-4 line-clamp-2">{complaint.description}</p>
-              <div className="flex items-center text-sm text-gray-500">
-                  <FaMapMarkerAlt className="mr-2" />
-                  <span>{complaint.address}</span>
-              </div>
-          </div>
-          <div className="w-full sm:w-auto flex flex-row sm:flex-col items-center justify-start sm:justify-center mt-4 sm:mt-0">
-              <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-semibold transition-colors">
-                  <FaRegComment /> 0
-              </button>
-          </div>
+  return (
+    <div
+      className="bg-white rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] animate-fade-in-up cursor-pointer"
+      onClick={onClick}
+    >
+      <div className="flex flex-col sm:flex-row items-start gap-6">
+        {complaint.photo && (
+          <img src={complaint.photo} alt={complaint.title} className="w-full sm:w-48 h-40 object-cover rounded-lg" />
+        )}
+        <div className="flex-1">
+            <div className="flex items-center gap-4 mb-3">
+                {getStatusBadge(complaint.status)}
+                <p className="text-sm text-gray-500">{formatDate(complaint.createdAt)}</p>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">{complaint.title}</h2>
+            <p className="text-gray-600 mb-4 line-clamp-2">{complaint.description}</p>
+            <div className="flex items-center text-sm text-gray-500">
+                <FaMapMarkerAlt className="mr-2" />
+                <span>{complaint.address}</span>
+            </div>
+        </div>
+        <div className="w-full sm:w-auto flex flex-row sm:flex-col items-center justify-start sm:justify-center mt-4 sm:mt-0">
+            <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-semibold transition-colors">
+                <FaRegComment /> 0
+            </button>
         </div>
       </div>
-    );
+    </div>
+  );
 };
 
 export default ViewComplaints;
