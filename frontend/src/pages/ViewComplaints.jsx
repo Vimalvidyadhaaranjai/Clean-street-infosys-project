@@ -104,7 +104,7 @@ const ComplaintCard = ({ complaint }) => {
               </div>
 
 
-            <img className="w-96" src={complaint.photo} alt="" />
+            <img className="w-1/2 rounded-lg h-full" src={complaint.photo} alt="" />
           </div>
         </div>
         <div className="w-full sm:w-auto flex flex-row sm:flex-col items-center justify-between mt-4 sm:mt-0">
