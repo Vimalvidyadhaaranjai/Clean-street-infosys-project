@@ -13,11 +13,18 @@ const ViewComplaints = () => {
   useEffect(() => {
     const fetchComplaints = async () => {
       try {
-        const res = await fetch("http://localhost:3002/api/complaints/community");
+        const res = await fetch("http://localhost:3002/api/complaints/community", {
+          credentials: 'include' // Add this if you protected the route
+        });
         const data = await res.json();
         if (res.ok && data.success) {
           setComplaints(data.data);
-        } else {
+        } else if (res.status === 401) {
+          // If the user is not authorized, you can handle it here
+          // For now, we'll just show the error
+          throw new Error("You must be logged in to view complaints.");
+        } 
+        else {
           throw new Error(data.message || "Failed to fetch complaints");
         }
       } catch (err) {
@@ -48,14 +55,6 @@ const ViewComplaints = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="bg-gray-50 flex justify-center items-center min-h-screen">
-        <p className="text-red-500 text-lg">{error}</p>
-      </div>
-    );
-  }
-
   return (
     <div className="bg-gray-50 min-h-screen">
       <Navbar />
@@ -64,22 +63,29 @@ const ViewComplaints = () => {
           <h1 className="text-4xl font-bold text-gray-800">Community Reports</h1>
           <p className="text-gray-500 mt-2">Browse issues reported by the community and track their status.</p>
         </div>
+        
+        {error ? (
+           <div className="text-center bg-red-50 text-red-700 rounded-xl shadow-md p-12">
+             <p className="text-lg">{error}</p>
+           </div>
+        ) : (
+          <div className="space-y-6">
+            {complaints.length > 0 ? (
+              complaints.map((complaint) => (
+                <ComplaintCard
+                  key={complaint._id}
+                  complaint={complaint}
+                  onClick={() => handleComplaintClick(complaint)}
+                />
+              ))
+            ) : (
+              <div className="text-center bg-white rounded-xl shadow-md p-12">
+                <p className="text-gray-500 text-lg">No community reports have been filed yet.</p>
+              </div>
+            )}
+          </div>
+        )}
 
-        <div className="space-y-6">
-          {complaints.length > 0 ? (
-            complaints.map((complaint) => (
-              <ComplaintCard
-                key={complaint._id}
-                complaint={complaint}
-                onClick={() => handleComplaintClick(complaint)}
-              />
-            ))
-          ) : (
-            <div className="text-center bg-white rounded-xl shadow-md p-12">
-              <p className="text-gray-500 text-lg">No community reports have been filed yet.</p>
-            </div>
-          )}
-        </div>
       </main>
       <Footer />
       <ComplaintModal
@@ -90,7 +96,6 @@ const ViewComplaints = () => {
   );
 };
 
-<<<<<<< HEAD
 const ComplaintCard = ({ complaint, onClick }) => {
     const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' });
     
@@ -108,79 +113,34 @@ const ComplaintCard = ({ complaint, onClick }) => {
     };
 
     return (
-        <div
+      <div
         className="bg-white rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] animate-fade-in-up cursor-pointer"
         onClick={onClick}
       >
-            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                {complaint.photo && (
-                <img src={complaint.photo} alt={complaint.title} className="w-full sm:w-48 h-auto object-cover rounded-lg" />
-                )}
-                <div className="flex-1">
-                    <div className="flex items-center gap-4 mb-3">
-                        {getStatusBadge(complaint.status)}
-                        <p className="text-sm text-gray-500">{formatDate(complaint.createdAt)}</p>
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">{complaint.title}</h2>
-                    <p className="text-gray-600 mb-4">{complaint.description}</p>
-                    <div className="flex items-center text-sm text-gray-500">
-                        <FaMapMarkerAlt className="mr-2" />
-                        <span>{complaint.address}</span>
-                    </div>
-                </div>
-                <div className="w-full sm:w-auto flex flex-row sm:flex-col items-center justify-between mt-4 sm:mt-0">
-                    <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-semibold transition-colors">
-                        <FaRegComment /> 0 Comments
-                    </button>
-                    {/* Voting can be added here later */}
-                </div>
-            </div>
-=======
-const ComplaintCard = ({ complaint }) => {
-  const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' });
-
-  const getStatusBadge = (status) => {
-    const styles = {
-      received: "bg-yellow-100 text-yellow-800",
-      in_review: "bg-blue-100 text-blue-800",
-      resolved: "bg-green-100 text-green-800",
-      rejected: "bg-red-100 text-red-800",
-    };
-    const labels = {
-      received: "Pending", in_review: "In Review", resolved: "Resolved", rejected: "Rejected",
-    };
-    return <span className={`px-3 py-1 text-sm font-semibold rounded-full ${styles[status]}`}>{labels[status] || 'Unknown'}</span>;
-  };
-
-  return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] animate-fade-in-up">
-      <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-        <div className="flex-1">
-          <div className="flex items-center gap-4 mb-3">
-            {getStatusBadge(complaint.status)}
-            <p className="text-sm text-gray-500">{formatDate(complaint.createdAt)}</p>
-          </div>
-            <div className="flex">
-              <div className="flex-col w-full">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">{complaint.title}</h2>
-          <p className="text-gray-600 mb-4">{complaint.description}</p>
-          <p className="text-sm text-gray-500 font-semibold">{complaint.address}</p>
+        <div className="flex flex-col sm:flex-row items-start gap-6">
+          {complaint.photo && (
+            <img src={complaint.photo} alt={complaint.title} className="w-full sm:w-48 h-40 object-cover rounded-lg" />
+          )}
+          <div className="flex-1">
+              <div className="flex items-center gap-4 mb-3">
+                  {getStatusBadge(complaint.status)}
+                  <p className="text-sm text-gray-500">{formatDate(complaint.createdAt)}</p>
               </div>
-
-
-            <img className="w-1/2 rounded-lg h-full" src={complaint.photo} alt="" />
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">{complaint.title}</h2>
+              <p className="text-gray-600 mb-4 line-clamp-2">{complaint.description}</p>
+              <div className="flex items-center text-sm text-gray-500">
+                  <FaMapMarkerAlt className="mr-2" />
+                  <span>{complaint.address}</span>
+              </div>
           </div>
->>>>>>> ef8a9b6ea4d6b40a3b46ecce899d80a10aedc11f
-        </div>
-        <div className="w-full sm:w-auto flex flex-row sm:flex-col items-center justify-between mt-4 sm:mt-0">
-          {/* <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-semibold transition-colors">
-            <FaRegComment /> 0 Comments
-          </button> */}
-          {/* Voting can be added here later */}
+          <div className="w-full sm:w-auto flex flex-row sm:flex-col items-center justify-start sm:justify-center mt-4 sm:mt-0">
+              <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-semibold transition-colors">
+                  <FaRegComment /> 0
+              </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
 };
 
 export default ViewComplaints;
