@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react'
-import { Link } from "react-router-dom";
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState, useRef } from 'react';
+import { Link, useNavigate } from "react-router-dom";
+import { FiGrid, FiFilePlus, FiEye, FiUser, FiLogOut } from "react-icons/fi"; // Using FiEye for consistency
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -9,11 +9,25 @@ const Navbar = () => {
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
     const profileMenuRef = useRef(null);
 
+    // Get user from localStorage on initial load
     useEffect(() => {
         try {
             const stored = localStorage.getItem("user");
             if (stored) setUser(JSON.parse(stored));
-        } catch { }
+        } catch (error) {
+            console.error("Failed to parse user from localStorage", error);
+        }
+    }, []);
+
+    // Close profile menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+                setIsProfileMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     const handleLogout = () => {
@@ -21,149 +35,150 @@ const Navbar = () => {
         localStorage.removeItem("user");
         setUser(null);
         setIsProfileMenuOpen(false);
+        setIsMenuOpen(false); // Close mobile menu on logout
         navigate('/login');
+    };
+    
+    // Function to close mobile menu
+    const closeMobileMenu = () => {
+        setIsMenuOpen(false);
     };
 
     const initial = user?.name ? user.name.trim().charAt(0).toUpperCase() : 'U';
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
-                setIsProfileMenuOpen(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
     return (
-            <nav className="bg-white/80 backdrop-blur-md px-4 lg:px-20 w-full h-20 fixed top-0 z-50 shadow-sm flex items-center justify-between gap-5 transition-all duration-300">
-                <Link to="/" className="flex items-center h-full">
-                    <img className="h-22 w-auto" src="/images/logo.png" alt="logo" />
-                </Link>
-                <div className={`lg:flex-1 lg:flex lg:items-center lg:justify-end  ${isMenuOpen ? 'block' : 'hidden'} absolute top-20 left-0 w-full bg-white/95 lg:static lg:bg-transparent lg:w-auto z-40 shadow-lg lg:shadow-none rounded-b-lg lg:rounded-none`}>
-                    {user ? (
-                        <div className="flex flex-col lg:flex-row items-start lg:items-center lg:gap-2 p-4 lg:p-0">
-                            <div className="w-full lg:w-auto">
-                                <Link to="/UserDashboard" className="block w-full px-6 py-3 lg:px-4 lg:py-2 text-gray-800 hover:bg-gray-100 lg:hover:bg-transparent lg:hover:text-blue-600 font-semibold transition-colors duration-300 rounded-md">
-                                    Dashboard
-                                </Link>
-                            </div>
-                            <div className="w-full lg:w-auto">
-                                <Link to="/ReportIssue" className="block w-full px-6 py-3 lg:px-4 lg:py-2 text-gray-800 hover:bg-gray-100 lg:hover:bg-transparent lg:hover:text-blue-600 font-semibold transition-colors duration-300 rounded-md">
-                                    Report Issue
-                                </Link>
-                            </div>
-                            <div className="w-full lg:w-auto">
-                                <Link to="/view-complaints" className="block w-full px-6 py-3 lg:px-4 lg:py-2 text-gray-800 hover:bg-gray-100 lg:hover:bg-transparent lg:hover:text-blue-600 font-semibold transition-colors duration-300 rounded-md">
-                                    View Complaints
-                                </Link>
-                            </div>
-                            
+        <>
+            {/* Main Navbar */}
+            <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg shadow-sm">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-20">
+                        
+                        {/* Logo */}
+                        <Link to="/" onClick={closeMobileMenu} className="flex-shrink-0">
+                            <img className="h-16 w-auto" src="/images/logo.png" alt="Clean Street Logo" />
+                        </Link>
 
-                            {/* Mobile profile options */}
-                            <div className="lg:hidden w-full pt-4 mt-4 border-t border-gray-200">
-                                <div className="w-full">
-                                    <Link to="/profile" className="block w-full px-6 py-3 text-gray-800 hover:bg-gray-100 font-semibold transition-colors duration-300 rounded-md">
-                                        Profile
-                                    </Link>
-                                </div>
-                                <div className="w-full">
-                                    <button
-                                        onClick={handleLogout}
-                                        className="block w-full px-6 py-3 text-red-500 hover:bg-red-50 font-semibold text-left transition-colors duration-300 rounded-md"
-                                    >
-                                        Logout
-                                    </button>
-                                </div>
-                            </div>
+                        {/* Desktop Navigation Links */}
+                        <div className="hidden lg:flex items-center space-x-2">
+                            {user && (
+                                <>
+                                    <NavLink to="/UserDashboard"><FiGrid /><span>Dashboard</span></NavLink>
+                                    <NavLink to="/ReportIssue"><FiFilePlus /><span>Report Issue</span></NavLink>
+                                    <NavLink to="/view-complaints"><FiEye /><span>View Complaints</span></NavLink>
+                                </>
+                            )}
                         </div>
-                    ) : null}
-                </div>
-                <div className="lg:flex items-center gap-4 relative">
-                    {/* Hamburger Menu Button */}
-                    <button
-                        className="lg:hidden p-2 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 flex flex-col justify-center items-center w-10 h-10"
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    >
-                        <span className={`block w-6 h-0.5 bg-gray-700 transition-transform duration-300 ${isMenuOpen ? 'transform rotate-45 translate-y-1.5' : ''}`}></span>
-                        <span className={`block w-6 h-0.5 bg-gray-700 my-1 transition-opacity duration-300 ${isMenuOpen ? 'opacity-0' : ''}`}></span>
-                        <span className={`block w-6 h-0.5 bg-gray-700 transition-transform duration-300 ${isMenuOpen ? 'transform -rotate-45 -translate-y-1.5' : ''}`}></span>
-                    </button>
-                    {user ? (
-                        <>
-                            <div className="relative hidden lg:block" ref={profileMenuRef}>
-                                {user.profilePhoto ? (
-                                    <img
-                                        src={user.profilePhoto}
-                                        alt="avatar"
-                                        className="w-12 h-12 rounded-full object-cover cursor-pointer border-2 border-transparent hover:border-blue-500 transition-all duration-300"
-                                        onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                    />
-                                ) : (
-                                    <div
-                                        className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center text-lg uppercase cursor-pointer font-bold hover:bg-blue-700 transition-colors duration-300"
-                                        onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                                    >
-                                        {initial}
-                                    </div>
-                                )}
 
-                                {/* Profile Dropdown Menu */}
-                                {isProfileMenuOpen && (
-                                    <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-200 animate-fade-in-down">
-                                        <div className="px-4 py-2 text-sm font-semibold text-gray-800 border-b border-gray-200 mb-2">
-                                            {user.name || 'User Profile'}
+                        {/* Right side: Auth buttons or User Profile */}
+                        <div className="flex items-center gap-4">
+                            {user ? (
+                                <div className="relative" ref={profileMenuRef}>
+                                    <button onClick={() => setIsProfileMenuOpen(prev => !prev)} className="flex items-center rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        {user.profilePhoto ? (
+                                            <img src={user.profilePhoto} alt="avatar" className="w-11 h-11 rounded-full object-cover"/>
+                                        ) : (
+                                            <div className="w-11 h-11 rounded-full bg-blue-600 text-white flex items-center justify-center text-lg uppercase font-bold">
+                                                {initial}
+                                            </div>
+                                        )}
+                                    </button>
+
+                                    {/* Profile Dropdown Menu */}
+                                    {isProfileMenuOpen && (
+                                        <div className="absolute right-0 mt-3 w-60 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-200 transform transition-all duration-150 ease-out origin-top-right">
+                                            <div className="px-4 py-3 border-b border-gray-200">
+                                                <p className="font-bold text-gray-800 truncate">{user.name}</p>
+                                                <p className="text-sm text-gray-500 truncate">{user.email}</p>
+                                            </div>
+                                            <div className="py-1">
+                                                <ProfileMenuItem to="/profile" icon={<FiUser />} onClick={() => setIsProfileMenuOpen(false)}>My Profile</ProfileMenuItem>
+                                                <ProfileMenuItem icon={<FiLogOut />} onClick={handleLogout} isLogout>Logout</ProfileMenuItem>
+                                            </div>
                                         </div>
-                                        <button
-                                            onClick={() => {
-                                                navigate('/profile');
-                                                setIsProfileMenuOpen(false);
-                                            }}
-                                            className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center gap-3 transition-colors duration-200"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                                            </svg>
-                                            Profile
-                                        </button>
-                                        <button
-                                            onClick={handleLogout}
-                                            className="w-full text-left px-4 py-2 text-red-500 hover:bg-red-50 flex items-center gap-3 transition-colors duration-200"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7z" clipRule="evenodd" />
-                                                <path d="M8.293 7.293a1 1 0 011.414 0L11 8.586V7a1 1 0 112 0v4a1 1 0 11-2 0V9.414l-1.293 1.293a1 1 0 01-1.414-1.414l3-3z" />
-                                            </svg>
-                                            Logout
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        </>
-                    ) : (
-                        <>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="hidden lg:flex items-center gap-2">
+                                    <AuthButton to="/login" secondary>Login</AuthButton>
+                                    <AuthButton to="/register">Register</AuthButton>
+                                </div>
+                            )}
+
+                            {/* Hamburger Menu Button (visible on mobile) */}
                             <button
-                                className="border border-blue-600 px-4 py-2 text-sm sm:px-5 sm:py-2.5 sm:text-base rounded-full font-semibold text-blue-600 bg-white hover:bg-blue-50 transform transition-transform duration-300 hover:scale-105"
-                                onClick={() => navigate('/login')}
+                                className="lg:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none"
+                                onClick={() => setIsMenuOpen(prev => !prev)}
+                                aria-label="Toggle menu"
                             >
-                                Login
+                                <div className={`w-6 h-0.5 bg-current transition-transform duration-300 ease-in-out ${isMenuOpen ? 'rotate-45 translate-y-[5px]' : ''}`} />
+                                <div className={`w-6 h-0.5 bg-current my-1.5 transition-opacity duration-300 ${isMenuOpen ? 'opacity-0' : 'opacity-100'}`} />
+                                <div className={`w-6 h-0.5 bg-current transition-transform duration-300 ease-in-out ${isMenuOpen ? '-rotate-45 -translate-y-[5px]' : ''}`} />
                             </button>
-                            <button
-                                className="bg-blue-600 text-white px-4 py-2 text-sm sm:px-5 sm:py-2.5 sm:text-base rounded-full font-semibold hover:bg-blue-700 transform transition-transform duration-300 hover:scale-105"
-                                onClick={() => navigate('/register')}
-                            >
-                                Register
-                            </button>
-                        </>
-                    )}
+                        </div>
+                    </div>
                 </div>
             </nav>
-    )
-}
 
-export default Navbar
+            {/* Mobile Navigation Menu Panel (slides from top) */}
+            <div className={`fixed top-20 left-0 right-0 z-40 bg-white shadow-md lg:hidden transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-y-0' : '-translate-y-full'}`}>
+                <div className="px-2 pt-2 pb-4 space-y-1 sm:px-3">
+                    {user ? (
+                        <>
+                            <MobileNavLink to="/UserDashboard" onClick={closeMobileMenu}><FiGrid /><span>Dashboard</span></MobileNavLink>
+                            <MobileNavLink to="/ReportIssue" onClick={closeMobileMenu}><FiFilePlus /><span>Report Issue</span></MobileNavLink>
+                            <MobileNavLink to="/view-complaints" onClick={closeMobileMenu}><FiEye /><span>View Complaints</span></MobileNavLink>
+                        </>
+                    ) : (
+                        <div className="flex items-center justify-center gap-4 py-4">
+                           <AuthButton to="/login" onClick={closeMobileMenu} secondary>Login</AuthButton>
+                           <AuthButton to="/register" onClick={closeMobileMenu}>Register</AuthButton>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </>
+    );
+};
+
+// --- Reusable Sub-components for a Cleaner and More Maintainable Navbar ---
+
+const NavLink = ({ to, children }) => (
+    <Link to={to} className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600 font-semibold rounded-lg transition-colors duration-200">
+        {children}
+    </Link>
+);
+
+const MobileNavLink = ({ to, children, onClick }) => (
+    <Link to={to} onClick={onClick} className="flex items-center gap-3 px-3 py-3 text-base font-semibold text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200">
+        {children}
+    </Link>
+);
+
+const AuthButton = ({ to, children, secondary = false, onClick }) => (
+    <Link
+        to={to}
+        onClick={onClick}
+        className={`px-5 py-2.5 rounded-full font-semibold text-sm transition-transform duration-200 transform hover:scale-105
+            ${secondary 
+                ? 'bg-gray-100 text-gray-800 hover:bg-gray-200' 
+                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-md'
+            }`
+        }
+    >
+        {children}
+    </Link>
+);
+
+const ProfileMenuItem = ({ to, icon, children, onClick, isLogout = false }) => {
+    const className = `w-full text-left px-4 py-2.5 flex items-center gap-3 transition-colors duration-200 text-sm ${
+        isLogout ? 'font-semibold text-red-600 hover:bg-red-50' : 'font-medium text-gray-700 hover:bg-gray-100'
+    }`;
+    
+    return to ? (
+        <Link to={to} className={className} onClick={onClick}>{icon}{children}</Link>
+    ) : (
+        <button className={className} onClick={onClick}>{icon}{children}</button>
+    );
+};
+
+export default Navbar;

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
-import { FaRegComment, FaSpinner } from "react-icons/fa";
+import ComplaintModal from "../Components/ComplaintModal";
+import { FaRegComment, FaSpinner, FaMapMarkerAlt } from "react-icons/fa";
 
 const ViewComplaints = () => {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
 
   useEffect(() => {
     const fetchComplaints = async () => {
@@ -26,6 +28,14 @@ const ViewComplaints = () => {
     };
     fetchComplaints();
   }, []);
+
+  const handleComplaintClick = (complaint) => {
+    setSelectedComplaint(complaint);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedComplaint(null);
+  };
 
   if (loading) {
     return (
@@ -58,7 +68,11 @@ const ViewComplaints = () => {
         <div className="space-y-6">
           {complaints.length > 0 ? (
             complaints.map((complaint) => (
-              <ComplaintCard key={complaint._id} complaint={complaint} />
+              <ComplaintCard
+                key={complaint._id}
+                complaint={complaint}
+                onClick={() => handleComplaintClick(complaint)}
+              />
             ))
           ) : (
             <div className="text-center bg-white rounded-xl shadow-md p-12">
@@ -68,11 +82,15 @@ const ViewComplaints = () => {
         </div>
       </main>
       <Footer />
+      <ComplaintModal
+        complaint={selectedComplaint}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };
 
-const ComplaintCard = ({ complaint }) => {
+const ComplaintCard = ({ complaint, onClick }) => {
     const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' });
     
     const getStatusBadge = (status) => {
@@ -89,8 +107,14 @@ const ComplaintCard = ({ complaint }) => {
     };
 
     return (
-        <div className="bg-white rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] animate-fade-in-up">
+        <div
+        className="bg-white rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] animate-fade-in-up cursor-pointer"
+        onClick={onClick}
+      >
             <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                {complaint.photo && (
+                <img src={complaint.photo} alt={complaint.title} className="w-full sm:w-48 h-auto object-cover rounded-lg" />
+                )}
                 <div className="flex-1">
                     <div className="flex items-center gap-4 mb-3">
                         {getStatusBadge(complaint.status)}
@@ -98,7 +122,10 @@ const ComplaintCard = ({ complaint }) => {
                     </div>
                     <h2 className="text-2xl font-bold text-gray-800 mb-2">{complaint.title}</h2>
                     <p className="text-gray-600 mb-4">{complaint.description}</p>
-                    <p className="text-sm text-gray-500 font-semibold">{complaint.address}</p>
+                    <div className="flex items-center text-sm text-gray-500">
+                        <FaMapMarkerAlt className="mr-2" />
+                        <span>{complaint.address}</span>
+                    </div>
                 </div>
                 <div className="w-full sm:w-auto flex flex-row sm:flex-col items-center justify-between mt-4 sm:mt-0">
                     <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-semibold transition-colors">
