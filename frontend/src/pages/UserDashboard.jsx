@@ -9,6 +9,7 @@ import {
   FaArrowLeft,
   FaTrash,
   FaPlus,
+  FaMapMarkerAlt,
 } from "react-icons/fa";
 import Footer from "../Components/Footer";
 
@@ -216,22 +217,27 @@ const StatCard = ({ icon, value, label }) => (
 );
 
 const ReportCard = ({ complaint, formatDate, getStatusBadge, handleDelete }) => (
-  <div className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col">
-    {complaint.photo && (
-      <img src={complaint.photo} alt={complaint.title} className="w-full h-40 object-cover" />
-    )}
-    <div className="p-5 flex flex-col flex-grow">
-      <div className="flex justify-between items-start mb-2">
-        {getStatusBadge(complaint.status)}
-        <button onClick={() => handleDelete(complaint._id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors" title="Delete Report">
-          <FaTrash />
-        </button>
+    <div className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col">
+      {complaint.photo && (
+        <img src={complaint.photo} alt={complaint.title} className="w-full h-40 object-cover" />
+      )}
+      <div className="p-5 flex flex-col flex-grow">
+        <div className="flex justify-between items-start mb-2">
+          {getStatusBadge(complaint.status)}
+          <button onClick={() => handleDelete(complaint._id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors" title="Delete Report">
+            <FaTrash />
+          </button>
+        </div>
+        <h3 className="font-bold text-lg text-gray-800 mb-2 line-clamp-2 flex-grow">{complaint.title}</h3>
+        <p className="text-sm text-gray-500 mb-1 line-clamp-1"><span className="font-semibold">Type:</span> {complaint.type}</p>
+        <p className="text-sm text-gray-500"><span className="font-semibold">Reported:</span> {formatDate(complaint.createdAt)}</p>
+        <div className="flex items-center text-sm text-gray-500 mt-2">
+          <FaMapMarkerAlt className="mr-2" />
+          <span>{complaint.address}</span>
+        </div>
       </div>
-      <h3 className="font-bold text-lg text-gray-800 mb-2 line-clamp-2 flex-grow">{complaint.title}</h3>
-      <p className="text-sm text-gray-500 mb-1 line-clamp-1"><span className="font-semibold">Type:</span> {complaint.type}</p>
-      <p className="text-sm text-gray-500"><span className="font-semibold">Reported:</span> {formatDate(complaint.createdAt)}</p>
     </div>
-  </div>
-);
+  );
+  
 
 export default UserDashboard;
