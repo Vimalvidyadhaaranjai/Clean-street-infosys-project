@@ -6,7 +6,7 @@ import LandingPage from "./pages/LandingPage";
 import Profilepage from "./pages/Profilepage";
 import UserDashboard from "./pages/UserDashboard";
 import ReportIssue from "./pages/ReportIssue";
-import ViewComplaints from "./pages/ViewComplaints";
+import ViewComplaint from "./pages/ViewComplaint";
 import Navbar from "./Components/Navbar";
 
 export default function App() {
@@ -21,7 +21,7 @@ export default function App() {
         <Route path="/profile" element={<Profilepage />} />   
         <Route path="/UserDashboard" element={<UserDashboard/>}/>
         <Route path="/ReportIssue" element={<ReportIssue/>}/>
-         <Route path="/view-complaints" element={<ViewComplaints />} />
+         <Route path="/view-complaints" element={<ViewComplaint />} />
       </Routes>
     </Router>
     
