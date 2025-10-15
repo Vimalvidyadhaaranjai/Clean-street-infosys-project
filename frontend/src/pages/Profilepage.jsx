@@ -127,9 +127,9 @@ export default function Profilepage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
-      <main className="container mx-auto pt-28 pb-12 px-4 sm:px-6 lg:px-8">
+      <main className="container mx-auto pt-28 pb-12 px-4 sm:px-6 lg:px-8 flex-grow">
         <div className="mb-10 animate-fade-in-down">
           <h1 className="text-4xl font-bold text-gray-800">Account Settings</h1>
           <p className="text-gray-500 mt-1">Manage your personal information and security settings.</p>

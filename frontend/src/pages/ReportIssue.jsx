@@ -73,22 +73,20 @@ const ReportIssue = () => {
       }
     } catch (error) {
       console.error(error);
-      alert("Error submitting report.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col">
       <Navbar />
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12 flex-grow">
         <div className="relative mb-8">
             <button
                 onClick={() => navigate("/UserDashboard")}
                 className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-semibold transition-colors animate-fade-in-down"
             >
-                <FaArrowLeft />
                 Back to Dashboard
             </button>
         </div>

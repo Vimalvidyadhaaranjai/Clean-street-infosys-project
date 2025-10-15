@@ -193,9 +193,9 @@ const VolunteerDashboard = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen flex flex-col">
       <Navbar />
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12 flex-grow">
         <div className="animate-fade-in-up">
           <header className="mb-10">
             <h1 className="text-4xl font-bold text-gray-800">
