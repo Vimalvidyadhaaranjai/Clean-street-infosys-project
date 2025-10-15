@@ -52,7 +52,6 @@ const Navbar = () => {
             <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg shadow-sm">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-20">
-                        
                         {/* Logo */}
                         <Link to="/" onClick={closeMobileMenu} className="flex-shrink-0">
                             <img className="h-16 w-auto" src="/images/logo.png" alt="Clean Street Logo" />
@@ -63,6 +62,9 @@ const Navbar = () => {
                             {user && (
                                 <>
                                     <NavLink to="/UserDashboard"><FiGrid /><span>Dashboard</span></NavLink>
+                                    {user.role === "volunteer" && (
+                                        <NavLink to="/VolunteerDashboard"><FiGrid /><span>Volunteer Dashboard</span></NavLink>
+                                    )}
                                     <NavLink to="/ReportIssue"><FiFilePlus /><span>Report Issue</span></NavLink>
                                     <NavLink to="/view-complaints"><FiEye /><span>View Complaints</span></NavLink>
                                 </>
@@ -125,6 +127,9 @@ const Navbar = () => {
                     {user ? (
                         <>
                             <MobileNavLink to="/UserDashboard" onClick={closeMobileMenu}><FiGrid /><span>Dashboard</span></MobileNavLink>
+                            {user.role === "volunteer" && (
+                                <MobileNavLink to="/VolunteerDashboard" onClick={closeMobileMenu}><FiGrid /><span>Volunteer Dashboard</span></MobileNavLink>
+                            )}
                             <MobileNavLink to="/ReportIssue" onClick={closeMobileMenu}><FiFilePlus /><span>Report Issue</span></MobileNavLink>
                             <MobileNavLink to="/view-complaints" onClick={closeMobileMenu}><FiEye /><span>View Complaints</span></MobileNavLink>
                         </>

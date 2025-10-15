@@ -116,7 +116,7 @@ const ComplaintCard = ({ complaint, onClick }) => {
     >
       <div className="flex flex-col sm:flex-row items-start gap-6">
         {complaint.photo && (
-          <img src={complaint.photo} alt={complaint.title} className="w-full sm:w-48 h-40 object-cover rounded-lg" />
+          <img src={complaint.photo} alt={complaint.title} className="w-full sm:w-64 h-70  object-contain rounded-lg" />
         )}
         <div className="flex-1">
             <div className="flex items-center gap-4 mb-3">
