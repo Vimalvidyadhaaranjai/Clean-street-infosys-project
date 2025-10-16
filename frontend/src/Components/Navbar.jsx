@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FiGrid, FiFilePlus, FiEye, FiUser, FiLogOut } from "react-icons/fi"; // Using FiEye for consistency
 
 const Navbar = () => {
@@ -147,17 +147,48 @@ const Navbar = () => {
 
 // --- Reusable Sub-components for a Cleaner and More Maintainable Navbar ---
 
-const NavLink = ({ to, children }) => (
-    <Link to={to} className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600 font-semibold rounded-lg transition-colors duration-200">
-        {children}
-    </Link>
-);
+const NavLink = ({ to, children }) => {
+    const location = useLocation();
+    const isActive = location.pathname === to;
+    
+    return (
+        <Link 
+            to={to} 
+            className={`flex items-center gap-2 px-4 py-2 font-semibold rounded-lg transition-colors duration-200 relative ${
+                isActive 
+                    ? 'text-blue-600 bg-blue-50' 
+                    : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'
+            }`}
+        >
+            {children}
+            {isActive && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></span>
+            )}
+        </Link>
+    );
+};
 
-const MobileNavLink = ({ to, children, onClick }) => (
-    <Link to={to} onClick={onClick} className="flex items-center gap-3 px-3 py-3 text-base font-semibold text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200">
-        {children}
-    </Link>
-);
+const MobileNavLink = ({ to, children, onClick }) => {
+    const location = useLocation();
+    const isActive = location.pathname === to;
+    
+    return (
+        <Link 
+            to={to} 
+            onClick={onClick} 
+            className={`flex items-center gap-3 px-3 py-3 text-base font-semibold rounded-md transition-colors duration-200 relative ${
+                isActive 
+                    ? 'text-blue-600 bg-blue-50' 
+                    : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+            }`}
+        >
+            {children}
+            {isActive && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></span>
+            )}
+        </Link>
+    );
+};
 
 const AuthButton = ({ to, children, secondary = false, onClick }) => (
     <Link
