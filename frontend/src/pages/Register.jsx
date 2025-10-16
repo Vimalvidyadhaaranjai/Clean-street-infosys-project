@@ -35,13 +35,16 @@ export default function Register() {
       localStorage.setItem("user", JSON.stringify(data.user));
       alert("Registration successful!");
       setTimeout(() => {
-        navigate("/UserDashboard")
+        if (data.user.role === "volunteer") {
+          navigate("/VolunteerDashboard");
+        } else {
+          navigate("/UserDashboard");
+        }
       }, 500);
     } catch (err) {
       if (err.message && err.message.toLowerCase().includes("user already exists")) {
         alert("User already exists!");
       }
-      setError(err.message);
     } finally {
       setLoading(false);
     }

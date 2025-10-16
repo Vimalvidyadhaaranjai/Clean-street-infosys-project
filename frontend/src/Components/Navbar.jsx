@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FiGrid, FiFilePlus, FiEye, FiUser, FiLogOut } from "react-icons/fi"; // Using FiEye for consistency
 
 const Navbar = () => {
@@ -52,7 +52,6 @@ const Navbar = () => {
             <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg shadow-sm">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-20">
-                        
                         {/* Logo */}
                         <Link to="/" onClick={closeMobileMenu} className="flex-shrink-0">
                             <img className="h-16 w-auto" src="/images/logo.png" alt="Clean Street Logo" />
@@ -63,6 +62,9 @@ const Navbar = () => {
                             {user && (
                                 <>
                                     <NavLink to="/UserDashboard"><FiGrid /><span>Dashboard</span></NavLink>
+                                    {user.role === "volunteer" && (
+                                        <NavLink to="/VolunteerDashboard"><FiGrid /><span>Volunteer Dashboard</span></NavLink>
+                                    )}
                                     <NavLink to="/ReportIssue"><FiFilePlus /><span>Report Issue</span></NavLink>
                                     <NavLink to="/view-complaints"><FiEye /><span>View Complaints</span></NavLink>
                                 </>
@@ -125,6 +127,9 @@ const Navbar = () => {
                     {user ? (
                         <>
                             <MobileNavLink to="/UserDashboard" onClick={closeMobileMenu}><FiGrid /><span>Dashboard</span></MobileNavLink>
+                            {user.role === "volunteer" && (
+                                <MobileNavLink to="/VolunteerDashboard" onClick={closeMobileMenu}><FiGrid /><span>Volunteer Dashboard</span></MobileNavLink>
+                            )}
                             <MobileNavLink to="/ReportIssue" onClick={closeMobileMenu}><FiFilePlus /><span>Report Issue</span></MobileNavLink>
                             <MobileNavLink to="/view-complaints" onClick={closeMobileMenu}><FiEye /><span>View Complaints</span></MobileNavLink>
                         </>
@@ -142,17 +147,48 @@ const Navbar = () => {
 
 // --- Reusable Sub-components for a Cleaner and More Maintainable Navbar ---
 
-const NavLink = ({ to, children }) => (
-    <Link to={to} className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600 font-semibold rounded-lg transition-colors duration-200">
-        {children}
-    </Link>
-);
+const NavLink = ({ to, children }) => {
+    const location = useLocation();
+    const isActive = location.pathname === to;
+    
+    return (
+        <Link 
+            to={to} 
+            className={`flex items-center gap-2 px-4 py-2 font-semibold rounded-lg transition-colors duration-200 relative ${
+                isActive 
+                    ? 'text-blue-600 bg-blue-50' 
+                    : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'
+            }`}
+        >
+            {children}
+            {isActive && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></span>
+            )}
+        </Link>
+    );
+};
 
-const MobileNavLink = ({ to, children, onClick }) => (
-    <Link to={to} onClick={onClick} className="flex items-center gap-3 px-3 py-3 text-base font-semibold text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200">
-        {children}
-    </Link>
-);
+const MobileNavLink = ({ to, children, onClick }) => {
+    const location = useLocation();
+    const isActive = location.pathname === to;
+    
+    return (
+        <Link 
+            to={to} 
+            onClick={onClick} 
+            className={`flex items-center gap-3 px-3 py-3 text-base font-semibold rounded-md transition-colors duration-200 relative ${
+                isActive 
+                    ? 'text-blue-600 bg-blue-50' 
+                    : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+            }`}
+        >
+            {children}
+            {isActive && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></span>
+            )}
+        </Link>
+    );
+};
 
 const AuthButton = ({ to, children, secondary = false, onClick }) => (
     <Link

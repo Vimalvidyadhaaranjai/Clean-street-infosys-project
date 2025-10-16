@@ -26,7 +26,11 @@ export default function Login() {
       localStorage.setItem("user", JSON.stringify(data.user)); // save user for navbar/avatar
       alert("Login successful!");
       setTimeout(() => {
-        navigate("/UserDashboard");
+        if (data.user.role === "volunteer") {
+          navigate("/VolunteerDashboard");
+        } else {
+          navigate("/UserDashboard");
+        }
       }, 500);
     } catch (err) {
       setError(err.message);

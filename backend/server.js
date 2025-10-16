@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 import config from "./.config/config.js"; // your config file
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
-import complaintRoutes from "./routes/complaint.routes.js" // auth routes
+import complaintRoutes from "./routes/complaint.routes.js";
+import volunteerRoutes from "./routes/volunteer.routes.js";
 import cors from "cors";
 import path from 'path'; 
 import { fileURLToPath } from 'url'; 
@@ -32,7 +33,8 @@ app.get("/", (req, res) => {
 app.use("/api/user/profile/photo", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user/",userRoutes);
-app.use("/api/complaints",complaintRoutes)
+app.use("/api/complaints",complaintRoutes);
+app.use("/api/volunteer", volunteerRoutes);
 // Validate DB URI before attempting connection
 if (!config.MONGO_URL || typeof config.MONGO_URL !== "string") {
   console.error("❌ MongoDB connection error: MONGO_URL is missing or invalid. Ensure it is defined in your environment or .env file.");

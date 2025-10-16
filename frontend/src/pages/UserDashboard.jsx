@@ -132,9 +132,9 @@ const UserDashboard = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen flex flex-col">
       <Navbar />
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12 flex-grow">
         {!showAllReports ? (
           <div className="animate-fade-in-up">
             <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10">

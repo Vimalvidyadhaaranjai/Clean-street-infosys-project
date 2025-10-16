@@ -5,6 +5,7 @@ import RegisterPage from "./pages/Register";
 import LandingPage from "./pages/LandingPage";
 import Profilepage from "./pages/Profilepage";
 import UserDashboard from "./pages/UserDashboard";
+import VolunteerDashboard from "./pages/VolunteerDashboard";
 import ReportIssue from "./pages/ReportIssue";
 import ViewComplaint from "./pages/ViewComplaint";
 import Navbar from "./Components/Navbar";
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/profile" element={<Profilepage />} />   
         <Route path="/UserDashboard" element={<UserDashboard/>}/>
+        <Route path="/VolunteerDashboard" element={<VolunteerDashboard/>}/>
         <Route path="/ReportIssue" element={<ReportIssue/>}/>
          <Route path="/view-complaints" element={<ViewComplaint />} />
       </Routes>
