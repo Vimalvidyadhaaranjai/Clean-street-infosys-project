@@ -7,7 +7,7 @@ import Profilepage from "./pages/Profilepage";
 import UserDashboard from "./pages/UserDashboard";
 import VolunteerDashboard from "./pages/VolunteerDashboard";
 import ReportIssue from "./pages/ReportIssue";
-import ViewComplaint from "./pages/ViewComplaint";
+import ViewComplaints from "./pages/ViewComplaints";
 import Navbar from "./Components/Navbar";
 
 export default function App() {
@@ -23,7 +23,7 @@ export default function App() {
         <Route path="/UserDashboard" element={<UserDashboard/>}/>
         <Route path="/VolunteerDashboard" element={<VolunteerDashboard/>}/>
         <Route path="/ReportIssue" element={<ReportIssue/>}/>
-         <Route path="/view-complaints" element={<ViewComplaint />} />
+         <Route path="/view-complaints" element={<ViewComplaints />} />
       </Routes>
     </Router>
     
