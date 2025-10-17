@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { FaTimes, FaMapMarkerAlt, FaTag, FaExclamationTriangle, FaCalendarAlt, FaPaperPlane, FaThumbsUp, FaThumbsDown, FaReply, FaTrash, FaImage } from "react-icons/fa";
+// 1. Import FaSpinner icon
+import { FaTimes, FaMapMarkerAlt, FaTag, FaExclamationTriangle, FaCalendarAlt, FaPaperPlane, FaThumbsUp, FaThumbsDown, FaReply, FaTrash, FaImage, FaSpinner } from "react-icons/fa";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -13,7 +14,7 @@ const markerIcon = new L.Icon({
     iconAnchor: [12, 41],
 });
 
-const ComplaintModal = ({ complaint, onClose }) => {
+const ComplaintModal = ({ complaint, onClose, onCommentAdded }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [comments, setComments] = useState([]);
     const [commentCount, setCommentCount] = useState(complaint?.comments?.length || 0);
@@ -21,6 +22,9 @@ const ComplaintModal = ({ complaint, onClose }) => {
     const [commentImage, setCommentImage] = useState(null);
     const [previewImage, setPreviewImage] = useState(null);
     const [activeReplyId, setActiveReplyId] = useState(null);
+    // 2. Add new state for loading animation
+    const [isPostingComment, setIsPostingComment] = useState(false);
+
 
     const user = JSON.parse(localStorage.getItem("user"));
 
@@ -41,7 +45,6 @@ const ComplaintModal = ({ complaint, onClose }) => {
             const data = await res.json();
             if (res.ok) {
                 setComments(data.data);
-                // Update count based on replies as well
                 const totalComments = data.data.reduce((acc, comment) => acc + 1 + (comment.replies ? comment.replies.length : 0), 0);
                 setCommentCount(totalComments);
             }
@@ -54,22 +57,48 @@ const ComplaintModal = ({ complaint, onClose }) => {
         e.preventDefault();
         if (!text.trim()) return;
 
+        // 3. Set loading to true before sending request
+        setIsPostingComment(true);
+
         const formData = new FormData();
         formData.append("text", text);
         if (parentId) formData.append("parentCommentId", parentId);
         if (imageFile) formData.append("image", imageFile);
 
         try {
-            const res = await fetch(`http://localhost:3002/api/comments/${complaint._id}`, { method: 'POST', credentials: 'include', body: formData });
+            const res = await fetch(`http://localhost:3002/api/comments/${complaint._id}`, {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            });
+
+            const newCommentData = await res.json();
+
             if (res.ok) {
+                if (parentId) {
+                    fetchComments();
+                } else {
+                    setComments(prevComments => [...prevComments, newCommentData.data]);
+                    setCommentCount(prevCount => prevCount + 1);
+                }
+
+                if (onCommentAdded) {
+                   onCommentAdded(complaint._id, newCommentData.data);
+                }
+
                 setNewComment("");
                 setCommentImage(null);
                 setPreviewImage(null);
                 setActiveReplyId(null);
-                fetchComments();
+            } else {
+                 throw new Error(newCommentData.message || "Failed to post comment");
             }
         } catch (error) {
             console.error("Error adding comment:", error);
+            alert(`Error: ${error.message}`);
+        } finally {
+            // 4. Set loading back to false after request is complete
+            setIsPostingComment(false);
         }
     };
     
@@ -159,7 +188,7 @@ const ComplaintModal = ({ complaint, onClose }) => {
                     <div className="mt-8 pt-6 border-t">
                         <h3 className="text-xl font-bold text-slate-800 mb-4">Comments ({commentCount})</h3>
                         <form onSubmit={(e) => handlePostComment(e, newComment, null, commentImage)} className="mb-6">
-                           <div className="flex items-start gap-4">
+                            <div className="flex items-start gap-4">
                                 <UserAvatar user={user} />
                                 <div className="flex-1">
                                     <textarea value={newComment} onChange={(e) => setNewComment(e.target.value)} placeholder="Add a public comment..." className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500 shadow-sm" rows="2" />
@@ -169,8 +198,15 @@ const ComplaintModal = ({ complaint, onClose }) => {
                                             <FaImage size={20} />
                                             <input type="file" id="comment-image-upload" accept="image/*" onChange={handleImageChange} className="hidden" />
                                         </label>
-                                        <button type="submit" className="flex items-center gap-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-700">
-                                            <FaPaperPlane /> Post
+                                        {/* 5. Update the button to show spinner when loading */}
+                                        <button type="submit" className="flex items-center justify-center w-24 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-700 disabled:opacity-75 disabled:cursor-not-allowed" disabled={isPostingComment}>
+                                            {isPostingComment ? (
+                                                <FaSpinner className="animate-spin" />
+                                            ) : (
+                                                <>
+                                                    <FaPaperPlane className="mr-2"/> Post
+                                                </>
+                                            )}
                                         </button>
                                     </div>
                                 </div>

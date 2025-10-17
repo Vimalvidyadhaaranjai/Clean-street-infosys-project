@@ -39,10 +39,10 @@ export const addComment = async (req, res) => {
       parentComment: parentCommentId || null,
     });
 
-    if (req.file) {
-      // Construct the full URL for the image
-      newComment.image = `http://localhost:3002/${req.file.path.replace(/\\/g, "/")}`;
-    }
+   if (req.file) {
+    // Use the path directly from Cloudinary
+    newComment.image = req.file.path;
+}
 
     let savedComment = await newComment.save();
     

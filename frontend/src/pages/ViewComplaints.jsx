@@ -14,11 +14,13 @@ const ViewComplaints = () => {
     const fetchComplaints = async () => {
       try {
         const res = await fetch("http://localhost:3002/api/complaints/community", {
-          credentials: 'include' // Add this if you protected the route
+          credentials: 'include'
         });
         const data = await res.json();
         if (res.ok && data.success) {
-          setComplaints(data.data);
+          // We need to make sure comments is an array
+          const complaintsWithComments = data.data.map(c => ({ ...c, comments: c.comments || [] }));
+          setComplaints(complaintsWithComments);
         } else if (res.status === 401) {
           throw new Error("You must be logged in to view complaints.");
         } else {
@@ -40,6 +42,16 @@ const ViewComplaints = () => {
   const handleCloseModal = () => {
     setSelectedComplaint(null);
   };
+
+  // This function will be passed to the modal to update the comment count
+  const updateCommentCount = (complaintId, newComment) => {
+    setComplaints(complaints.map(complaint =>
+      complaint._id === complaintId
+        ? { ...complaint, comments: [...complaint.comments, newComment] }
+        : complaint
+    ));
+  };
+
 
   if (loading) {
     return (
@@ -66,7 +78,8 @@ const ViewComplaints = () => {
             <p className="text-lg">{error}</p>
           </div>
         ) : (
-          <div className="space-y-6">
+          /* CHANGE 1: Side-by-side layout */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {complaints.length > 0 ? (
               complaints.map((complaint) => (
                 <ComplaintCard
@@ -76,7 +89,7 @@ const ViewComplaints = () => {
                 />
               ))
             ) : (
-              <div className="text-center bg-white rounded-xl shadow-md p-12">
+              <div className="text-center bg-white rounded-xl shadow-md p-12 lg:col-span-3">
                 <p className="text-gray-500 text-lg">No community reports have been filed yet.</p>
               </div>
             )}
@@ -85,10 +98,13 @@ const ViewComplaints = () => {
 
       </main>
       <Footer />
-      <ComplaintModal
-        complaint={selectedComplaint}
-        onClose={handleCloseModal}
-      />
+      {selectedComplaint && (
+        <ComplaintModal
+          complaint={selectedComplaint}
+          onClose={handleCloseModal}
+          onCommentAdded={updateCommentCount} // Pass the update function
+        />
+      )}
     </div>
   );
 };
@@ -111,29 +127,32 @@ const ComplaintCard = ({ complaint, onClick }) => {
 
   return (
     <div
-      className="bg-white rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] animate-fade-in-up cursor-pointer"
+      className="bg-white rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] animate-fade-in-up cursor-pointer flex flex-col"
       onClick={onClick}
     >
-      <div className="flex flex-col sm:flex-row items-start gap-6">
-        {complaint.photo && (
-          <img src={complaint.photo} alt={complaint.title} className="w-full sm:w-64 h-70  object-contain rounded-lg" />
-        )}
-        <div className="flex-1">
-            <div className="flex items-center gap-4 mb-3">
-                {getStatusBadge(complaint.status)}
-                <p className="text-sm text-gray-500">{formatDate(complaint.createdAt)}</p>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">{complaint.title}</h2>
-            <p className="text-gray-600 mb-4 line-clamp-2">{complaint.description}</p>
-            <div className="flex items-center text-sm text-gray-500">
-                <FaMapMarkerAlt className="mr-2" />
-                <span>{complaint.address}</span>
-            </div>
+      <div className="flex-grow">
+        <div className="flex items-center gap-4 mb-3">
+            {getStatusBadge(complaint.status)}
+            <p className="text-sm text-gray-500 ml-auto">{formatDate(complaint.createdAt)}</p>
         </div>
-        <div className="w-full sm:w-auto flex flex-row sm:flex-col items-center justify-start sm:justify-center mt-4 sm:mt-0">
-            <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-semibold transition-colors">
-                <FaRegComment /> 0
-            </button>
+        {complaint.photo && (
+          <img src={complaint.photo} alt={complaint.title} className="w-full h-48 object-cover rounded-lg mb-4" />
+        )}
+        <h2 className="text-xl font-bold text-gray-800 mb-2">{complaint.title}</h2>
+        <p className="text-gray-600 mb-4 line-clamp-2">{complaint.description}</p>
+        <div className="flex items-center text-sm text-gray-500 mb-4">
+            <FaMapMarkerAlt className="mr-2 flex-shrink-0" />
+            <span>{complaint.address}</span>
+        </div>
+      </div>
+      <div className="mt-auto pt-4 border-t border-gray-100">
+        <div className="flex items-center justify-between">
+            {/* CHANGE 2: "Reply" text instead of icon */}
+            <div className="flex items-center gap-2 text-gray-600 font-semibold text-sm">
+              <span>Reply:</span>
+              <span>{complaint.comments?.length || 0} {complaint.comments?.length === 1 ? 'reply' : 'replies'}</span>
+            </div>
+            <span className="text-blue-600 font-semibold text-sm hover:underline">View Details</span>
         </div>
       </div>
     </div>
