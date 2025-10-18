@@ -65,7 +65,12 @@ const complaintSchema = new mongoose.Schema(
       enum: ["received", "in_review", "resolved", "rejected"],
       default: "received",
     },
+    comments: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment"
+    }]
   },
+  
   {
     // Adds created_at and updated_at timestamps automatically
     timestamps: true,

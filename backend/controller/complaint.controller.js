@@ -264,7 +264,8 @@ export const getCommunityComplaints = async (req, res) => {
   try {
     const complaints = await Complaint.find({})
       .sort({ createdAt: -1 })
-      .populate('user_id', 'name'); // Gets the name of the user who reported
+      .populate('user_id', 'name') // Gets the name of the user who reported
+      .populate('comments'); // THIS IS THE NEW LINE TO ADD
 
     res.status(200).json({
       success: true,
