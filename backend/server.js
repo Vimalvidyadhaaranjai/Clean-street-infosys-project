@@ -5,7 +5,8 @@ import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import complaintRoutes from "./routes/complaint.routes.js";
 import volunteerRoutes from "./routes/volunteer.routes.js";
-import commentRoutes from "./routes/comment.routes.js"; // Single, correct import
+import commentRoutes from "./routes/comment.routes.js";
+import adminRoutes from "./routes/admin.routes.js"; // Single, correct import
 import cors from "cors";
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -33,7 +34,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/volunteer", volunteerRoutes);
-app.use("/api/comments", commentRoutes); // Use the routes once
+app.use("/api/comments", commentRoutes);
+app.use("/api/admin", adminRoutes); // Use the routes once
 
 
 // --- Database Connection ---
