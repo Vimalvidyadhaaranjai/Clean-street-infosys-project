@@ -25,16 +25,23 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user)); // save user for navbar/avatar
       alert("Login successful!");
+
+      // --- MODIFICATION START ---
       setTimeout(() => {
-        if (data.user.role === "volunteer") {
+        if (data.user.role === "admin") {
+          navigate("/AdminDashboard"); // Redirect admin
+        } else if (data.user.role === "volunteer") {
           navigate("/VolunteerDashboard");
         } else {
           navigate("/UserDashboard");
         }
-      }, 500);
+      }, 300); // Reduced delay slightly
+      // --- MODIFICATION END ---
+
     } catch (err) {
       setError(err.message);
-      alert(err.message);
+      // Keep alert or use a more integrated error display
+       alert(err.message || 'Login failed. Please check credentials.');
     } finally {
       setLoading(false);
     }

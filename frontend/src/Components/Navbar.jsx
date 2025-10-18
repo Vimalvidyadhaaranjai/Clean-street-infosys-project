@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FiGrid, FiFilePlus, FiEye, FiUser, FiLogOut } from "react-icons/fi"; // Using FiEye for consistency
+// --- MODIFICATION START ---
+import { FiGrid, FiFilePlus, FiEye, FiUser, FiLogOut, FiShield } from "react-icons/fi"; // Added FiShield
+// --- MODIFICATION END ---
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -38,7 +40,7 @@ const Navbar = () => {
         setIsMenuOpen(false); // Close mobile menu on logout
         navigate('/login');
     };
-    
+
     // Function to close mobile menu
     const closeMobileMenu = () => {
         setIsMenuOpen(false);
@@ -63,8 +65,13 @@ const Navbar = () => {
                                 <>
                                     <NavLink to="/UserDashboard"><FiGrid /><span>Dashboard</span></NavLink>
                                     {user.role === "volunteer" && (
-                                        <NavLink to="/VolunteerDashboard"><FiGrid /><span>Volunteer Dashboard</span></NavLink>
+                                        <NavLink to="/VolunteerDashboard"><FiGrid /><span>Volunteer Board</span></NavLink>
                                     )}
+                                    {/* --- ADDITION START --- */}
+                                    {user.role === "admin" && (
+                                        <NavLink to="/AdminDashboard"><FiShield /><span>Admin Panel</span></NavLink>
+                                    )}
+                                    {/* --- ADDITION END --- */}
                                     <NavLink to="/ReportIssue"><FiFilePlus /><span>Report Issue</span></NavLink>
                                     <NavLink to="/view-complaints"><FiEye /><span>View Complaints</span></NavLink>
                                 </>
@@ -128,8 +135,13 @@ const Navbar = () => {
                         <>
                             <MobileNavLink to="/UserDashboard" onClick={closeMobileMenu}><FiGrid /><span>Dashboard</span></MobileNavLink>
                             {user.role === "volunteer" && (
-                                <MobileNavLink to="/VolunteerDashboard" onClick={closeMobileMenu}><FiGrid /><span>Volunteer Dashboard</span></MobileNavLink>
-                            )}
+                                <MobileNavLink to="/VolunteerDashboard" onClick={closeMobileMenu}><FiGrid /><span>Volunteer Board</span></MobileNavLink>
+                             )}
+                             {/* --- ADDITION START --- */}
+                             {user.role === "admin" && (
+                                <MobileNavLink to="/AdminDashboard" onClick={closeMobileMenu}><FiShield /><span>Admin Panel</span></MobileNavLink>
+                             )}
+                            {/* --- ADDITION END --- */}
                             <MobileNavLink to="/ReportIssue" onClick={closeMobileMenu}><FiFilePlus /><span>Report Issue</span></MobileNavLink>
                             <MobileNavLink to="/view-complaints" onClick={closeMobileMenu}><FiEye /><span>View Complaints</span></MobileNavLink>
                         </>
@@ -150,13 +162,13 @@ const Navbar = () => {
 const NavLink = ({ to, children }) => {
     const location = useLocation();
     const isActive = location.pathname === to;
-    
+
     return (
-        <Link 
-            to={to} 
+        <Link
+            to={to}
             className={`flex items-center gap-2 px-4 py-2 font-semibold rounded-lg transition-colors duration-200 relative ${
-                isActive 
-                    ? 'text-blue-600 bg-blue-50' 
+                isActive
+                    ? 'text-blue-600 bg-blue-50'
                     : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'
             }`}
         >
@@ -171,14 +183,14 @@ const NavLink = ({ to, children }) => {
 const MobileNavLink = ({ to, children, onClick }) => {
     const location = useLocation();
     const isActive = location.pathname === to;
-    
+
     return (
-        <Link 
-            to={to} 
-            onClick={onClick} 
+        <Link
+            to={to}
+            onClick={onClick}
             className={`flex items-center gap-3 px-3 py-3 text-base font-semibold rounded-md transition-colors duration-200 relative ${
-                isActive 
-                    ? 'text-blue-600 bg-blue-50' 
+                isActive
+                    ? 'text-blue-600 bg-blue-50'
                     : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
             }`}
         >
@@ -195,8 +207,8 @@ const AuthButton = ({ to, children, secondary = false, onClick }) => (
         to={to}
         onClick={onClick}
         className={`px-5 py-2.5 rounded-full font-semibold text-sm transition-transform duration-200 transform hover:scale-105
-            ${secondary 
-                ? 'bg-gray-100 text-gray-800 hover:bg-gray-200' 
+            ${secondary
+                ? 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                 : 'bg-blue-600 text-white hover:bg-blue-700 shadow-md'
             }`
         }
@@ -209,7 +221,7 @@ const ProfileMenuItem = ({ to, icon, children, onClick, isLogout = false }) => {
     const className = `w-full text-left px-4 py-2.5 flex items-center gap-3 transition-colors duration-200 text-sm ${
         isLogout ? 'font-semibold text-red-600 hover:bg-red-50' : 'font-medium text-gray-700 hover:bg-gray-100'
     }`;
-    
+
     return to ? (
         <Link to={to} className={className} onClick={onClick}>{icon}{children}</Link>
     ) : (
