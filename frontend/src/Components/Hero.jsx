@@ -33,7 +33,7 @@ const Hero = () => {
                      {/* Call to Action Button */}
                      <Link
                         to="/register" // Link to registration page
-                        className="mt-10 inline-flex items-center gap-3 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-black/50 animate-fade-in-up duration-700 delay-400"
+                        className="mt-10 inline-flex items-center gap-3 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-full shadow-lg transition-all  ease-in-out transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-black/50 animate-fade-in-up duration-700 delay-400"
                     >
                         Get Started Now <FiArrowRight className="ml-1" />
                     </Link>
