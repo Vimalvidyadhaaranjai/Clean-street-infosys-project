@@ -20,7 +20,13 @@ const ViewComplaints = () => {
         if (res.ok && data.success) {
           // We need to make sure comments is an array
           const complaintsWithComments = data.data.map(c => ({ ...c, comments: c.comments || [] }));
-          setComplaints(complaintsWithComments);
+          // Sort by net votes (upvotes - downvotes) in descending order
+          const sortedComplaints = complaintsWithComments.sort((a, b) => {
+            const netVotesA = (a.upvotes?.length || 0) - (a.downvotes?.length || 0);
+            const netVotesB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
+            return netVotesB - netVotesA; // Descending order (highest first)
+          });
+          setComplaints(sortedComplaints);
         } else if (res.status === 401) {
           throw new Error("You must be logged in to view complaints.");
         } else {
@@ -62,7 +68,7 @@ const ViewComplaints = () => {
       const data = await res.json();
       if (res.ok) {
         // Update the complaint in state
-        setComplaints(complaints.map(complaint =>
+        const updatedComplaints = complaints.map(complaint =>
           complaint._id === complaintId
             ? { 
                 ...complaint, 
@@ -70,7 +76,14 @@ const ViewComplaints = () => {
                 downvotes: Array(data.data.downvotes).fill(null)
               }
             : complaint
-        ));
+        );
+        // Re-sort by net votes after update
+        const sortedComplaints = updatedComplaints.sort((a, b) => {
+          const netVotesA = (a.upvotes?.length || 0) - (a.downvotes?.length || 0);
+          const netVotesB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
+          return netVotesB - netVotesA;
+        });
+        setComplaints(sortedComplaints);
       }
     } catch (error) {
       console.error("Error upvoting complaint:", error);
@@ -87,7 +100,7 @@ const ViewComplaints = () => {
       const data = await res.json();
       if (res.ok) {
         // Update the complaint in state
-        setComplaints(complaints.map(complaint =>
+        const updatedComplaints = complaints.map(complaint =>
           complaint._id === complaintId
             ? { 
                 ...complaint, 
@@ -95,7 +108,14 @@ const ViewComplaints = () => {
                 downvotes: Array(data.data.downvotes).fill(null)
               }
             : complaint
-        ));
+        );
+        // Re-sort by net votes after update
+        const sortedComplaints = updatedComplaints.sort((a, b) => {
+          const netVotesA = (a.upvotes?.length || 0) - (a.downvotes?.length || 0);
+          const netVotesB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
+          return netVotesB - netVotesA;
+        });
+        setComplaints(sortedComplaints);
       }
     } catch (error) {
       console.error("Error downvoting complaint:", error);
@@ -208,7 +228,8 @@ const ComplaintCard = ({ complaint, onClick, onUpvote, onDownvote }) => {
                 className="flex items-center gap-1 text-gray-600 hover:text-green-600 transition-colors"
               >
                 <FaThumbsUp className="text-sm" />
-                <span className="text-sm font-semibold">{complaint.upvotes?.length || 0}</span>
+                Upvote
+                <span className="text-md font-semibold">{complaint.upvotes?.length || 0}</span>
               </button>
               <button
                 onClick={(e) => {
@@ -218,7 +239,8 @@ const ComplaintCard = ({ complaint, onClick, onUpvote, onDownvote }) => {
                 className="flex items-center gap-1 text-gray-600 hover:text-red-600 transition-colors"
               >
                 <FaThumbsDown className="text-sm" />
-                <span className="text-sm font-semibold">{complaint.downvotes?.length || 0}</span>
+                Downvote
+                <span className="text-md font-semibold">{complaint.downvotes?.length || 0}</span>
               </button>
               <div className="flex items-center gap-2 text-gray-600 text-sm">
                 <FaRegComment />
