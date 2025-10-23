@@ -255,17 +255,18 @@ export const deleteComplaint = async (req, res) => {
     res.status(500).json({ message: "Server error. Could not delete the complaint." });
   }
 };
+
 /**
- * @desc    Get all complaints for the community view
+ * @desc   Get all complaints for the community view
  * @route   GET /api/complaints/community
- * @access  Public
+ * @access   Public
  */
 export const getCommunityComplaints = async (req, res) => {
   try {
     const complaints = await Complaint.find({})
       .sort({ createdAt: -1 })
-      .populate('user_id', 'name') // Gets the name of the user who reported
-      .populate('comments'); // THIS IS THE NEW LINE TO ADD
+      .populate('user_id', 'name')
+      .populate('comments');
 
     res.status(200).json({
       success: true,
@@ -274,5 +275,113 @@ export const getCommunityComplaints = async (req, res) => {
   } catch (error) {
     console.error("Error fetching community complaints:", error);
     res.status(500).json({ message: "Server error. Could not fetch reports." });
+  }
+};
+
+/**
+ * @desc   Upvote a complaint
+ * @route   POST /api/complaints/:id/upvote
+ * @access   Private
+ */
+export const upvoteComplaint = async (req, res) => {
+  try {
+    const complaintId = req.params.id;
+    const userId = req.user._id;
+
+    if (!mongoose.Types.ObjectId.isValid(complaintId)) {
+      return res.status(400).json({ message: "Invalid complaint ID." });
+    }
+
+    const complaint = await Complaint.findById(complaintId);
+
+    if (!complaint) {
+      return res.status(404).json({ message: "Complaint not found." });
+    }
+
+    // Check if user already upvoted
+    const hasUpvoted = complaint.upvotes.includes(userId);
+    const hasDownvoted = complaint.downvotes.includes(userId);
+
+    if (hasUpvoted) {
+      // Remove upvote
+      complaint.upvotes = complaint.upvotes.filter(id => id.toString() !== userId.toString());
+    } else {
+      // Add upvote
+      complaint.upvotes.push(userId);
+      // Remove downvote if exists
+      if (hasDownvoted) {
+        complaint.downvotes = complaint.downvotes.filter(id => id.toString() !== userId.toString());
+      }
+    }
+
+    await complaint.save();
+
+    res.status(200).json({
+      success: true,
+      data: {
+        upvotes: complaint.upvotes.length,
+        downvotes: complaint.downvotes.length,
+        hasUpvoted: !hasUpvoted,
+        hasDownvoted: false
+      }
+    });
+
+  } catch (error) {
+    console.error("Error upvoting complaint:", error);
+    res.status(500).json({ message: "Server error. Could not upvote complaint." });
+  }
+};
+
+/**
+ * @desc   Downvote a complaint
+ * @route   POST /api/complaints/:id/downvote
+ * @access   Private
+ */
+export const downvoteComplaint = async (req, res) => {
+  try {
+    const complaintId = req.params.id;
+    const userId = req.user._id;
+
+    if (!mongoose.Types.ObjectId.isValid(complaintId)) {
+      return res.status(400).json({ message: "Invalid complaint ID." });
+    }
+
+    const complaint = await Complaint.findById(complaintId);
+
+    if (!complaint) {
+      return res.status(404).json({ message: "Complaint not found." });
+    }
+
+    // Check if user already downvoted
+    const hasUpvoted = complaint.upvotes.includes(userId);
+    const hasDownvoted = complaint.downvotes.includes(userId);
+
+    if (hasDownvoted) {
+      // Remove downvote
+      complaint.downvotes = complaint.downvotes.filter(id => id.toString() !== userId.toString());
+    } else {
+      // Add downvote
+      complaint.downvotes.push(userId);
+      // Remove upvote if exists
+      if (hasUpvoted) {
+        complaint.upvotes = complaint.upvotes.filter(id => id.toString() !== userId.toString());
+      }
+    }
+
+    await complaint.save();
+
+    res.status(200).json({
+      success: true,
+      data: {
+        upvotes: complaint.upvotes.length,
+        downvotes: complaint.downvotes.length,
+        hasUpvoted: false,
+        hasDownvoted: !hasDownvoted
+      }
+    });
+
+  } catch (error) {
+    console.error("Error downvoting complaint:", error);
+    res.status(500).json({ message: "Server error. Could not downvote complaint." });
   }
 };

@@ -2,7 +2,7 @@
 
 import express from "express";
 import multer from 'multer'; // 1. Import multer
-import { createComplaint, updateComplaint, getUserComplaints, getAllUserComplaints, deleteComplaint, getCommunityComplaints} from "../controller/complaint.controller.js";
+import { createComplaint, updateComplaint, getUserComplaints, getAllUserComplaints, deleteComplaint, getCommunityComplaints, upvoteComplaint, downvoteComplaint} from "../controller/complaint.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
@@ -47,5 +47,18 @@ router.delete("/:id", protect, deleteComplaint);
 // ADD THIS NEW LINE AT THE END OF THE FILE
 router.get("/community", getCommunityComplaints);
 
+/**
+ * @route   POST /api/complaints/:id/upvote
+ * @desc    Upvote a complaint
+ * @access  Private
+ */
+router.post("/:id/upvote", protect, upvoteComplaint);
+
+/**
+ * @route   POST /api/complaints/:id/downvote
+ * @desc    Downvote a complaint
+ * @access  Private
+ */
+router.post("/:id/downvote", protect, downvoteComplaint);
 
 export default router;

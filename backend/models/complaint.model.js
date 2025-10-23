@@ -68,6 +68,14 @@ const complaintSchema = new mongoose.Schema(
     comments: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Comment"
+    }],
+    upvotes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }],
+    downvotes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
     }]
   },
   

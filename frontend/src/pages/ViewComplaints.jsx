@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import ComplaintModal from "../Components/ComplaintModal";
-import { FaRegComment, FaSpinner, FaMapMarkerAlt } from "react-icons/fa";
+import { FaRegComment, FaSpinner, FaMapMarkerAlt, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
 const ViewComplaints = () => {
   const [complaints, setComplaints] = useState([]);
@@ -20,7 +20,13 @@ const ViewComplaints = () => {
         if (res.ok && data.success) {
           // We need to make sure comments is an array
           const complaintsWithComments = data.data.map(c => ({ ...c, comments: c.comments || [] }));
-          setComplaints(complaintsWithComments);
+          // Sort by net votes (upvotes - downvotes) in descending order
+          const sortedComplaints = complaintsWithComments.sort((a, b) => {
+            const netVotesA = (a.upvotes?.length || 0) - (a.downvotes?.length || 0);
+            const netVotesB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
+            return netVotesB - netVotesA; // Descending order (highest first)
+          });
+          setComplaints(sortedComplaints);
         } else if (res.status === 401) {
           throw new Error("You must be logged in to view complaints.");
         } else {
@@ -52,6 +58,69 @@ const ViewComplaints = () => {
     ));
   };
 
+  // Handle upvote
+  const handleUpvote = async (complaintId) => {
+    try {
+      const res = await fetch(`http://localhost:3002/api/complaints/${complaintId}/upvote`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (res.ok) {
+        // Update the complaint in state
+        const updatedComplaints = complaints.map(complaint =>
+          complaint._id === complaintId
+            ? { 
+                ...complaint, 
+                upvotes: Array(data.data.upvotes).fill(null),
+                downvotes: Array(data.data.downvotes).fill(null)
+              }
+            : complaint
+        );
+        // Re-sort by net votes after update
+        const sortedComplaints = updatedComplaints.sort((a, b) => {
+          const netVotesA = (a.upvotes?.length || 0) - (a.downvotes?.length || 0);
+          const netVotesB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
+          return netVotesB - netVotesA;
+        });
+        setComplaints(sortedComplaints);
+      }
+    } catch (error) {
+      console.error("Error upvoting complaint:", error);
+    }
+  };
+
+  // Handle downvote
+  const handleDownvote = async (complaintId) => {
+    try {
+      const res = await fetch(`http://localhost:3002/api/complaints/${complaintId}/downvote`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (res.ok) {
+        // Update the complaint in state
+        const updatedComplaints = complaints.map(complaint =>
+          complaint._id === complaintId
+            ? { 
+                ...complaint, 
+                upvotes: Array(data.data.upvotes).fill(null),
+                downvotes: Array(data.data.downvotes).fill(null)
+              }
+            : complaint
+        );
+        // Re-sort by net votes after update
+        const sortedComplaints = updatedComplaints.sort((a, b) => {
+          const netVotesA = (a.upvotes?.length || 0) - (a.downvotes?.length || 0);
+          const netVotesB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
+          return netVotesB - netVotesA;
+        });
+        setComplaints(sortedComplaints);
+      }
+    } catch (error) {
+      console.error("Error downvoting complaint:", error);
+    }
+  };
 
   if (loading) {
     return (
@@ -86,6 +155,8 @@ const ViewComplaints = () => {
                   key={complaint._id}
                   complaint={complaint}
                   onClick={() => handleComplaintClick(complaint)}
+                  onUpvote={handleUpvote}
+                  onDownvote={handleDownvote}
                 />
               ))
             ) : (
@@ -109,7 +180,7 @@ const ViewComplaints = () => {
   );
 };
 
-const ComplaintCard = ({ complaint, onClick }) => {
+const ComplaintCard = ({ complaint, onClick, onUpvote, onDownvote }) => {
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' });
   
   const getStatusBadge = (status) => {
@@ -147,10 +218,35 @@ const ComplaintCard = ({ complaint, onClick }) => {
       </div>
       <div className="mt-auto pt-4 border-t border-gray-100">
         <div className="flex items-center justify-between">
-            {/* CHANGE 2: "Reply" text instead of icon */}
-            <div className="flex items-center gap-2 text-gray-600 font-semibold text-sm">
-              <span>Reply:</span>
-              <span>{complaint.comments?.length || 0} {complaint.comments?.length === 1 ? 'reply' : 'replies'}</span>
+            {/* Vote buttons */}
+            <div className="flex items-center gap-4">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onUpvote(complaint._id);
+                }}
+                className="flex items-center gap-1 text-gray-600 hover:text-green-600 transition-colors"
+              >
+                <FaThumbsUp className="text-sm" />
+                
+                <span className="text-md font-semibold">{complaint.upvotes?.length || 0}</span>
+                Upvote
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDownvote(complaint._id);
+                }}
+                className="flex items-center gap-1 text-gray-600 hover:text-red-600 transition-colors"
+              >
+                <FaThumbsDown className="text-sm" />
+                <span className="text-md font-semibold">{complaint.downvotes?.length || 0}</span>
+                Downvote
+              </button>
+              <div className="flex items-center gap-2 text-gray-600 text-sm">
+                <FaRegComment />
+                <span>{complaint.comments?.length || 0}</span>
+              </div>
             </div>
             <span className="text-blue-600 font-semibold text-sm hover:underline">View Details</span>
         </div>

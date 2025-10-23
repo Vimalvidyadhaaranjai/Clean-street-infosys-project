@@ -24,7 +24,7 @@ const Hero = () => {
                 <div className="max-w-4xl mx-auto">
                     {/* Enhanced Text Animation */}
                     <h1 className="text-white text-4xl sm:text-6xl md:text-7xl font-bold leading-tight mb-6 animate-fade-in-down duration-700">
-                        Transform Your Streets, <span className="text-blue-400">Together.</span>
+                        Transform Your Streets, Together.
                     </h1>
                     <p className="mt-4 text-white/90 text-base sm:text-lg md:text-xl max-w-2xl mx-auto animate-fade-in-up duration-700 delay-200">
                         Join thousands of citizens building better neighborhoods. Report issues, track progress, and collaborate for the change you want to see.
@@ -33,7 +33,7 @@ const Hero = () => {
                      {/* Call to Action Button */}
                      <Link
                         to="/register" // Link to registration page
-                        className="mt-10 inline-flex items-center gap-3 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-black/50 animate-fade-in-up duration-700 delay-400"
+                        className="mt-10 inline-flex items-center gap-3 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-full shadow-lg transition-all  ease-in-out transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-black/50 animate-fade-in-up duration-700 delay-400"
                     >
                         Get Started Now <FiArrowRight className="ml-1" />
                     </Link>
@@ -43,21 +43,21 @@ const Hero = () => {
                 <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                     {/* Card 1 */}
                     <FeatureCard
-                        icon="images/icons/icon1.png" //
+                        icon="images/icons/location.png" //
                         title="Smart Reporting"
                         description="Use advanced tools to report issues with precise location tracking and photo evidence."
                         delay="300"
                     />
                      {/* Card 2 */}
                     <FeatureCard
-                        icon="images/icons/icon2.png" //
+                        icon="images/icons/user.png" //
                         title="Role-Based Access"
                         description="Citizens, Volunteers, and administrators working together using a centralized platform."
                         delay="500"
                     />
                      {/* Card 3 */}
                     <FeatureCard
-                        icon="images/icons/icon3.png" //
+                        icon="images/icons/restore.png" //
                         title="Real-Time Updates"
                         description="Get instant notifications and track resolution progress in your personalized dashboard."
                         delay="700"

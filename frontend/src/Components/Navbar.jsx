@@ -62,7 +62,7 @@ const Navbar = () => {
                         {/* Logo */}
                         <Link to="/" onClick={closeMobileMenu} className="flex-shrink-0 transition-transform duration-300 hover:scale-105">
                             {/* TRENDY STYLE: Increased logo size h-20 */}
-                            <img className="h-20 w-auto" src="/images/logo.png" alt="Clean Street Logo" />
+                            <img className="h-30 w-auto" src="/images/logo.png" alt="Clean Street Logo" />
                         </Link>
 
                         {/* Desktop Navigation Links */}
