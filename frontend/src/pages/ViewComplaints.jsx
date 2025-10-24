@@ -230,7 +230,8 @@ const ComplaintCard = ({ complaint, onClick, onUpvote, onDownvote }) => {
                 <FaThumbsUp className="text-sm" />
                 
                 <span className="text-md font-semibold">{complaint.upvotes?.length || 0}</span>
-                Upvote
+               
+                <p className="lg:block hidden">Upvote</p>
               </button>
               <button
                 onClick={(e) => {
@@ -241,7 +242,7 @@ const ComplaintCard = ({ complaint, onClick, onUpvote, onDownvote }) => {
               >
                 <FaThumbsDown className="text-sm" />
                 <span className="text-md font-semibold">{complaint.downvotes?.length || 0}</span>
-                Downvote
+                <p className="lg:block hidden">Downvote</p>
               </button>
               <div className="flex items-center gap-2 text-gray-600 text-sm">
                 <FaRegComment />
