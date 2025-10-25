@@ -82,33 +82,6 @@ const Navbar = () => {
                                         )}
                                         <NavLink to="/ReportIssue"><FiFilePlus /><span>Report Issue</span></NavLink>
                                         <NavLink to="/view-complaints"><FiEye /><span>View Complaints</span></NavLink>
-                                        
-                                        {/* About Dropdown for logged-in users */}
-                                        <div className="relative" ref={aboutDropdownRef}>
-                                            <button
-                                                id="about-dropdown-button"
-                                                onClick={toggleAboutDropdown}
-                                                className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 text-gray-600 hover:text-gray-900 hover:bg-gray-100 group"
-                                                aria-label="About menu"
-                                                aria-haspopup="true"
-                                                aria-expanded={isAboutDropdownOpen}
-                                            >
-                                                <FiInfo />
-                                                <span>About</span>
-                                                <FiChevronDown size={16} className={`text-gray-500 transition-transform duration-200 ${isAboutDropdownOpen ? 'rotate-180' : ''}`} />
-                                            </button>
-
-                                            <div
-                                                className={`absolute left-0 mt-2 w-56 origin-top-left bg-white rounded-lg shadow-xl py-2 border border-gray-200 focus:outline-none transition-all duration-200 ease-out ${isAboutDropdownOpen ? 'opacity-100 scale-100 visible z-[60]' : 'opacity-0 scale-95 invisible'}`}
-                                                role="menu"
-                                                aria-orientation="vertical"
-                                                aria-labelledby="about-dropdown-button"
-                                            >
-                                                <DropdownLink to="/about" icon={<FiInfo />} onClick={() => setIsAboutDropdownOpen(false)}>About Page</DropdownLink>
-                                                <DropdownLink to="/how-it-works" icon={<FiHelpCircle />} onClick={() => setIsAboutDropdownOpen(false)}>How It Works</DropdownLink>
-                                                <DropdownLink to="/services" icon={<FiSettings />} onClick={() => setIsAboutDropdownOpen(false)}>Services</DropdownLink>
-                                            </div>
-                                        </div>
                                     </>
                                 ) : (
                                     // Logged-out Links with About Us Dropdown
@@ -228,29 +201,7 @@ const Navbar = () => {
                             )}
                             <MobileNavLink to="/ReportIssue" onClick={closeMobileMenu}><FiFilePlus /><span>Report Issue</span></MobileNavLink>
                             <MobileNavLink to="/view-complaints" onClick={closeMobileMenu}><FiEye /><span>View Complaints</span></MobileNavLink>
-                            
-                            {/* About Accordion for logged-in mobile users */}
-                            <div>
-                                <button
-                                    onClick={toggleMobileAbout}
-                                    className="w-full flex items-center justify-between px-4 py-2.5 text-base font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <FiInfo />
-                                        <span>About</span>
-                                    </div>
-                                    <FiChevronDown size={18} className={`transition-transform duration-200 ${isMobileAboutOpen ? 'rotate-180' : ''}`} />
-                                </button>
-                                
-                                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isMobileAboutOpen ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'}`}>
-                                    <div className="pl-8 py-1 space-y-1">
-                                        <MobileNavLink to="/about" onClick={closeMobileMenu}><FiInfo /><span>About Page</span></MobileNavLink>
-                                        <MobileNavLink to="/how-it-works" onClick={closeMobileMenu}><FiHelpCircle /><span>How It Works</span></MobileNavLink>
-                                        <MobileNavLink to="/services" onClick={closeMobileMenu}><FiSettings /><span>Services</span></MobileNavLink>
-                                    </div>
-                                </div>
-                            </div>
-                            
+
                             <div className="pt-4 mt-4 border-t border-gray-100">
                                 <MobileNavLink to="/profile" onClick={closeMobileMenu}><FiUser /><span>My Profile</span></MobileNavLink>
                                 <button
@@ -306,11 +257,10 @@ const NavLink = ({ to, children }) => {
     return (
         <Link
             to={to}
-            className={`relative flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 group ${
-                isActive
+            className={`relative flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 group ${isActive
                     ? 'text-indigo-600 bg-indigo-50'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-            }`}
+                }`}
         >
             {children}
 
@@ -330,11 +280,10 @@ const MobileNavLink = ({ to, children, onClick }) => {
         <Link
             to={to}
             onClick={onClick}
-            className={`flex items-center gap-3 px-4 py-2.5 text-base font-medium rounded-md transition-colors duration-200 ${
-                isActive
+            className={`flex items-center gap-3 px-4 py-2.5 text-base font-medium rounded-md transition-colors duration-200 ${isActive
                     ? 'text-indigo-700 bg-indigo-100'
                     : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-            }`}
+                }`}
         >
             {children}
         </Link>
@@ -379,11 +328,10 @@ const DropdownLink = ({ to, icon, children, onClick }) => {
         <Link
             to={to}
             onClick={onClick}
-            className={`w-full text-left px-4 py-2.5 flex items-center gap-2.5 transition-colors duration-150 text-sm font-medium rounded-md mx-1 ${
-                isActive
+            className={`w-full text-left px-4 py-2.5 flex items-center gap-2.5 transition-colors duration-150 text-sm font-medium rounded-md mx-1 ${isActive
                     ? 'text-indigo-700 bg-indigo-50'
                     : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-            }`}
+                }`}
             role="menuitem"
         >
             {icon}
