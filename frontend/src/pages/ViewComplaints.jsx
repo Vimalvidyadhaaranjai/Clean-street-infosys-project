@@ -18,13 +18,13 @@ const ViewComplaints = () => {
         });
         const data = await res.json();
         if (res.ok && data.success) {
-          // We need to make sure comments is an array
-          const complaintsWithComments = data.data.map(c => ({ ...c, comments: c.comments || [] }));
-          // Sort by net votes (upvotes - downvotes) in descending order
+
+          const complaintsWithComments = data.data.map(c => ({ ...c, comments: Array.isArray(c.comments) ? c.comments : [] }));
+
           const sortedComplaints = complaintsWithComments.sort((a, b) => {
             const netVotesA = (a.upvotes?.length || 0) - (a.downvotes?.length || 0);
             const netVotesB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
-            return netVotesB - netVotesA; // Descending order (highest first)
+            return netVotesB - netVotesA;
           });
           setComplaints(sortedComplaints);
         } else if (res.status === 401) {
@@ -49,16 +49,16 @@ const ViewComplaints = () => {
     setSelectedComplaint(null);
   };
 
-  // This function will be passed to the modal to update the comment count
+
   const updateCommentCount = (complaintId, newComment) => {
     setComplaints(complaints.map(complaint =>
       complaint._id === complaintId
-        ? { ...complaint, comments: [...complaint.comments, newComment] }
+        ? { ...complaint, comments: [...(Array.isArray(complaint.comments) ? complaint.comments : []), newComment] }
         : complaint
     ));
   };
 
-  // Handle upvote
+
   const handleUpvote = async (complaintId) => {
     try {
       const res = await fetch(`http://localhost:3002/api/complaints/${complaintId}/upvote`, {
@@ -67,30 +67,31 @@ const ViewComplaints = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        // Update the complaint in state
+
         const updatedComplaints = complaints.map(complaint =>
           complaint._id === complaintId
-            ? { 
-                ...complaint, 
+            ? {
+                ...complaint,
                 upvotes: Array(data.data.upvotes).fill(null),
                 downvotes: Array(data.data.downvotes).fill(null)
               }
             : complaint
         );
-        // Re-sort by net votes after update
+
         const sortedComplaints = updatedComplaints.sort((a, b) => {
           const netVotesA = (a.upvotes?.length || 0) - (a.downvotes?.length || 0);
           const netVotesB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
           return netVotesB - netVotesA;
         });
         setComplaints(sortedComplaints);
-      }
+      } else { throw new Error(data.message || 'Failed to upvote'); }
     } catch (error) {
       console.error("Error upvoting complaint:", error);
+       setError("Could not record vote. Please try again.");
     }
   };
 
-  // Handle downvote
+
   const handleDownvote = async (complaintId) => {
     try {
       const res = await fetch(`http://localhost:3002/api/complaints/${complaintId}/downvote`, {
@@ -99,26 +100,27 @@ const ViewComplaints = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        // Update the complaint in state
+
         const updatedComplaints = complaints.map(complaint =>
           complaint._id === complaintId
-            ? { 
-                ...complaint, 
+            ? {
+                ...complaint,
                 upvotes: Array(data.data.upvotes).fill(null),
                 downvotes: Array(data.data.downvotes).fill(null)
               }
             : complaint
         );
-        // Re-sort by net votes after update
+
         const sortedComplaints = updatedComplaints.sort((a, b) => {
           const netVotesA = (a.upvotes?.length || 0) - (a.downvotes?.length || 0);
           const netVotesB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
           return netVotesB - netVotesA;
         });
         setComplaints(sortedComplaints);
-      }
+      } else { throw new Error(data.message || 'Failed to downvote'); }
     } catch (error) {
       console.error("Error downvoting complaint:", error);
+      setError("Could not record vote. Please try again.");
     }
   };
 
@@ -141,13 +143,13 @@ const ViewComplaints = () => {
           <h1 className="text-4xl font-bold text-gray-800">Community Reports</h1>
           <p className="text-gray-500 mt-2">Browse issues reported by the community and track their status.</p>
         </div>
-        
+
         {error ? (
           <div className="text-center bg-red-50 text-red-700 rounded-xl shadow-md p-12">
             <p className="text-lg">{error}</p>
           </div>
         ) : (
-          /* CHANGE 1: Side-by-side layout */
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {complaints.length > 0 ? (
               complaints.map((complaint) => (
@@ -173,7 +175,7 @@ const ViewComplaints = () => {
         <ComplaintModal
           complaint={selectedComplaint}
           onClose={handleCloseModal}
-          onCommentAdded={updateCommentCount} // Pass the update function
+          onCommentAdded={updateCommentCount}
         />
       )}
     </div>
@@ -182,7 +184,7 @@ const ViewComplaints = () => {
 
 const ComplaintCard = ({ complaint, onClick, onUpvote, onDownvote }) => {
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' });
-  
+
   const getStatusBadge = (status) => {
     const styles = {
       received: "bg-yellow-100 text-yellow-800",
@@ -217,8 +219,8 @@ const ComplaintCard = ({ complaint, onClick, onUpvote, onDownvote }) => {
         </div>
       </div>
       <div className="mt-auto pt-4 border-t border-gray-100">
+         {/* Adjusted Alignment */}
         <div className="flex items-center justify-between">
-            {/* Vote buttons */}
             <div className="flex items-center gap-4">
               <button
                 onClick={(e) => {
@@ -226,12 +228,11 @@ const ComplaintCard = ({ complaint, onClick, onUpvote, onDownvote }) => {
                   onUpvote(complaint._id);
                 }}
                 className="flex items-center gap-1 text-gray-600 hover:text-green-600 transition-colors"
+                aria-label={`Upvote this complaint currently having ${complaint.upvotes?.length || 0} upvotes`}
               >
                 <FaThumbsUp className="text-sm" />
-                
-                <span className="text-md font-semibold">{complaint.upvotes?.length || 0}</span>
-               
-                <p className="lg:block hidden">Upvote</p>
+                <span className="text-sm font-semibold">{complaint.upvotes?.length || 0}</span>
+                <p className="lg:block hidden text-sm">Upvote</p>
               </button>
               <button
                 onClick={(e) => {
@@ -239,18 +240,20 @@ const ComplaintCard = ({ complaint, onClick, onUpvote, onDownvote }) => {
                   onDownvote(complaint._id);
                 }}
                 className="flex items-center gap-1 text-gray-600 hover:text-red-600 transition-colors"
+                 aria-label={`Downvote this complaint currently having ${complaint.downvotes?.length || 0} downvotes`}
               >
                 <FaThumbsDown className="text-sm" />
-                <span className="text-md font-semibold">{complaint.downvotes?.length || 0}</span>
-                <p className="lg:block hidden">Downvote</p>
+                <span className="text-sm font-semibold">{complaint.downvotes?.length || 0}</span>
+                <p className="lg:block hidden text-sm">Downvote</p>
               </button>
-              <div className="flex items-center gap-2 text-gray-600 text-sm">
+              <div className="flex items-center gap-1.5 text-gray-600 text-sm" aria-label={`${complaint.comments?.length || 0} comments`}>
                 <FaRegComment />
                 <span>{complaint.comments?.length || 0}</span>
               </div>
             </div>
-            <span className="text-blue-600 font-semibold text-sm hover:underline">View Details</span>
+          <span className="text-blue-600 font-semibold text-sm hover:underline flex-shrink-0">View Details</span>
         </div>
+        {/* End Adjusted Alignment */}
       </div>
     </div>
   );

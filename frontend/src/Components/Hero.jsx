@@ -1,65 +1,68 @@
+// src/Components/Hero.jsx
+
 import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link for the button
-import { FiArrowRight } from 'react-icons/fi'; // Icon for the button
+import { Link } from 'react-router-dom';
+import { FiArrowRight, FiMapPin, FiUsers, FiClock } from 'react-icons/fi'; // Updated icons for relevance
 
 const Hero = () => {
     return (
-        // Added overflow-hidden and a unique class for potential background animation
-        <div className="relative min-h-screen flex items-center justify-center pt-24 pb-16 overflow-hidden hero-background">
-            {/* Background Image */}
+        // === STYLE UPDATE: Added bg-gradient-to-b, adjusted padding ===
+        <div className="relative min-h-screen flex items-center justify-center pt-24 pb-20 overflow-hidden bg-gradient-to-b from-blue-50 via-gray-50 to-white">
+
+            {/* Background Image Container */}
             <div className="absolute inset-0 w-full h-full">
+                {/* === IMAGE UPDATE: Changed src to hero4.jpg === */}
                 <img
-                    src="images/hero.png" //
-                    alt="City Street"
+                    src="/images/hero4.jpg" // <<< CHANGED IMAGE SOURCE
+                    alt="Clean city street"
                     className="absolute inset-0 w-full h-full object-cover object-center"
                 />
-                {/* Enhanced Overlay - Smoother gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none"></div>
-                 {/* Optional: Subtle pattern overlay */}
-                 {/* <div className="absolute inset-0 bg-[url('/path/to/subtle-pattern.png')] opacity-10"></div> */}
+                {/* === STYLE UPDATE: Adjusted overlay gradient for better text visibility === */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/10 pointer-events-none"></div>
             </div>
 
             {/* Content Area */}
-            <div className="relative z-10 px-4 sm:px-8 py-10 text-center">
+            {/* === STYLE UPDATE: Adjusted padding, max-width === */}
+            <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
                 <div className="max-w-4xl mx-auto">
-                    {/* Enhanced Text Animation */}
-                    <h1 className="text-white text-4xl sm:text-6xl md:text-7xl font-bold leading-tight mb-6 animate-fade-in-down duration-700">
-                        Transform Your Streets, Together.
+                    {/* === STYLE UPDATE: Enhanced text styling, smoother animation === */}
+                    <h1 className="text-white text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6 animate-fade-in-down duration-700 ease-out drop-shadow-lg">
+                        Building Cleaner Communities, <span className="text-blue-300">Together</span>.
                     </h1>
-                    <p className="mt-4 text-white/90 text-base sm:text-lg md:text-xl max-w-2xl mx-auto animate-fade-in-up duration-700 delay-200">
-                        Join thousands of citizens building better neighborhoods. Report issues, track progress, and collaborate for the change you want to see.
+                    <p className="mt-4 text-gray-200 text-base sm:text-lg md:text-xl max-w-2xl mx-auto animate-fade-in-up duration-700 ease-out delay-200 drop-shadow">
+                        Report street issues easily, track their resolution, and collaborate with your community for a better neighborhood. Your action matters.
                     </p>
 
                      {/* Call to Action Button */}
+                     {/* === STYLE UPDATE: Refined button style, hover effect === */}
                      <Link
-                        to="/register" // Link to registration page
-                        className="mt-10 inline-flex items-center gap-3 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-full shadow-lg transition-all  ease-in-out transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-black/50 animate-fade-in-up duration-700 delay-400"
+                        to="/register"
+                        className="mt-10 inline-flex items-center gap-2.5 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-base font-semibold rounded-lg shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 animate-fade-in-up duration-700 ease-out delay-400"
                     >
-                        Get Started Now <FiArrowRight className="ml-1" />
+                        Get Started <FiArrowRight className="ml-1 text-blue-200" size={18} />
                     </Link>
                 </div>
 
-                {/* Feature Cards - Enhanced Styling & Hover Effect */}
-                <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                    {/* Card 1 */}
+                {/* Feature Cards Section */}
+                {/* === STYLE UPDATE: Increased top margin, adjusted grid gap === */}
+                <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                    {/* Updated icons and potentially text */}
                     <FeatureCard
-                        icon="images/icons/location.png" //
-                        title="Smart Reporting"
-                        description="Use advanced tools to report issues with precise location tracking and photo evidence."
+                        icon={<FiMapPin size={32} className="text-blue-500"/>} // Using icon component
+                        title="Precise Reporting"
+                        description="Easily report issues using map integration and photo uploads for accurate location and details."
                         delay="300"
                     />
-                     {/* Card 2 */}
                     <FeatureCard
-                        icon="images/icons/user.png" //
-                        title="Role-Based Access"
-                        description="Citizens, Volunteers, and administrators working together using a centralized platform."
+                        icon={<FiUsers size={32} className="text-green-500"/>} // Using icon component
+                        title="Community Driven"
+                        description="Engage with fellow citizens, volunteers, and officials on a unified platform for collective action."
                         delay="500"
                     />
-                     {/* Card 3 */}
                     <FeatureCard
-                        icon="images/icons/restore.png" //
-                        title="Real-Time Updates"
-                        description="Get instant notifications and track resolution progress in your personalized dashboard."
+                        icon={<FiClock size={32} className="text-orange-500"/>} // Using icon component
+                        title="Track Progress"
+                        description="Receive real-time updates and monitor the status of reported issues directly from your dashboard."
                         delay="700"
                     />
                 </div>
@@ -68,17 +71,20 @@ const Hero = () => {
     );
 };
 
-// Feature Card Component - Enhanced Style
+// Feature Card Component
+// === STYLE UPDATE: Refined card styling, added border, hover effect ===
 const FeatureCard = ({ icon, title, description, delay }) => (
     <div
-        className={`bg-white/10 backdrop-blur-xl border border-white/20 text-white p-8 rounded-2xl transition-all duration-300 ease-out transform hover:scale-[1.03] hover:border-white/40 hover:shadow-2xl hover:shadow-blue-500/20 animate-fade-in-up animation-delay-${delay}`}
-        // style={{ animationDelay: `${delay}ms` }} // Alternative way to handle delay if Tailwind classes aren't sufficient
+        className={`bg-white/80 backdrop-blur-md border border-gray-200/50 text-gray-800 p-6 rounded-xl shadow-lg transition-all duration-300 ease-out transform hover:-translate-y-2 hover:shadow-xl hover:border-blue-200 animate-fade-in-up animation-delay-${delay}`}
+        style={{ animationDelay: `${parseInt(delay)}ms` }} // Ensure animation delay works
     >
         <div className="flex flex-col items-center text-center">
-            {/* Make sure icons are visible (e.g., white or use invert) */}
-            <img className="h-14 mb-5 filter invert brightness-0" src={icon} alt={`${title} icon`} />
-            <h3 className="text-xl font-semibold mb-2">{title}</h3>
-            <p className="text-sm text-white/80 leading-relaxed">{description}</p>
+            {/* Render icon component directly */}
+            <div className="mb-4 p-3 bg-gradient-to-br from-gray-100 to-blue-100 rounded-full shadow-inner border border-white/50">
+                 {icon}
+            </div>
+            <h3 className="text-lg font-semibold mb-2 text-gray-900">{title}</h3>
+            <p className="text-sm text-gray-600 leading-relaxed">{description}</p>
         </div>
     </div>
 );

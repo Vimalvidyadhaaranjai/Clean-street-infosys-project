@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
-// --- ICON IMPORTS (Keep existing ones) ---
-import { FiGrid, FiFilePlus, FiEye, FiUser, FiLogOut, FiShield, FiMenu, FiX } from "react-icons/fi"; // Added FiMenu, FiX
+import { FiGrid, FiFilePlus, FiEye, FiUser, FiLogOut, FiShield, FiMenu, FiX, FiChevronDown, FiInfo, FiHelpCircle, FiSettings } from "react-icons/fi"; // Added Info, HelpCircle, Settings
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -9,9 +8,8 @@ const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
     const profileMenuRef = useRef(null);
-    const mobileMenuRef = useRef(null); // Ref for mobile menu
+    const mobileMenuRef = useRef(null);
 
-    // Get user from localStorage on initial load
     useEffect(() => {
         try {
             const stored = localStorage.getItem("user");
@@ -19,16 +17,17 @@ const Navbar = () => {
         } catch (error) {
             console.error("Failed to parse user from localStorage", error);
         }
-    }, []);
+    }, []
+);
 
-    // Close menus when clicking outside
-    useEffect(() => {
+    useEffect(() => 
+        {
         const handleClickOutside = (event) => {
-            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target) && !event.target.closest('#profile-menu-button')) {
                 setIsProfileMenuOpen(false);
             }
-            // Close mobile menu if clicking outside of it and not on the toggle button
-            if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target) && !event.target.closest('#mobile-menu-button')) {
+            if
+             (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target) && !event.target.closest('#mobile-menu-button')) {
                setIsMenuOpen(false);
             }
         };
@@ -45,32 +44,26 @@ const Navbar = () => {
         navigate('/login');
     };
 
-    const closeMobileMenu = () => {
-        setIsMenuOpen(false);
-    };
+    const closeMobileMenu = () => setIsMenuOpen(false);
+    const toggleProfileMenu = () => setIsProfileMenuOpen(prev => !prev);
+    const toggleMobileMenu = () => setIsMenuOpen(prev => !prev);
 
     const initial = user?.name ? user.name.trim().charAt(0).toUpperCase() : 'U';
 
     return (
         <>
-            {/* Main Navbar */}
-            {/* TRENDY STYLE: Added gradient, slightly increased height, adjusted blur/opacity */}
-            <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-white/80 via-white/70 to-blue-50/60 backdrop-blur-xl shadow-md border-b border-gray-200/50">
+            <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg shadow-sm border-b border-gray-200/60">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* TRENDY STYLE: Increased height h-24 */}
-                    <div className="flex items-center justify-between h-24">
-                        {/* Logo */}
-                        <Link to="/" onClick={closeMobileMenu} className="flex-shrink-0 transition-transform duration-300 hover:scale-105">
-                            {/* TRENDY STYLE: Increased logo size h-20 */}
-                            <img className="h-30 w-auto" src="/images/logo.png" alt="Clean Street Logo" />
+                    <div className="flex items-center justify-between h-20">
+                        <Link to="/" onClick={closeMobileMenu} className="flex-shrink-0 transition-transform duration-300 ease-out hover:scale-105 group">
+                            <img className="h-16 w-auto transition-filter duration-300 group-hover:brightness-110" src="/images/logo.png" alt="Clean Street Logo" />
                         </Link>
 
-                        {/* Desktop Navigation Links */}
-                        {/* TRENDY STYLE: Increased spacing space-x-4 */}
-                        <div className="hidden lg:flex items-center space-x-4">
-                            {user && (
+                        {/* === CONDITIONAL NAVIGATION LINKS === */}
+                        <div className="hidden lg:flex items-center space-x-2">
+                            {user ? (
+                                // Logged-in Links
                                 <>
-                                    {/* Using the new NavLink component */}
                                     <NavLink to="/UserDashboard"><FiGrid /><span>Dashboard</span></NavLink>
                                     {user.role === "volunteer" && (
                                         <NavLink to="/VolunteerDashboard"><FiGrid /><span>Volunteer Board</span></NavLink>
@@ -81,6 +74,13 @@ const Navbar = () => {
                                     <NavLink to="/ReportIssue"><FiFilePlus /><span>Report Issue</span></NavLink>
                                     <NavLink to="/view-complaints"><FiEye /><span>View Complaints</span></NavLink>
                                 </>
+                            ) : (
+                                // Logged-out Links (NEW)
+                                <>
+        <NavLink to="/about"><FiInfo /><span>About</span></NavLink>
+        <NavLink to="/how-it-works"><FiHelpCircle /><span>How it Works</span></NavLink>
+        <NavLink to="/services"><FiSettings /><span>Services</span></NavLink> {/* Correct */}
+    </>
                             )}
                         </div>
 
@@ -88,46 +88,49 @@ const Navbar = () => {
                         <div className="flex items-center gap-4">
                             {user ? (
                                 <div className="relative" ref={profileMenuRef}>
-                                    <button onClick={() => setIsProfileMenuOpen(prev => !prev)} className="flex items-center rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform duration-300 hover:scale-110">
-                                         {/* TRENDY STYLE: Increased avatar size w-12 h-12 */}
+                                    <button
+                                        id="profile-menu-button"
+                                        onClick={toggleProfileMenu}
+                                        className="flex items-center gap-2 rounded-full p-1 pr-3 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
+                                        aria-label="User menu" aria-haspopup="true" aria-expanded={isProfileMenuOpen}
+                                    >
                                         {user.profilePhoto ? (
-                                            <img src={user.profilePhoto} alt="avatar" className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md"/>
+                                            <img src={user.profilePhoto} alt="avatar" className="w-10 h-10 rounded-full object-cover border-2 border-gray-100 shadow-sm"/>
                                         ) : (
-                                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-xl uppercase font-bold shadow-md">
+                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-lg uppercase font-semibold shadow-sm border-2 border-white">
                                                 {initial}
                                             </div>
                                         )}
+                                        <span className="hidden sm:inline text-sm font-medium text-gray-700">{user.name}</span>
+                                        <FiChevronDown size={16} className={`hidden sm:inline text-gray-500 transition-transform duration-200 ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
                                     </button>
 
-                                    {/* Profile Dropdown Menu */}
-                                    {/* TRENDY STYLE: Added transition classes */}
                                     <div
-                                        className={`absolute right-0 mt-4 w-64 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-100 transition-all duration-300 ease-out origin-top-right ${isProfileMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}
+                                        className={`absolute right-0 mt-3 w-60 origin-top-right bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100 focus:outline-none transition-all duration-200 ease-out ${isProfileMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}
+                                        role="menu" aria-orientation="vertical" aria-labelledby="profile-menu-button" tabIndex="-1"
                                     >
-                                        <div className="px-4 py-3 border-b border-gray-100">
-                                            <p className="font-bold text-gray-800 truncate">{user.name}</p>
-                                            <p className="text-sm text-gray-500 truncate">{user.email}</p>
+                                        <div className="px-4 py-2 border-b border-gray-100">
+                                            <p className="font-semibold text-sm text-gray-800 truncate">{user.name}</p>
+                                            <p className="text-xs text-gray-500 truncate">{user.email}</p>
                                         </div>
-                                        <div className="py-1">
-                                            <ProfileMenuItem to="/profile" icon={<FiUser />} onClick={() => setIsProfileMenuOpen(false)}>My Profile</ProfileMenuItem>
+                                        <div className="py-1" role="none">
+                                            <ProfileMenuItem to="/profile" icon={<FiUser />} onClick={toggleProfileMenu}>My Profile</ProfileMenuItem>
                                             <ProfileMenuItem icon={<FiLogOut />} onClick={handleLogout} isLogout>Logout</ProfileMenuItem>
                                         </div>
                                     </div>
                                 </div>
                             ) : (
-                                <div className="hidden lg:flex items-center gap-3">
+                                <div className="hidden lg:flex items-center gap-2">
                                     <AuthButton to="/login" secondary>Login</AuthButton>
                                     <AuthButton to="/register">Register</AuthButton>
                                 </div>
                             )}
 
-                            {/* Hamburger Menu Button (visible on mobile) */}
-                            {/* TRENDY STYLE: Using FiMenu/FiX icons, styled button */}
                             <button
-                                id="mobile-menu-button" // Added ID for click outside logic
-                                className="lg:hidden p-3 rounded-full text-gray-700 hover:bg-gray-200/60 focus:outline-none transition-colors duration-200"
-                                onClick={() => setIsMenuOpen(prev => !prev)}
-                                aria-label="Toggle menu"
+                                id="mobile-menu-button"
+                                className="lg:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 transition-colors"
+                                onClick={toggleMobileMenu}
+                                aria-label="Toggle menu" aria-controls="mobile-menu" aria-expanded={isMenuOpen}
                             >
                                {isMenuOpen ? <FiX size={24}/> : <FiMenu size={24} />}
                             </button>
@@ -137,25 +140,27 @@ const Navbar = () => {
             </nav>
 
             {/* Mobile Navigation Menu Panel */}
-            {/* TRENDY STYLE: Slide in from right, full height, blurred background */}
+            
             <div
-                ref={mobileMenuRef} // Add ref here
-                className={`fixed top-0 right-0 h-full w-72 bg-white/90 backdrop-blur-lg shadow-xl z-[60] lg:hidden transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                ref={mobileMenuRef} id="mobile-menu"
+                className={`fixed top-0 right-0 h-full w-72 bg-white shadow-xl z-40 lg:hidden transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                role="dialog" aria-modal="true"
             >
-                <div className="flex justify-between items-center p-4 border-b border-gray-200 h-24">
-                     <span className="font-bold text-lg text-gray-700">Menu</span>
+                <div className="flex justify-between items-center p-4 border-b border-gray-200 h-20">
+                     <span className="font-semibold text-lg text-gray-800">Menu</span>
                      <button
-                         className="p-2 rounded-full text-gray-500 hover:bg-gray-200/60"
+                         className="p-2 rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                          onClick={closeMobileMenu}
                          aria-label="Close menu"
                      >
-                         <FiX size={22}/>
+                         <FiX size={24}/>
                      </button>
                  </div>
-                <div className="px-2 pt-4 pb-4 space-y-2 sm:px-3">
+                <nav className="px-3 pt-4 pb-4 space-y-1">
+                    {/* === CONDITIONAL MOBILE LINKS === */}
                     {user ? (
+                        // Logged-in Mobile Links
                         <>
-                            {/* Using new MobileNavLink component */}
                             <MobileNavLink to="/UserDashboard" onClick={closeMobileMenu}><FiGrid /><span>Dashboard</span></MobileNavLink>
                             {user.role === "volunteer" && (
                                 <MobileNavLink to="/VolunteerDashboard" onClick={closeMobileMenu}><FiGrid /><span>Volunteer Board</span></MobileNavLink>
@@ -165,34 +170,40 @@ const Navbar = () => {
                              )}
                             <MobileNavLink to="/ReportIssue" onClick={closeMobileMenu}><FiFilePlus /><span>Report Issue</span></MobileNavLink>
                             <MobileNavLink to="/view-complaints" onClick={closeMobileMenu}><FiEye /><span>View Complaints</span></MobileNavLink>
-                            {/* Added Profile link for mobile */}
-                            <div className="pt-4 mt-4 border-t border-gray-200">
+                            <div className="pt-4 mt-4 border-t border-gray-100">
                                 <MobileNavLink to="/profile" onClick={closeMobileMenu}><FiUser /><span>My Profile</span></MobileNavLink>
                                 <button
                                     onClick={handleLogout}
-                                    className="w-full flex items-center gap-3 px-3 py-3 text-base font-semibold rounded-md text-red-600 hover:bg-red-50 transition-colors duration-200"
+                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-base font-medium rounded-md text-red-600 hover:bg-red-50 transition-colors duration-200"
                                 >
                                     <FiLogOut /><span>Logout</span>
                                 </button>
                             </div>
                         </>
                     ) : (
-                        <div className="flex flex-col items-center gap-4 py-6 px-4">
-                           <AuthButton to="/login" onClick={closeMobileMenu} secondary fullWidth>Login</AuthButton>
-                           <AuthButton to="/register" onClick={closeMobileMenu} fullWidth>Register</AuthButton>
-                        </div>
+                        // Logged-out Mobile Links
+                        <>
+                            <>
+        <MobileNavLink to="/about" onClick={closeMobileMenu}><FiInfo /><span>About</span></MobileNavLink>
+        <MobileNavLink to="/how-it-works" onClick={closeMobileMenu}><FiHelpCircle /><span>How it Works</span></MobileNavLink>
+        <MobileNavLink to="/services" onClick={closeMobileMenu}><FiSettings /><span>Services</span></MobileNavLink> {/* Correct */}
+        {/* ... Login/Register links ... */}
+    </>
+                            <div className="pt-4 mt-4 border-t border-gray-100">
+                                <MobileNavLink to="/login" onClick={closeMobileMenu}>Login</MobileNavLink>
+                                <MobileNavLink to="/register" onClick={closeMobileMenu}>Register</MobileNavLink>
+                            </div>
+                        </>
                     )}
-                </div>
+                </nav>
             </div>
-             {/* TRENDY STYLE: Overlay for mobile menu */}
-            {isMenuOpen && <div className="fixed inset-0 bg-black/30 z-50 lg:hidden" onClick={closeMobileMenu}></div>}
+            {isMenuOpen && <div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={closeMobileMenu}></div>}
+            <div className="h-20" />
         </>
     );
 };
 
-// --- Reusable Sub-components ---
-
-// TRENDY STYLE: Updated NavLink styles for better hover/active states
+// --- Reusable Sub-components (Keep NavLink, MobileNavLink, AuthButton, ProfileMenuItem as they were) ---
 const NavLink = ({ to, children }) => {
     const location = useLocation();
     const isActive = location.pathname === to;
@@ -200,22 +211,22 @@ const NavLink = ({ to, children }) => {
     return (
         <Link
             to={to}
-            className={`flex items-center gap-2 px-4 py-2 font-semibold rounded-full transition-all duration-300 relative group ${
+            className={`relative flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 group ${
                 isActive
                     ? 'text-indigo-600 bg-indigo-50'
-                    : 'text-gray-600 hover:text-indigo-600 hover:bg-indigo-50/50'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
             }`}
         >
             {children}
-            {/* TRENDY STYLE: Animated underline effect on hover */}
+
             <span
-                className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-indigo-600 transition-all duration-300 ease-out group-hover:w-3/5 ${isActive ? 'w-3/5' : 'w-0'}`}
+                className={`absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 transition-all duration-300 ease-out origin-center ${isActive ? 'scale-x-75 opacity-100' : 'scale-x-0 opacity-0 group-hover:scale-x-50 group-hover:opacity-100'}`}
+                aria-hidden="true"
             ></span>
         </Link>
     );
-};
-
-// TRENDY STYLE: Updated MobileNavLink styles
+}
+;
 const MobileNavLink = ({ to, children, onClick }) => {
     const location = useLocation();
     const isActive = location.pathname === to;
@@ -224,7 +235,7 @@ const MobileNavLink = ({ to, children, onClick }) => {
         <Link
             to={to}
             onClick={onClick}
-            className={`flex items-center gap-3 px-4 py-3 text-base font-semibold rounded-lg transition-colors duration-200 ${
+            className={`flex items-center gap-3 px-4 py-2.5 text-base font-medium rounded-md transition-colors duration-200 ${
                 isActive
                     ? 'text-indigo-700 bg-indigo-100'
                     : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
@@ -233,36 +244,36 @@ const MobileNavLink = ({ to, children, onClick }) => {
             {children}
         </Link>
     );
-};
-
-// TRENDY STYLE: Updated AuthButton styles
+}
+;
 const AuthButton = ({ to, children, secondary = false, onClick, fullWidth = false }) => (
-    <Link
+     <Link
         to={to}
         onClick={onClick}
-        className={`px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-md flex items-center justify-center ${fullWidth ? 'w-full' : ''}
+        className={`px-5 py-2 rounded-md font-semibold text-sm transition-all duration-200 ease-out transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 flex items-center justify-center ${fullWidth ? 'w-full' : ''}
             ${secondary
-                ? 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700'
+                ? 'bg-gray-100 text-gray-800 hover:bg-gray-200 border border-gray-200/80 shadow-sm'
+                : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow hover:shadow-md hover:from-blue-700 hover:to-indigo-700'
             }`
         }
     >
         {children}
-    </Link>
-);
 
-// TRENDY STYLE: Updated ProfileMenuItem styles
+    </Link>
+)
+;
 const ProfileMenuItem = ({ to, icon, children, onClick, isLogout = false }) => {
-    const baseClasses = `w-full text-left px-5 py-3 flex items-center gap-3 transition-colors duration-200 text-sm rounded-lg mx-1`;
-    const normalClasses = `font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900`;
-    const logoutClasses = `font-semibold text-red-600 hover:bg-red-50`;
+
+    const baseClasses = `w-full text-left px-4 py-2 flex items-center gap-2.5 transition-colors duration-150 text-sm`;
+    const normalClasses = `font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md mx-1`;
+    const logoutClasses = `font-medium text-red-600 hover:bg-red-50 rounded-md mx-1`;
 
     const className = `${baseClasses} ${isLogout ? logoutClasses : normalClasses}`;
 
     return to ? (
-        <Link to={to} className={className} onClick={onClick}>{icon}{children}</Link>
+        <Link to={to} className={className} onClick={onClick} role="menuitem" tabIndex="-1">{icon}{children}</Link>
     ) : (
-        <button className={className} onClick={onClick}>{icon}{children}</button>
+        <button className={className} onClick={onClick} role="menuitem" tabIndex="-1">{icon}{children}</button>
     );
 };
 
