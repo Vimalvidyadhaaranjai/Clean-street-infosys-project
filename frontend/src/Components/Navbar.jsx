@@ -56,9 +56,10 @@ const Navbar = () => {
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-20">
                         <Link to="/" onClick={closeMobileMenu} className="flex-shrink-0 transition-transform duration-300 ease-out hover:scale-105 group">
-                            <img className="h-16 w-auto transition-filter duration-300 group-hover:brightness-110" src="/images/logo.png" alt="Clean Street Logo" />
+                            <img className="h-24 w-auto transition-filter duration-300 group-hover:brightness-110" src="/images/logo.png" alt="Clean Street Logo" />
                         </Link>
 
+                    <div className='flex justify-end'>
                         {/* === CONDITIONAL NAVIGATION LINKS === */}
                         <div className="hidden lg:flex items-center space-x-2">
                             {user ? (
@@ -135,6 +136,7 @@ const Navbar = () => {
                                {isMenuOpen ? <FiX size={24}/> : <FiMenu size={24} />}
                             </button>
                         </div>
+                    </div>
                     </div>
                 </div>
             </nav>

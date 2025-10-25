@@ -9,7 +9,7 @@ const ServicesPage = () => {
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
             <Navbar />
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow animate-fade-in-up">
-                <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sm:p-10 max-w-4xl mx-auto">
+                <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sm:p-10 max-w-8xl mx-auto">
                     <header className="text-center mb-8 border-b border-gray-200 pb-6">
                          <FiGrid className="mx-auto text-5xl text-indigo-500 mb-4" />
                         <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 tracking-tight">
@@ -18,7 +18,7 @@ const ServicesPage = () => {
                         <p className="text-gray-600 mt-2 text-base">Features designed for community action.</p>
                     </header>
 
-                    <section className="space-y-6 text-gray-700 leading-relaxed">
+                    <section className="space-y-4 px-16 text-gray-700 leading-relaxed">
                         <ServiceItem icon={<FiMapPin className="text-blue-600"/>} title="Issue Reporting with Geolocation">
                             Easily report environmental concerns using an interactive map to pinpoint the exact location. Add details, priority, type, and photos for comprehensive reporting.
                         </ServiceItem>

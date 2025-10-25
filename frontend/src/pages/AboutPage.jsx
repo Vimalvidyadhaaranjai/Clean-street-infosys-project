@@ -8,7 +8,7 @@ const AboutPage = () => {
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
             <Navbar />
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow animate-fade-in-up">
-                <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sm:p-10 max-w-4xl mx-auto">
+                <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sm:p-10 max-w-8xl mx-auto">
                     <header className="text-center mb-8 border-b border-gray-200 pb-6">
                         <FiInfo className="mx-auto text-5xl text-indigo-500 mb-4" />
                         <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 tracking-tight">
@@ -31,9 +31,7 @@ const AboutPage = () => {
                         <p>
                             We are a community-focused initiative leveraging technology to address common urban challenges like garbage disposal, road damage, and infrastructure maintenance. Our platform connects people who care about their local environment with the resources and channels needed to make a tangible difference.
                         </p>
-                        <p>
-                            (Add more details about the project's origin, team, or goals here...)
-                        </p>
+
 
                     </section>
                 </div>
