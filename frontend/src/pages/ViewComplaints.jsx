@@ -198,6 +198,26 @@ const ComplaintCard = ({ complaint, onClick, onUpvote, onDownvote }) => {
     return <span className={`px-3 py-1 text-sm font-semibold rounded-full ${styles[status]}`}>{labels[status] || 'Unknown'}</span>;
   };
 
+  const getProgressPercentage = (status) => {
+    const progressMap = {
+      received: 25,
+      in_review: 50,
+      resolved: 100,
+      rejected: 0,
+    };
+    return progressMap[status] || 0;
+  };
+
+  const getProgressColor = (status) => {
+    const colorMap = {
+      received: "bg-yellow-500",
+      in_review: "bg-blue-500",
+      resolved: "bg-green-500",
+      rejected: "bg-red-500",
+    };
+    return colorMap[status] || "bg-gray-500";
+  };
+
   return (
     <div
       className="bg-white rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] animate-fade-in-up cursor-pointer flex flex-col"
@@ -208,6 +228,9 @@ const ComplaintCard = ({ complaint, onClick, onUpvote, onDownvote }) => {
             {getStatusBadge(complaint.status)}
             <p className="text-sm text-gray-500 ml-auto">{formatDate(complaint.createdAt)}</p>
         </div>
+        
+
+        
         {complaint.photo && (
           <img src={complaint.photo} alt={complaint.title} className="w-full h-48 object-cover rounded-lg mb-4" />
         )}
@@ -216,6 +239,20 @@ const ComplaintCard = ({ complaint, onClick, onUpvote, onDownvote }) => {
         <div className="flex items-center text-sm text-gray-500 mb-4">
             <FaMapMarkerAlt className="mr-2 flex-shrink-0" />
             <span>{complaint.address}</span>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-medium text-gray-600">Progress</span>
+            <span className="text-xs font-semibold text-gray-700">{getProgressPercentage(complaint.status)}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+            <div 
+              className={`h-2.5 rounded-full transition-all duration-500 ease-out ${getProgressColor(complaint.status)}`}
+              style={{ width: `${getProgressPercentage(complaint.status)}%` }}
+            ></div>
+          </div>
         </div>
       </div>
       <div className="mt-auto pt-4 border-t border-gray-100">
