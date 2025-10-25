@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import { useNavigate } from "react-router-dom";
-import { FaUsers, FaClipboardList, FaCheckCircle, FaSpinner, FaEdit, FaSave, FaTimes, FaToggleOn, FaToggleOff } from "react-icons/fa";
+import { FiUsers, FiClipboard, FiAlertCircle, FiCheckCircle, FiEdit, FiSave, FiX, FiLoader, FiActivity, FiUserCheck, FiClock } from "react-icons/fi";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -11,17 +11,17 @@ const AdminDashboard = () => {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState("overview"); // overview, users, complaints
+  const [activeTab, setActiveTab] = useState("overview");
   const [editingUserId, setEditingUserId] = useState(null);
   const [selectedRole, setSelectedRole] = useState("");
+  const [isSavingRole, setIsSavingRole] = useState(false);
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    // Role check
     if (currentUser?.role !== "admin") {
       alert("Access Denied: Admins only.");
-      navigate("/UserDashboard"); // Redirect non-admins
+      navigate("/UserDashboard");
       return;
     }
     fetchData();
@@ -38,7 +38,8 @@ const AdminDashboard = () => {
       ]);
 
       if (!statsRes.ok || !usersRes.ok || !complaintsRes.ok) {
-         throw new Error('Failed to fetch admin data. Ensure you are logged in as admin.');
+         const errorData = await (statsRes.ok ? usersRes.ok ? complaintsRes : usersRes : statsRes).json();
+         throw new Error(errorData.message || 'Failed to fetch admin data. Ensure you are logged in as admin.');
       }
 
       const statsData = await statsRes.json();
@@ -52,7 +53,7 @@ const AdminDashboard = () => {
     } catch (err) {
       console.error("Error fetching admin data:", err);
       setError(err.message || "Failed to load data. Please try again.");
-       if (err.message.includes('403') || err.message.includes('401')) { // Basic check for auth errors
+       if (err.message.includes('403') || err.message.includes('401') || err.message.includes('logged in')) {
            alert("Authentication failed or forbidden access. Please log in as an admin.");
            navigate('/login');
        }
@@ -72,7 +73,8 @@ const AdminDashboard = () => {
   };
 
   const handleSaveRole = async (userId) => {
-    if (!selectedRole) return;
+    if (!selectedRole || !editingUserId || userId !== editingUserId) return;
+    setIsSavingRole(true);
     try {
       const res = await fetch(`http://localhost:3002/api/admin/users/${userId}/role`, {
         method: 'PATCH',
@@ -84,127 +86,166 @@ const AdminDashboard = () => {
       if (res.ok && data.success) {
         alert('User role updated successfully!');
         setEditingUserId(null);
-        fetchData(); // Refresh user list
+        fetchData();
       } else {
         throw new Error(data.message || 'Failed to update role.');
       }
     } catch (err) {
       console.error("Error updating role:", err);
       alert(`Error: ${err.message}`);
+    } finally {
+        setIsSavingRole(false);
     }
   };
 
    const getStatusBadge = (status) => {
-    const styles = { received: "bg-yellow-100 text-yellow-800", in_review: "bg-blue-100 text-blue-800", resolved: "bg-green-100 text-green-800", rejected: "bg-red-100 text-red-800" };
+    const styles = {
+      received: "bg-yellow-100 text-yellow-800 border border-yellow-200",
+      in_review: "bg-blue-100 text-blue-800 border border-blue-200",
+      resolved: "bg-green-100 text-green-800 border border-green-200",
+      rejected: "bg-red-100 text-red-800 border border-red-200",
+    };
     const labels = { received: "Pending", in_review: "In Review", resolved: "Resolved", rejected: "Rejected" };
-    return <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${styles[status]}`}>{labels[status] || 'Unknown'}</span>;
+    return <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full ${styles[status] || 'bg-gray-100 text-gray-800 border-gray-200'}`}>{labels[status] || status}</span>;
    };
 
    const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
   if (loading) {
     return (
-      <>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
         <Navbar />
-        <div className="bg-gray-50 flex justify-center items-center min-h-screen">
-          <div className="text-center"><FaSpinner className="animate-spin text-blue-600 text-5xl mx-auto mb-4" /><p className="text-gray-600 text-lg">Loading Admin Dashboard...</p></div>
+         <div className="flex-grow flex items-center justify-center">
+             <div className="text-center">
+                 <svg className="animate-spin mx-auto h-12 w-12 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                 </svg>
+                 <p className="mt-4 text-lg font-medium text-gray-600">Loading Admin Dashboard...</p>
+             </div>
         </div>
-      </>
+        <Footer />
+      </div>
     );
   }
 
    if (error) {
     return (
-      <>
+       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
         <Navbar />
-        <div className="bg-gray-50 flex justify-center items-center min-h-screen">
-           <div className="text-center text-red-600 bg-red-50 p-6 rounded-lg shadow">
-               <p className="font-semibold">Error Loading Dashboard:</p>
-               <p>{error}</p>
-               <button onClick={() => navigate('/login')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Go to Login</button>
+         <div className="flex-grow flex items-center justify-center p-4">
+           <div className="text-center bg-red-50 p-6 rounded-lg shadow border border-red-200 max-w-lg w-full">
+               <FiAlertCircle className="mx-auto text-red-500 text-4xl mb-3"/>
+               <p className="font-semibold text-red-800 text-lg">Error Loading Dashboard</p>
+               <p className="text-red-700 text-sm mt-1">{error}</p>
+               <button onClick={() => navigate('/login')} className="mt-5 px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 transition-colors">
+                 Go to Login
+               </button>
            </div>
         </div>
-      </>
+        <Footer/>
+      </div>
     );
   }
 
-
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
       <Navbar />
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12 flex-grow">
-        <header className="mb-10 animate-fade-in-down">
-          <h1 className="text-4xl font-bold text-gray-800">Admin Dashboard</h1>
-          <p className="text-gray-500 mt-1">Manage users and monitor complaints.</p>
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow">
+        <header className="mb-8 animate-fade-in-down">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 tracking-tight">Admin Dashboard</h1>
+          <p className="text-gray-600 mt-1 text-base">Overview and management tools.</p>
         </header>
 
-        {/* Tabs */}
-        <div className="flex gap-4 mb-6 border-b border-gray-200">
-           <TabButton id="overview" activeTab={activeTab} setActiveTab={setActiveTab}>Overview</TabButton>
-           <TabButton id="users" activeTab={activeTab} setActiveTab={setActiveTab}>Manage Users ({stats.totalUsers})</TabButton>
-           <TabButton id="complaints" activeTab={activeTab} setActiveTab={setActiveTab}>View Complaints ({stats.totalComplaints})</TabButton>
+        <div className="border-b border-gray-200 mb-6">
+            <nav className="flex -mb-px space-x-6" aria-label="Tabs">
+               <TabButton id="overview" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiActivity />}>Overview</TabButton>
+               <TabButton id="users" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiUsers />}>Manage Users ({stats.totalUsers})</TabButton>
+               <TabButton id="complaints" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiClipboard />}>View Complaints ({stats.totalComplaints})</TabButton>
+             </nav>
          </div>
 
 
-        {/* Tab Content */}
         <div className="animate-fade-in-up">
           {activeTab === 'overview' && (
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <StatCard icon={<FaUsers className="text-purple-500" />} value={stats.totalUsers} label="Total Users" />
-              <StatCard icon={<FaClipboardList className="text-blue-500" />} value={stats.totalComplaints} label="Total Complaints" />
-              <StatCard icon={<FaSpinner className="text-yellow-500" />} value={stats.pendingComplaints} label="Pending Complaints" />
-              <StatCard icon={<FaCheckCircle className="text-green-500" />} value={stats.resolvedComplaints} label="Resolved Complaints" />
-              {/* Add more stats cards as needed */}
+              <StatCard icon={<FiUsers className="text-purple-500" />} value={stats.totalUsers} label="Total Users" />
+              <StatCard icon={<FiClipboard className="text-blue-500" />} value={stats.totalComplaints} label="Total Complaints" />
+              <StatCard icon={<FiClock className="text-yellow-500" />} value={stats.pendingComplaints} label="Pending Complaints" />
+              <StatCard icon={<FiCheckCircle className="text-green-500" />} value={stats.resolvedComplaints} label="Resolved Complaints" />
             </section>
           )}
 
           {activeTab === 'users' && (
-            <section className="bg-white p-6 rounded-xl shadow-md">
-               <h2 className="text-2xl font-bold text-gray-800 mb-6">User Management</h2>
+            <section className="bg-white p-5 sm:p-6 rounded-xl shadow border border-gray-100">
+               <h2 className="text-xl font-semibold text-gray-800 mb-5">User Management</h2>
                <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                        <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                        <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                        <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+                        <th scope="col" className="px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                        {users.map(user => (
-                        <tr key={user._id}>
-                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.name}</td>
-                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
-                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.location || 'N/A'}</td>
-                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <tr key={user._id} className="hover:bg-gray-50 transition-colors">
+                           <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.name}</td>
+                           <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
+                           <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{user.location || 'N/A'}</td>
+                           <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">
                             {editingUserId === user._id ? (
-                              <select value={selectedRole} onChange={e => setSelectedRole(e.target.value)} className="border rounded px-2 py-1">
+                              <select
+                                value={selectedRole}
+                                onChange={e => setSelectedRole(e.target.value)}
+                                className="border border-gray-300 rounded px-2 py-1 text-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                disabled={isSavingRole}
+                              >
                                 <option value="user">User</option>
                                 <option value="volunteer">Volunteer</option>
                                 <option value="admin">Admin</option>
                               </select>
                             ) : (
-                              <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-red-100 text-red-800' : user.role === 'volunteer' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                              <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-red-100 text-red-800' : user.role === 'volunteer' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                                 {user.role}
                               </span>
                             )}
                            </td>
-                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(user.createdAt)}</td>
-                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                           <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(user.createdAt)}</td>
+                           <td className="px-5 py-4 whitespace-nowrap text-center text-sm font-medium">
                             {editingUserId === user._id ? (
-                              <>
-                                <button onClick={() => handleSaveRole(user._id)} className="text-green-600 hover:text-green-900 mr-3"><FaSave /></button>
-                                <button onClick={handleCancelEdit} className="text-red-600 hover:text-red-900"><FaTimes /></button>
-                              </>
+                              <div className="flex items-center justify-center gap-2">
+                                <button
+                                    onClick={() => handleSaveRole(user._id)}
+                                    className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={isSavingRole}
+                                    title="Save Role"
+                                >
+                                    {isSavingRole ? <FiLoader className="animate-spin" size={16}/> : <FiSave size={16} />}
+                                </button>
+                                <button
+                                    onClick={handleCancelEdit}
+                                    className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded disabled:opacity-50"
+                                    disabled={isSavingRole}
+                                    title="Cancel Edit"
+                                >
+                                    <FiX size={16} />
+                                </button>
+                              </div>
                             ) : (
-                              <button onClick={() => handleEditRole(user)} className="text-indigo-600 hover:text-indigo-900" disabled={currentUser._id === user._id && user.role === 'admin' /* Optional: Prevent self-edit */} >
-                                  <FaEdit />
+                              <button
+                                onClick={() => handleEditRole(user)}
+                                className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100 rounded disabled:opacity-50 disabled:text-gray-400 disabled:hover:bg-transparent"
+                                disabled={currentUser._id === user._id}
+                                title={currentUser._id === user._id ? "Cannot edit own role" : "Edit Role"}
+                              >
+                                  <FiEdit size={16} />
                               </button>
                             )}
-                            {/* Add delete button later if needed */}
                            </td>
                         </tr>
                        ))}
@@ -215,36 +256,37 @@ const AdminDashboard = () => {
           )}
 
           {activeTab === 'complaints' && (
-            <section className="bg-white p-6 rounded-xl shadow-md">
-               <h2 className="text-2xl font-bold text-gray-800 mb-6">All Complaints</h2>
+            <section className="bg-white p-5 sm:p-6 rounded-xl shadow border border-gray-100">
+               <h2 className="text-xl font-semibold text-gray-800 mb-5">All Complaints</h2>
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                        <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reported By</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assigned To</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                            {/* Add Actions column if needed */}
+                            <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                            <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reported By</th>
+                            <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned To</th>
+                            <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                         </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                         {complaints.map(complaint => (
-                            <tr key={complaint._id}>
-                                <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{complaint.title}</td>
-                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.user_id?.name || 'Unknown User'}</td>
-                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.type}</td>
-                                <td className="px-4 py-4 whitespace-nowrap text-sm">{getStatusBadge(complaint.status)}</td>
-                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.assigned_to?.name || 'Unassigned'}</td>
-                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(complaint.createdAt)}</td>
-                                {/* Add action buttons (e.g., view details, change status, assign) later */}
+                            <tr key={complaint._id} className="hover:bg-gray-50 transition-colors">
+                                <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{complaint.title}</td>
+                                <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.user_id?.name || 'Unknown User'}</td>
+                                <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.type}</td>
+                                <td className="px-5 py-4 whitespace-nowrap text-sm">{getStatusBadge(complaint.status)}</td>
+                                <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.assigned_to?.name || <span className="text-gray-400 italic">Unassigned</span>}</td>
+                                <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(complaint.createdAt)}</td>
                             </tr>
                         ))}
                         </tbody>
                     </table>
                </div>
+               {complaints.length === 0 && (
+                 <p className="text-center text-gray-500 py-6">No complaints found.</p>
+               )}
             </section>
           )}
         </div>
@@ -255,20 +297,30 @@ const AdminDashboard = () => {
   );
 };
 
-// Helper Components (can be moved to separate file later)
+
 const StatCard = ({ icon, value, label }) => (
-  <div className="bg-white p-6 rounded-2xl shadow-md flex items-center gap-5 transition-all duration-300 hover:shadow-xl hover:scale-105">
-    <div className="text-4xl">{icon}</div>
+  <div className="bg-white p-5 rounded-xl shadow border border-gray-100 flex items-center gap-4 transition-all duration-300 ease-in-out hover:shadow-lg hover:border-indigo-100 transform hover:-translate-y-1">
+    <div className="p-3 rounded-full bg-gradient-to-br from-gray-100 to-blue-100 text-2xl flex-shrink-0">
+      {icon}
+    </div>
     <div>
-      <p className="text-3xl font-bold text-gray-800">{value}</p>
-      <p className="text-gray-500">{label}</p>
+      <p className="text-2xl font-bold text-gray-800 capitalize">{value}</p>
+      <p className="text-sm font-medium text-gray-500">{label}</p>
     </div>
   </div>
 );
 
- const TabButton = ({ id, activeTab, setActiveTab, children }) => (
-   <button onClick={() => setActiveTab(id)} className={`pb-3 px-4 font-semibold transition-colors ${ activeTab === id ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700" }`}>
-     {children}
+ const TabButton = ({ id, activeTab, setActiveTab, icon, children }) => (
+   <button
+      onClick={() => setActiveTab(id)}
+      className={`flex items-center gap-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none focus-visible:bg-indigo-50 rounded-t
+        ${activeTab === id
+          ? "border-indigo-600 text-indigo-600"
+          : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+        }`}
+    >
+      {React.cloneElement(icon, { size: 16 })}
+      <span>{children}</span>
    </button>
  );
 
