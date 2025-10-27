@@ -5,7 +5,10 @@ import RegisterPage from "./pages/Register";
 import LandingPage from "./pages/LandingPage";
 import Profilepage from "./pages/Profilepage";
 import UserDashboard from "./pages/UserDashboard";
+import VolunteerDashboard from "./pages/VolunteerDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import ReportIssue from "./pages/ReportIssue";
+import ViewComplaints from "./pages/ViewComplaints";
 import Navbar from "./Components/Navbar";
 import ViewCompliaint from "./pages/ViewCompliaint";
 export default function App() {
@@ -19,8 +22,13 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/profile" element={<Profilepage />} />   
         <Route path="/UserDashboard" element={<UserDashboard/>}/>
+        <Route path="/VolunteerDashboard" element={<VolunteerDashboard/>}/>
+        <Route path="/AdminDashboard" element={<AdminDashboard />} />
         <Route path="/ReportIssue" element={<ReportIssue/>}/>
-        <Route path="/ViewComplaints" element={<ViewCompliaint/>}/>
+         <Route path="/view-complaints" element={<ViewComplaints />} />
+         <Route path="/about" element={<AboutPage />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
+          <Route path="/services" element={<ServicesPage />} />
       </Routes>
     </Router>
     
