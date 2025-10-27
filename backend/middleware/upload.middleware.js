@@ -31,7 +31,7 @@ const ProfilePhotoStorage= new CloudinaryStorage({
   },
 });
 
-export const uploadProfilePhoto = multer({ ProfilePhotoStorage});
+export const uploadProfilePhoto = multer({ storage: ProfilePhotoStorage});
 
 // Storage definition for complaint photos
 const complaintStorage = new CloudinaryStorage({
