@@ -18,7 +18,7 @@ cloudinary.config({
 });
 
 // Storage definition for profile photos
-const storage = new CloudinaryStorage({
+const ProfilePhotoStorage= new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
     return {
@@ -31,4 +31,33 @@ const storage = new CloudinaryStorage({
   },
 });
 
-export const upload = multer({ storage });
+export const uploadProfilePhoto = multer({ storage: ProfilePhotoStorage});
+
+// Storage definition for complaint photos
+const complaintStorage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    return {
+      folder: "cleanstreet/complaints",
+      allowed_formats: ["jpg", "jpeg", "png", "webp"],
+      public_id: `complaint_${req.user?._id || "anonymous"}_${Date.now()}`,
+      transformation: [{ width: 1024, height: 1024, crop: "limit" }],
+    };
+  },
+});
+
+export const uploadComplaintPhoto = multer({ storage: complaintStorage });
+
+const commentImageStorage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    return {
+      folder: "cleanstreet/comments",
+      allowed_formats: ["jpg", "jpeg", "png", "webp"],
+      public_id: `complaint_${req.user?._id || "anonymous"}_${Date.now()}`,
+      transformation: [{ width: 1024, height: 1024, crop: "limit" }],
+    };
+  },
+});
+
+export const uploadCommentImage = multer({ storage:commentImageStorage  });

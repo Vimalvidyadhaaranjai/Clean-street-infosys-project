@@ -23,8 +23,9 @@ export const createComplaint = async (req, res) => {
     // ADDED: Handle the uploaded file from multer
     let photoUrl = null;
     if (req.file) {
-      // Construct the full URL for the image
-      photoUrl = `http://localhost:3002/${req.file.path.replace(/\\/g, "/")}`;
+      // Use Cloudinary URL
+  
+      photoUrl = req.file.path;
     }
 
     // Basic validation to ensure all required fields are present
