@@ -18,7 +18,7 @@ cloudinary.config({
 });
 
 // Storage definition for profile photos
-const storage = new CloudinaryStorage({
+const ProfilePhotoStorage= new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
     return {
@@ -31,7 +31,7 @@ const storage = new CloudinaryStorage({
   },
 });
 
-export const upload = multer({ storage });
+export const ProfilePhoto = multer({ storage });
 
 // Storage definition for complaint photos
 const complaintStorage = new CloudinaryStorage({
