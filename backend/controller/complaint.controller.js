@@ -24,6 +24,7 @@ export const createComplaint = async (req, res) => {
     let photoUrl = null;
     if (req.file) {
       // Use Cloudinary URL
+  
       photoUrl = req.file.path;
     }
 

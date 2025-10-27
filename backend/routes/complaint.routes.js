@@ -4,12 +4,12 @@ import express from "express";
  // 1. Import multer
 import { createComplaint, updateComplaint, getUserComplaints, getAllUserComplaints, deleteComplaint, getCommunityComplaints, upvoteComplaint, downvoteComplaint} from "../controller/complaint.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
-import { uploadComplaintPhoto } from "../middleware/upload.middleware.js";
 
+import { uploadComplaintPhoto } from "../middleware/upload.middleware.js";
 const router = express.Router();
 
 // 2. Configure multer to save files to an 'uploads/' directory
-const upload = multer({ dest: 'uploads/' });
+
 
 /**
  * @route   POST /api/complaints/create
@@ -18,13 +18,7 @@ const upload = multer({ dest: 'uploads/' });
  */
 // 3. Add the multer middleware here. 
 // It looks for a single file in a form field named 'photo'.
-router.post("/create", protect, upload.single('photo'), createComplaint);
-router.post(
-  "/complaints",
-  protect, // your auth middleware
-  uploadComplaintPhoto.single("photo"),
-  createComplaint
-);
+router.post("/create", protect, uploadComplaintPhoto.single('photo'), createComplaint);
 
 
 /**
