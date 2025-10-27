@@ -16,7 +16,7 @@ import {
   FaExclamationTriangle, // For Pending status
   FaSyncAlt, // For In Progress status
 } from "react-icons/fa"; // Added more specific icons
-
+import {Toaster,  toast } from "react-hot-toast"
 const UserDashboard = () => {
   const navigate = useNavigate();
   const [showAllReports, setShowAllReports] = useState(false);
@@ -36,6 +36,7 @@ const UserDashboard = () => {
   useEffect(() => {
     if (!user) {
         // Redirect to login if user data is somehow missing
+        toast.error("Session expired or unauthorized. Please log in again.");
         navigate("/login");
         return;
     }
@@ -62,16 +63,16 @@ const UserDashboard = () => {
           setDashboardData({ complaints, stats }); //
         } else {
           console.error("Failed to fetch dashboard data:", data.message); //
-           // Handle potential auth errors
-           if (res.status === 401 || res.status === 403) {
-               alert("Session expired or unauthorized. Please log in again.");
-               navigate("/login");
-           }
+          if (res.status === 401 || res.status === 403) {
+              toast.error("Session expired or unauthorized. Please log in again.");
+              navigate("/login");
+          } else {
+              toast.error(data.message || "Failed to fetch dashboard data.");
+          }
         }
       } catch (error) {
         console.error("Error fetching dashboard data:", error); //
-        // Add user-friendly error handling here
-        alert("Could not load dashboard data. Please try refreshing the page.");
+        toast.error("Could not load dashboard data. Please try refreshing the page.");
       } finally {
         setLoading(false); //
       }
@@ -84,7 +85,6 @@ const UserDashboard = () => {
     if (!window.confirm("Are you sure you want to delete this report? This action cannot be undone.")) { //
       return; //
     }
-    // Add temporary optimistic UI update or loading state for delete
     try {
       const res = await fetch(
         `http://localhost:3002/api/complaints/${complaintId}`, //
@@ -95,7 +95,7 @@ const UserDashboard = () => {
       );
       const data = await res.json(); //
       if (res.ok) { //
-        alert("Report deleted successfully!"); //
+        toast.success("Report deleted successfully!"); //
         // Correctly update state after deletion
         setDashboardData((prevData) => {
             const updatedComplaints = prevData.complaints.filter((c) => c._id !== complaintId); //
@@ -111,11 +111,11 @@ const UserDashboard = () => {
            };
         });
       } else {
-        alert(data.message || "Failed to delete report."); //
+        toast.error(data.message || "Failed to delete report."); //
       }
     } catch (error) {
       console.error("Error deleting report:", error); //
-      alert("An error occurred while deleting the report."); //
+      toast.error("An error occurred while deleting the report."); //
     }
   };
 
@@ -149,6 +149,7 @@ const UserDashboard = () => {
     return (
       <>
         <Navbar />
+        <Toaster position="bottom-center" reverseOrder={false} />
         {/* === STYLE UPDATE: Consistent loading spinner === */}
         <div className="min-h-[calc(100vh-theme(space.20))] flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
           <div className="text-center">
@@ -166,8 +167,9 @@ const UserDashboard = () => {
 
   // --- Main Render ---
   return (
-    // === STYLE UPDATE: Use gradient background ===
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+      <Toaster position="bottom-center" reverseOrder={false}
+      />
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow"> {/* Reduced pt */}
 

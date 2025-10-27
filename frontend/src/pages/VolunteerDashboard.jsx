@@ -4,7 +4,8 @@ import Footer from "../Components/Footer";
 import { useNavigate } from "react-router-dom";
 import {
   FiClipboard, FiCheckCircle, FiLoader, FiMapPin, FiTool, FiAlertCircle, FiClock, FiXCircle, FiUserPlus, FiUserMinus, FiRotateCw
-} from "react-icons/fi"; // Updated icons
+} from "react-icons/fi";
+import { Toaster, toast } from "react-hot-toast"; // <-- Add this import
 
 const VolunteerDashboard = () => {
   const navigate = useNavigate();
@@ -18,38 +19,36 @@ const VolunteerDashboard = () => {
     resolvedAssignments: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(""); // Added error state
+  const [error, setError] = useState("");
   const [volunteerLocation, setVolunteerLocation] = useState("");
-  const [actionLoading, setActionLoading] = useState({}); // State for loading indicators on buttons { [complaintId]: true/false }
+  const [actionLoading, setActionLoading] = useState({});
 
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     if (user?.role !== "volunteer") {
-      alert("Access denied. Volunteers only.");
+      toast.error("Access denied. Volunteers only.");
       navigate("/UserDashboard");
       return;
     }
     fetchData();
-  }, [navigate, user?.role]); // Added navigate and user?.role dependencies
+  }, [navigate, user?.role]);
 
   const fetchData = async () => {
     setLoading(true);
-    setError(""); // Clear previous errors
+    setError("");
     try {
-
       const nearbyRes = await fetch(
-        "http://localhost:3002/api/volunteer/nearby-complaints?maxDistance=50", // Added default distance
+        "http://localhost:3002/api/volunteer/nearby-complaints?maxDistance=50",
         { credentials: "include" }
       );
       const nearbyData = await nearbyRes.json();
       if (nearbyRes.ok && nearbyData.success) {
-        setNearbyComplaints(nearbyData.data || []); // Ensure array
-        setVolunteerLocation(nearbyData.volunteerLocation || 'Your Area'); // Fallback location
+        setNearbyComplaints(nearbyData.data || []);
+        setVolunteerLocation(nearbyData.volunteerLocation || 'Your Area');
       } else {
-         throw new Error(nearbyData.message || "Failed to fetch nearby complaints.");
+        throw new Error(nearbyData.message || "Failed to fetch nearby complaints.");
       }
-
 
       const assignmentsRes = await fetch(
         "http://localhost:3002/api/volunteer/my-assignments",
@@ -57,17 +56,17 @@ const VolunteerDashboard = () => {
       );
       const assignmentsData = await assignmentsRes.json();
       if (assignmentsRes.ok && assignmentsData.success) {
-        setMyAssignments(assignmentsData.data?.assignments || []); // Ensure array
-        setStats(assignmentsData.data?.stats || { totalAssignments: 0, pendingAssignments: 0, inProgressAssignments: 0, resolvedAssignments: 0 }); // Fallback stats
+        setMyAssignments(assignmentsData.data?.assignments || []);
+        setStats(assignmentsData.data?.stats || { totalAssignments: 0, pendingAssignments: 0, inProgressAssignments: 0, resolvedAssignments: 0 });
       } else {
-          throw new Error(assignmentsData.message || "Failed to fetch assignments.");
+        throw new Error(assignmentsData.message || "Failed to fetch assignments.");
       }
     } catch (error) {
       console.error("Error fetching volunteer data:", error);
-      setError(error.message || "Could not load dashboard data. Please try again."); // Set error message
+      setError(error.message || "Could not load dashboard data. Please try again.");
       if (error.message.includes('401') || error.message.includes('403')) {
-          alert("Session expired or unauthorized. Please log in again.");
-          navigate("/login");
+        toast.error("Session expired or unauthorized. Please log in again.");
+        navigate("/login");
       }
     } finally {
       setLoading(false);
@@ -78,53 +77,72 @@ const VolunteerDashboard = () => {
     setActionLoading(prev => ({ ...prev, [complaintId]: true }));
     let url = `http://localhost:3002/api/volunteer/${actionType}/${complaintId}`;
     let options = {
-        method: 'POST',
-        credentials: 'include',
-        headers: {},
+      method: 'POST',
+      credentials: 'include',
+      headers: {},
     };
 
     if (actionType === 'update-status') {
-        url = `http://localhost:3002/api/volunteer/update-status/${complaintId}`;
-        options.method = 'PATCH';
-        options.headers['Content-Type'] = 'application/json';
-        options.body = JSON.stringify(payload);
+      url = `http://localhost:3002/api/volunteer/update-status/${complaintId}`;
+      options.method = 'PATCH';
+      options.headers['Content-Type'] = 'application/json';
+      options.body = JSON.stringify(payload);
     } else if (actionType === 'assign') {
-        url = `http://localhost:3002/api/volunteer/assign/${complaintId}`;
-        // Method is already POST
+      url = `http://localhost:3002/api/volunteer/assign/${complaintId}`;
     } else if (actionType === 'unassign') {
-         url = `http://localhost:3002/api/volunteer/unassign/${complaintId}`;
-         // Method is already POST
+      url = `http://localhost:3002/api/volunteer/unassign/${complaintId}`;
     } else {
-        console.error("Unknown action type:", actionType);
-        setActionLoading(prev => ({ ...prev, [complaintId]: false }));
-        return; // Invalid action
+      console.error("Unknown action type:", actionType);
+      setActionLoading(prev => ({ ...prev, [complaintId]: false }));
+      return;
     }
 
     try {
-        const res = await fetch(url, options);
-        const data = await res.json();
-        if (res.ok && data.success !== false) { // Check for success flag if backend provides it
-            alert(data.message || `${actionType.replace('-', ' ')} successful!`);
-            fetchData();
-        } else {
-            throw new Error(data.message || `Failed to perform action: ${actionType}`);
-        }
+      const res = await fetch(url, options);
+      const data = await res.json();
+      if (res.ok && data.success !== false) {
+        toast.success(data.message || `${actionType.replace('-', ' ')} successful!`);
+        fetchData();
+      } else {
+        throw new Error(data.message || `Failed to perform action: ${actionType}`);
+      }
     } catch (error) {
-        console.error(`Error performing action ${actionType}:`, error);
-        alert(`Error: ${error.message}`);
+      console.error(`Error performing action ${actionType}:`, error);
+      toast.error(`Error: ${error.message}`);
     } finally {
-        setActionLoading(prev => ({ ...prev, [complaintId]: false }));
+      setActionLoading(prev => ({ ...prev, [complaintId]: false }));
     }
   };
 
   const handleAssignToSelf = (complaintId) => handleAction('assign', complaintId);
   const handleUpdateStatus = (complaintId, newStatus) => handleAction('update-status', complaintId, { status: newStatus });
   const handleUnassign = (complaintId) => {
-    if (window.confirm("Are you sure you want to unassign this task?")) {
-        handleAction('unassign', complaintId);
-    }
+    toast(
+      (t) => (
+        <span>
+          Are you sure you want to unassign this task?
+          <div className="mt-2 flex gap-2">
+            <button
+              className="px-3 py-1 bg-gray-200 rounded text-gray-700 text-xs font-semibold"
+              onClick={() => toast.dismiss(t.id)}
+            >
+              Cancel
+            </button>
+            <button
+              className="px-3 py-1 bg-red-600 rounded text-white text-xs font-semibold"
+              onClick={() => {
+                toast.dismiss(t.id);
+                handleAction('unassign', complaintId);
+              }}
+            >
+              Unassign
+            </button>
+          </div>
+        </span>
+      ),
+      { duration: 6000 }
+    );
   };
-
 
    const getStatusBadge = (status) => {
     const styles = {
@@ -154,6 +172,7 @@ const VolunteerDashboard = () => {
   if (loading) {
      return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+        <Toaster position="top-right" reverseOrder={false} />
         <Navbar />
          <div className="flex-grow flex items-center justify-center">
              <div className="text-center">
@@ -172,6 +191,7 @@ const VolunteerDashboard = () => {
    if (error) {
      return (
        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+        <Toaster position="top-right" reverseOrder={false} />
         <Navbar />
          <div className="flex-grow flex items-center justify-center p-4">
            <div className="text-center bg-red-50 p-6 rounded-lg shadow border border-red-200 max-w-lg w-full">
@@ -190,6 +210,7 @@ const VolunteerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+      <Toaster position="top-right" reverseOrder={false} />
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow">
         <div className="animate-fade-in-up">
