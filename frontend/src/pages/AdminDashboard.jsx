@@ -3,6 +3,7 @@ import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import { useNavigate } from "react-router-dom";
 import { FiUsers, FiClipboard, FiAlertCircle, FiCheckCircle, FiEdit, FiSave, FiX, FiLoader, FiActivity, FiUserCheck, FiClock } from "react-icons/fi";
+import { Toaster, toast } from "react-hot-toast";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (currentUser?.role !== "admin") {
-      alert("Access Denied: Admins only.");
+      toast.error("Access Denied: Admins only.");
       navigate("/UserDashboard");
       return;
     }
@@ -54,7 +55,7 @@ const AdminDashboard = () => {
       console.error("Error fetching admin data:", err);
       setError(err.message || "Failed to load data. Please try again.");
        if (err.message.includes('403') || err.message.includes('401') || err.message.includes('logged in')) {
-           alert("Authentication failed or forbidden access. Please log in as an admin.");
+           toast.error("Authentication failed or forbidden access. Please log in as an admin.");
            navigate('/login');
        }
     } finally {
@@ -84,7 +85,7 @@ const AdminDashboard = () => {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        alert('User role updated successfully!');
+        toast.success('User role updated successfully!');
         setEditingUserId(null);
         fetchData();
       } else {
@@ -92,7 +93,7 @@ const AdminDashboard = () => {
       }
     } catch (err) {
       console.error("Error updating role:", err);
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     } finally {
         setIsSavingRole(false);
     }
@@ -114,6 +115,7 @@ const AdminDashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+        <Toaster position="bottom-center" reverseOrder={false} />
         <Navbar />
          <div className="flex-grow flex items-center justify-center">
              <div className="text-center">
@@ -132,6 +134,7 @@ const AdminDashboard = () => {
    if (error) {
     return (
        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+        <Toaster position="bottom-center" reverseOrder={false} />
         <Navbar />
          <div className="flex-grow flex items-center justify-center p-4">
            <div className="text-center bg-red-50 p-6 rounded-lg shadow border border-red-200 max-w-lg w-full">
@@ -150,6 +153,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+      <Toaster position="bottom-center" reverseOrder={false} />
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow">
         <header className="mb-8 animate-fade-in-down">

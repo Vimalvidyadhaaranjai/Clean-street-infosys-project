@@ -12,7 +12,7 @@ const Footer = () => {
             <p>&copy; {new Date().getFullYear()} Clean Street Initiative.</p>
             <span className="hidden sm:inline">|</span>
             <p className="flex items-center gap-1.5">
-                Made with for a cleaner community.
+                Made with ❤️ for a cleaner community.
             </p>
             
         </div> 

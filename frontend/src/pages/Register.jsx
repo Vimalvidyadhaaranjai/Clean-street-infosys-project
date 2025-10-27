@@ -2,21 +2,20 @@
 
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-// === ICON UPDATE: Added FiEye, FiEyeOff for password ===
 import { FiUser, FiMail, FiMapPin, FiLock, FiBriefcase, FiEye, FiEyeOff } from "react-icons/fi";
+import { Toaster, toast } from "react-hot-toast"; // <-- Add this import
 
 export default function Register() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
     location: "",
-    role: "user", // Default role to 'user'
+    role: "user",
     email: "",
     password: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  // === NEW STATE: For password visibility ===
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
@@ -25,54 +24,49 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Basic password validation (optional but recommended)
     if (form.password.length < 6) {
-        setError("Password must be at least 6 characters long.");
-        return;
+      setError("Password must be at least 6 characters long.");
+      toast.error("Password must be at least 6 characters long.");
+      return;
     }
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("http://localhost:3002/api/auth/register", { //
-        method: "POST", //
-        headers: { "Content-Type": "application/json" }, //
-        credentials: 'include', //
-        body: JSON.stringify(form), //
+      const res = await fetch("http://localhost:3002/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: 'include',
+        body: JSON.stringify(form),
       });
-      const data = await res.json(); //
-      if (!res.ok) throw new Error(data.message || "Registration failed"); //
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Registration failed");
 
-      // Store token and user data
-      localStorage.setItem("token", data.token); //
-      localStorage.setItem("user", JSON.stringify(data.user)); //
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-      alert("Registration successful!"); //
+      toast.success("Registration successful!"); // <-- Use toast instead of alert
 
-      // Navigate after a short delay
-      setTimeout(() => { //
-        if (data.user.role === "admin") { //
-            navigate("/AdminDashboard"); //
-        } else if (data.user.role === "volunteer") { //
-          navigate("/VolunteerDashboard"); //
+      setTimeout(() => {
+        if (data.user.role === "admin") {
+          navigate("/AdminDashboard");
+        } else if (data.user.role === "volunteer") {
+          navigate("/VolunteerDashboard");
         } else {
-          navigate("/UserDashboard"); //
+          navigate("/UserDashboard");
         }
-      }, 100); // Shorter delay
+      }, 100);
 
     } catch (err) {
-      // Display specific error if available, otherwise generic message
       setError(err.message || "An error occurred during registration.");
-      // Keep alert or rely solely on inline error message
-      // alert(err.message || "An error occurred during registration.");
+      toast.error(err.message || "An error occurred during registration."); // <-- Show error toast
     } finally {
-      setLoading(false); //
+      setLoading(false);
     }
   };
 
   return (
-    // === STYLE UPDATE: Use gradient background ===
     <div className="min-h-screen flex bg-gradient-to-br from-blue-50 via-indigo-50 to-white">
-
+      <Toaster position="top-right" reverseOrder={false} /> {/* <-- Add Toaster */}
       {/* Left Column - Image and Welcome Text */}
       {/* === IMAGE UPDATE: Changed to street1.png === */}
       {/* === STYLE UPDATE: Refined overlay and text styles === */}

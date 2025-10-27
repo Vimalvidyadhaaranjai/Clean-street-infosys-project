@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-// === ICON UPDATE: Added FiEye, FiEyeOff for password visibility ===
 import { FiMail, FiLock, FiLogIn, FiEye, FiEyeOff } from "react-icons/fi";
+import { Toaster, toast } from "react-hot-toast"; // <-- Add this import
 
 export default function Login() {
   const navigate = useNavigate();
@@ -11,7 +11,6 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  // === NEW STATE: For password visibility ===
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -31,10 +30,8 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      // === Use alert for immediate feedback, then navigate ===
-      alert("Login successful!");
+      toast.success("Login successful!"); // <-- Use toast instead of alert
 
-      // Redirect based on role after a short delay
       setTimeout(() => {
         if (data.user.role === "admin") {
           navigate("/AdminDashboard");
@@ -43,12 +40,11 @@ export default function Login() {
         } else {
           navigate("/UserDashboard");
         }
-      }, 100); // Shorter delay
+      }, 100);
 
     } catch (err) {
       setError(err.message || 'Login failed. Please check credentials.');
-      // Optional: Remove alert if error is displayed inline
-      // alert(err.message || 'Login failed. Please check credentials.');
+      toast.error(err.message || 'Login failed. Please check credentials.'); // <-- Show error toast
     } finally {
       setLoading(false);
     }
@@ -57,6 +53,7 @@ export default function Login() {
   return (
     // === STYLE UPDATE: Use gradient background for the whole page ===
     <div className="min-h-screen flex bg-gradient-to-br from-blue-50 via-indigo-50 to-white">
+      <Toaster position="top-right" reverseOrder={false} /> {/* <-- Add Toaster */}
 
       {/* Left Column - Image and Welcome Text */}
       {/* === IMAGE UPDATE: Changed to hero3.jpg === */}

@@ -60,7 +60,7 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg shadow-sm border-b border-gray-200/60">
+            <nav className="fixed top-0 left-0 right-0 z-50 bg-gray/90 backdrop-blur-lg shadow-sm border-b border-gray-200/60">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-20">
                         <Link to="/" onClick={closeMobileMenu} className="flex-shrink-0 transition-transform duration-300 ease-out hover:scale-105 group">
@@ -73,9 +73,10 @@ const Navbar = () => {
                                 {user ? (
                                     // Logged-in Links
                                     <>
-                                        <NavLink to="/UserDashboard"><FiGrid /><span>Dashboard</span></NavLink>
+                                    
+                                        <NavLink to="/UserDashboard"><FiGrid /><span>Complaint Dashboard</span></NavLink>
                                         {user.role === "volunteer" && (
-                                            <NavLink to="/VolunteerDashboard"><FiGrid /><span>Volunteer Board</span></NavLink>
+                                            <NavLink to="/VolunteerDashboard"><FiGrid /><span>Volunteer Panel</span></NavLink>
                                         )}
                                         {user.role === "admin" && (
                                             <NavLink to="/AdminDashboard"><FiShield /><span>Admin Panel</span></NavLink>
