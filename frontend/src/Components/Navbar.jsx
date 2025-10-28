@@ -60,7 +60,7 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className="fixed top-0 left-0 right-0 z-50 bg-gray/90 backdrop-blur-lg shadow-sm border-b border-gray-200/60">
+            <nav className="fixed top-0 left-0 right-0 z-50 bg-white/70 backdrop-blur-xl shadow-sm border-b border-gray-200/60">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-20">
                         <Link to="/" onClick={closeMobileMenu} className="flex-shrink-0 transition-transform duration-300 ease-out hover:scale-105 group">
@@ -69,7 +69,7 @@ const Navbar = () => {
 
                         <div className='flex justify-end'>
                             {/* === CONDITIONAL NAVIGATION LINKS === */}
-                            <div className="hidden lg:flex items-center space-x-2">
+                            <div className="hidden lg:flex items-center space-x-2 ">
                                 {user ? (
                                     // Logged-in Links
                                     <>

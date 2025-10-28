@@ -37,7 +37,7 @@ const Hero = () => {
                      {/* === STYLE UPDATE: Refined button style, hover effect === */}
                      <Link
                         to="/register"
-                        className="mt-10 inline-flex items-center gap-2.5 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-base font-semibold rounded-lg shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 animate-fade-in-up duration-700 ease-out delay-400"
+                        className="mt-10 inline-flex items-center gap-2.5 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-base font-semibold rounded-lg shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 animate-fade-in-up delay-400"
                     >
                         Get Started <FiArrowRight className="ml-1 text-blue-200" size={18} />
                     </Link>
