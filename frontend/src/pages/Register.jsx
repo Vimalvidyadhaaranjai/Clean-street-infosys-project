@@ -17,7 +17,7 @@ export default function Register() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-const backend_Url = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
+const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };

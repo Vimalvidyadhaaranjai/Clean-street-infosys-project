@@ -30,7 +30,7 @@ const UserDashboard = () => {
     },
   });
   const [loading, setLoading] = useState(true);
-const backend_Url = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
+const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
 // ...existing code...
   // --- Fetch user data (Keep original logic) ---
   const user = JSON.parse(localStorage.getItem("user"));

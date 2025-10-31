@@ -18,7 +18,7 @@ const AdminDashboard = () => {
   const [isSavingRole, setIsSavingRole] = useState(false);
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
-  const backend_Url = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
+  const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
 
   useEffect(() => {
     if (currentUser?.role !== "admin") {

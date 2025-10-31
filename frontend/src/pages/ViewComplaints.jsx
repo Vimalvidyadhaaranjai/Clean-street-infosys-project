@@ -9,7 +9,7 @@ const ViewComplaints = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedComplaint, setSelectedComplaint] = useState(null);
-const backend_Url = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
+const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
   useEffect(() => {
     const fetchComplaints = async () => {
       try {

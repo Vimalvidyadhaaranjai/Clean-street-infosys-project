@@ -53,7 +53,7 @@ const ReportIssue = () => {
   });
   const [loading, setLoading] = useState(false); //
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' }); // For success/error messages
-const backend_Url = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
+const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
   // --- Core Logic (Keep original logic, add preview handling) ---
   useEffect(() => {
     // Attempt to get user's current location
