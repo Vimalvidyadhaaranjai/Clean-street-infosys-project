@@ -53,7 +53,7 @@ const ReportIssue = () => {
   });
   const [loading, setLoading] = useState(false); //
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' }); // For success/error messages
-
+const backend_Url = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
   // --- Core Logic (Keep original logic, add preview handling) ---
   useEffect(() => {
     // Attempt to get user's current location
@@ -113,7 +113,7 @@ const ReportIssue = () => {
     if (photo) formData.append("photo", photo); //
 
     try {
-      const res = await fetch("http://localhost:3002/api/complaints/create", { //
+      const res = await fetch(`${backend_Url}/api/complaints/create`, { //
         method: "POST", credentials: "include", body: formData, //
       });
       const data = await res.json(); //

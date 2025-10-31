@@ -12,13 +12,13 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
+const backend_Url = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("http://localhost:3002/api/auth/login", {
+      const res = await fetch(`${backend_Url}/api/auth/login`, { // <-- use backend_Url here
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',

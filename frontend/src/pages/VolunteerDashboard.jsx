@@ -24,7 +24,7 @@ const VolunteerDashboard = () => {
   const [actionLoading, setActionLoading] = useState({});
 
   const user = JSON.parse(localStorage.getItem("user"));
-
+  const backend_Url = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
   useEffect(() => {
     if (user?.role !== "volunteer") {
       toast.error("Access denied. Volunteers only.");
@@ -39,7 +39,7 @@ const VolunteerDashboard = () => {
     setError("");
     try {
       const nearbyRes = await fetch(
-        "http://localhost:3002/api/volunteer/nearby-complaints?maxDistance=50",
+        `${backendUrl}/api/volunteer/nearby-complaints?maxDistance=50`,
         { credentials: "include" }
       );
       const nearbyData = await nearbyRes.json();
@@ -51,7 +51,7 @@ const VolunteerDashboard = () => {
       }
 
       const assignmentsRes = await fetch(
-        "http://localhost:3002/api/volunteer/my-assignments",
+        "${backendUrl}/api/volunteer/my-assignments",
         { credentials: "include" }
       );
       const assignmentsData = await assignmentsRes.json();
@@ -75,7 +75,7 @@ const VolunteerDashboard = () => {
 
   const handleAction = async (actionType, complaintId, payload = null) => {
     setActionLoading(prev => ({ ...prev, [complaintId]: true }));
-    let url = `http://localhost:3002/api/volunteer/${actionType}/${complaintId}`;
+    let url = `${backendUrl}/api/volunteer/${actionType}/${complaintId}`;
     let options = {
       method: 'POST',
       credentials: 'include',
@@ -83,14 +83,14 @@ const VolunteerDashboard = () => {
     };
 
     if (actionType === 'update-status') {
-      url = `http://localhost:3002/api/volunteer/update-status/${complaintId}`;
+      url = `${backendUrl}/api/volunteer/update-status/${complaintId}`;
       options.method = 'PATCH';
       options.headers['Content-Type'] = 'application/json';
       options.body = JSON.stringify(payload);
     } else if (actionType === 'assign') {
-      url = `http://localhost:3002/api/volunteer/assign/${complaintId}`;
+      url = `${backendUrl}/api/volunteer/assign/${complaintId}`;
     } else if (actionType === 'unassign') {
-      url = `http://localhost:3002/api/volunteer/unassign/${complaintId}`;
+      url = `${backendUrl}/api/volunteer/unassign/${complaintId}`;
     } else {
       console.error("Unknown action type:", actionType);
       setActionLoading(prev => ({ ...prev, [complaintId]: false }));

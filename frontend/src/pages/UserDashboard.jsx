@@ -30,7 +30,8 @@ const UserDashboard = () => {
     },
   });
   const [loading, setLoading] = useState(true);
-
+const backend_Url = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
+// ...existing code...
   // --- Fetch user data (Keep original logic) ---
   const user = JSON.parse(localStorage.getItem("user"));
   useEffect(() => {
@@ -44,7 +45,7 @@ const UserDashboard = () => {
       setLoading(true); // Ensure loading is true at the start
       try {
         const res = await fetch(
-          "http://localhost:3002/api/complaints/my-reports", //
+          `${backend_Url}/api/complaints/my-reports`, //
           {
             credentials: "include", //
           }
@@ -87,7 +88,7 @@ const UserDashboard = () => {
     }
     try {
       const res = await fetch(
-        `http://localhost:3002/api/complaints/${complaintId}`, //
+        `${backend_Url}/api/complaints/${complaintId}`, //
         {
           method: "DELETE", //
           credentials: "include", //

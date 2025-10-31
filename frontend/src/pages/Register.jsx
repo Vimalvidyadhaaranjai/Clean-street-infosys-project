@@ -17,7 +17,7 @@ export default function Register() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
+const backend_Url = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -32,7 +32,7 @@ export default function Register() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("http://localhost:3002/api/auth/register", {
+      const res = await fetch(`${backend_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',

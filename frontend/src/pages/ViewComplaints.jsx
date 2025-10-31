@@ -9,11 +9,11 @@ const ViewComplaints = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedComplaint, setSelectedComplaint] = useState(null);
-
+const backend_Url = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
   useEffect(() => {
     const fetchComplaints = async () => {
       try {
-        const res = await fetch("http://localhost:3002/api/complaints/community", {
+        const res = await fetch(`${backend_Url}/api/complaints/community`, {
           credentials: 'include'
         });
         const data = await res.json();
@@ -61,7 +61,7 @@ const ViewComplaints = () => {
 
   const handleUpvote = async (complaintId) => {
     try {
-      const res = await fetch(`http://localhost:3002/api/complaints/${complaintId}/upvote`, {
+      const res = await fetch(`${backend_Url}/api/complaints/${complaintId}/upvote`, {
         method: 'POST',
         credentials: 'include'
       });
@@ -94,7 +94,7 @@ const ViewComplaints = () => {
 
   const handleDownvote = async (complaintId) => {
     try {
-      const res = await fetch(`http://localhost:3002/api/complaints/${complaintId}/downvote`, {
+      const res = await fetch(`${backend_Url}/api/complaints/${complaintId}/downvote`, {
         method: 'POST',
         credentials: 'include'
       });

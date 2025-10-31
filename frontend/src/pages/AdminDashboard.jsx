@@ -18,6 +18,7 @@ const AdminDashboard = () => {
   const [isSavingRole, setIsSavingRole] = useState(false);
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
+  const backend_Url = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
 
   useEffect(() => {
     if (currentUser?.role !== "admin") {
@@ -33,9 +34,9 @@ const AdminDashboard = () => {
     setError("");
     try {
       const [statsRes, usersRes, complaintsRes] = await Promise.all([
-        fetch("http://localhost:3002/api/admin/stats", { credentials: "include" }),
-        fetch("http://localhost:3002/api/admin/users", { credentials: "include" }),
-        fetch("http://localhost:3002/api/admin/complaints", { credentials: "include" }),
+        fetch(`${backend_Url}/api/admin/stats`, { credentials: "include" }),
+        fetch(`${backend_Url}/api/admin/users`, { credentials: "include" }),
+        fetch(`${backend_Url}/api/admin/complaints`, { credentials: "include" }),
       ]);
 
       if (!statsRes.ok || !usersRes.ok || !complaintsRes.ok) {
@@ -77,7 +78,7 @@ const AdminDashboard = () => {
     if (!selectedRole || !editingUserId || userId !== editingUserId) return;
     setIsSavingRole(true);
     try {
-      const res = await fetch(`http://localhost:3002/api/admin/users/${userId}/role`, {
+      const res = await fetch(`${backend_Url}/api/admin/users/${userId}/role`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
