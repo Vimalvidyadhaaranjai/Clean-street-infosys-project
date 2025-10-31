@@ -20,7 +20,7 @@ const __dirname = path.dirname(__filename);
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://infosys-spring-board-clean-p-roject.vercel.app/"
+    "https://infosys-spring-board-clean-p-roject.vercel.app"
   ],
   credentials: true
 }));
