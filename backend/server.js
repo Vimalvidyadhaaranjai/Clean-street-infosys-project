@@ -18,10 +18,12 @@ const __dirname = path.dirname(__filename);
 
 // --- Middleware ---
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: [
+    "http://localhost:5173",
+    "https://infosys-spring-board-clean-p-roject.vercel.app/"
+  ],
   credentials: true
-})
-);
+}));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json());
 app.use(cookieParser());
