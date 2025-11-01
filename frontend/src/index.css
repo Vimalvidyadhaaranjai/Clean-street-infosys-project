@@ -10,6 +10,32 @@ body { /* */
   background-color: #c9d0d6; /* Or your preferred base bg */ /* */
 }
 
+/* Prevent unwanted text cursor/caret */
+* {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+}
+
+/* Allow text selection only where needed */
+input, textarea, [contenteditable="true"], p, span, h1, h2, h3, h4, h5, h6 {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Remove outline on focus for non-interactive elements */
+div:focus, span:focus, img:focus {
+  outline: none;
+}
+
+/* Ensure buttons and links don't show text cursor */
+button, a, [role="button"] {
+  cursor: pointer;
+}
+
 /* Refined Keyframes for smoother entry */
 @keyframes fade-in-down { /* */
   from { /* */
