@@ -24,7 +24,7 @@ const VolunteerDashboard = () => {
   const [actionLoading, setActionLoading] = useState({});
 
   const user = JSON.parse(localStorage.getItem("user"));
-  const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
   useEffect(() => {
     if (user?.role !== "volunteer") {
       toast.error("Access denied. Volunteers only.");
@@ -51,7 +51,7 @@ const VolunteerDashboard = () => {
       }
 
       const assignmentsRes = await fetch(
-        "${backendUrl}/api/volunteer/my-assignments",
+        `${backendUrl}/api/volunteer/my-assignments`,
         { credentials: "include" }
       );
       const assignmentsData = await assignmentsRes.json();

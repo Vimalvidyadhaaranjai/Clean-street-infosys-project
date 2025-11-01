@@ -17,6 +17,7 @@ const markerIcon = new L.Icon({
 const ComplaintModal = ({ complaint, onClose, onCommentAdded }) => {
     // --- State Variables (Keep original logic) ---
     const [isOpen, setIsOpen] = useState(false);
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
     const [comments, setComments] = useState([]);
     const [commentCount, setCommentCount] = useState(complaint?.comments?.length || 0);
     const [newComment, setNewComment] = useState("");
@@ -77,7 +78,7 @@ const ComplaintModal = ({ complaint, onClose, onCommentAdded }) => {
     const fetchComments = async () => { /* Original fetchComments logic */
         if (!complaint) return;
         try {
-            const res = await fetch(`http://localhost:3002/api/comments/${complaint._id}`, { credentials: 'include' });
+            const res = await fetch(`${backendUrl}/api/comments/${complaint._id}`, { credentials: 'include' });
             const data = await res.json();
             if (res.ok) {
                 setComments(data.data);
@@ -96,7 +97,7 @@ const ComplaintModal = ({ complaint, onClose, onCommentAdded }) => {
         if (parentId) formData.append("parentCommentId", parentId);
         if (imageFile) formData.append("image", imageFile);
         try {
-            const res = await fetch(`http://localhost:3002/api/comments/${complaint._id}`, { method: 'POST', credentials: 'include', body: formData });
+            const res = await fetch(`${backendUrl}/api/comments/${complaint._id}`, { method: 'POST', credentials: 'include', body: formData });
             const newCommentData = await res.json();
             if (res.ok) {
                 fetchComments(); // Refresh all comments
@@ -116,20 +117,20 @@ const ComplaintModal = ({ complaint, onClose, onCommentAdded }) => {
 
     const handleLike = async (commentId) => { /* Original handleLike logic */
          try {
-            const res = await fetch(`http://localhost:3002/api/comments/${commentId}/like`, { method: 'POST', credentials: 'include' });
+            const res = await fetch(`${backendUrl}/api/comments/${commentId}/like`, { method: 'POST', credentials: 'include' });
             if (res.ok) fetchComments();
         } catch (error) { console.error("Error liking comment:", error); }
     };
     const handleDislike = async (commentId) => { /* Original handleDislike logic */
         try {
-            const res = await fetch(`http://localhost:3002/api/comments/${commentId}/dislike`, { method: 'POST', credentials: 'include' });
+            const res = await fetch(`${backendUrl}/api/comments/${commentId}/dislike`, { method: 'POST', credentials: 'include' });
             if (res.ok) fetchComments();
         } catch (error) { console.error("Error disliking comment:", error); }
     };
     const handleDelete = async (commentId) => { /* Original handleDelete logic */
         if (window.confirm("Are you sure you want to delete this comment?")) {
             try {
-                const res = await fetch(`http://localhost:3002/api/comments/${commentId}`, { method: 'DELETE', credentials: 'include' });
+                const res = await fetch(`${backendUrl}/api/comments/${commentId}`, { method: 'DELETE', credentials: 'include' });
                 if (res.ok) fetchComments();
             } catch (error) { console.error("Error deleting comment:", error); }
         }
