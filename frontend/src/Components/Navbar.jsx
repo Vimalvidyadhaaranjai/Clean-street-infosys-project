@@ -259,8 +259,8 @@ const NavLink = ({ to, children }) => {
         <Link
             to={to}
             className={`relative flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 group ${isActive
-                    ? 'text-indigo-600 bg-indigo-50'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    ? 'text-indigo-800 bg-indigo-50'
+                    : 'text-gray-600 hover:text-gray-1000 hover:bg-blue-100/90'
                 }`}
         >
             {children}
