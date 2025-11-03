@@ -16,6 +16,9 @@ const AdminDashboard = () => {
   const [editingUserId, setEditingUserId] = useState(null);
   const [selectedRole, setSelectedRole] = useState("");
   const [isSavingRole, setIsSavingRole] = useState(false);
+  const [editingComplaintId, setEditingComplaintId] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [isSavingStatus, setIsSavingStatus] = useState(false);
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
@@ -97,6 +100,42 @@ const AdminDashboard = () => {
       toast.error(`Error: ${err.message}`);
     } finally {
         setIsSavingRole(false);
+    }
+  };
+
+  const handleEditStatus = (complaint) => {
+    setEditingComplaintId(complaint._id);
+    setSelectedStatus(complaint.status);
+  };
+
+  const handleCancelStatusEdit = () => {
+    setEditingComplaintId(null);
+    setSelectedStatus("");
+  };
+
+  const handleSaveStatus = async (complaintId) => {
+    if (!selectedStatus || !editingComplaintId || complaintId !== editingComplaintId) return;
+    setIsSavingStatus(true);
+    try {
+      const res = await fetch(`${backend_Url}/api/admin/complaints/${complaintId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status: selectedStatus }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success('Complaint status updated successfully!');
+        setEditingComplaintId(null);
+        fetchData();
+      } else {
+        throw new Error(data.message || 'Failed to update status.');
+      }
+    } catch (err) {
+      console.error("Error updating status:", err);
+      toast.error(`Error: ${err.message}`);
+    } finally {
+        setIsSavingStatus(false);
     }
   };
 
@@ -273,6 +312,7 @@ const AdminDashboard = () => {
                             <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned To</th>
                             <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th className="px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -281,9 +321,55 @@ const AdminDashboard = () => {
                                 <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{complaint.title}</td>
                                 <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.user_id?.name || 'Unknown User'}</td>
                                 <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.type}</td>
-                                <td className="px-5 py-4 whitespace-nowrap text-sm">{getStatusBadge(complaint.status)}</td>
+                                <td className="px-5 py-4 whitespace-nowrap text-sm">
+                                  {editingComplaintId === complaint._id ? (
+                                    <select
+                                      value={selectedStatus}
+                                      onChange={e => setSelectedStatus(e.target.value)}
+                                      className="border border-gray-300 rounded px-2 py-1 text-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                      disabled={isSavingStatus}
+                                    >
+                                      <option value="received">Pending</option>
+                                      <option value="in_review">In Review</option>
+                                      <option value="resolved">Resolved</option>
+                                      <option value="rejected">Rejected</option>
+                                    </select>
+                                  ) : (
+                                    getStatusBadge(complaint.status)
+                                  )}
+                                </td>
                                 <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.assigned_to?.name || <span className="text-gray-400 italic">Unassigned</span>}</td>
                                 <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(complaint.createdAt)}</td>
+                                <td className="px-5 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                  {editingComplaintId === complaint._id ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                      <button
+                                          onClick={() => handleSaveStatus(complaint._id)}
+                                          className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                          disabled={isSavingStatus}
+                                          title="Save Status"
+                                      >
+                                          {isSavingStatus ? <FiLoader className="animate-spin" size={16}/> : <FiSave size={16} />}
+                                      </button>
+                                      <button
+                                          onClick={handleCancelStatusEdit}
+                                          className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded disabled:opacity-50"
+                                          disabled={isSavingStatus}
+                                          title="Cancel Edit"
+                                      >
+                                          <FiX size={16} />
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={() => handleEditStatus(complaint)}
+                                      className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100 rounded"
+                                      title="Edit Status"
+                                    >
+                                        <FiEdit size={16} />
+                                    </button>
+                                  )}
+                                </td>
                             </tr>
                         ))}
                         </tbody>

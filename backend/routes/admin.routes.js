@@ -3,6 +3,7 @@ import {
   getAllComplaintsAdmin,
   getAllUsersAdmin,
   updateUserRoleAdmin,
+  updateComplaintStatusAdmin,
   getAdminStats
 } from "../controller/admin.controller.js";
 import { protect, authorize } from "../middleware/auth.middleware.js"; // Import authorize
@@ -33,6 +34,13 @@ router.get("/users", getAllUsersAdmin);
  * @access  Private (Admin only)
  */
 router.patch("/users/:userId/role", updateUserRoleAdmin);
+
+/**
+ * @route   PATCH /api/admin/complaints/:complaintId/status
+ * @desc    Update a complaint's status
+ * @access  Private (Admin only)
+ */
+router.patch("/complaints/:complaintId/status", updateComplaintStatusAdmin);
 
 /**
  * @route   GET /api/admin/stats

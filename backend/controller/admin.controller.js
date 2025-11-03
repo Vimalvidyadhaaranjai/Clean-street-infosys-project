@@ -81,25 +81,61 @@ export const updateUserRoleAdmin = async (req, res) => {
  * @access  Private (Admin only)
  */
 export const getAdminStats = async (req, res) => {
-    try {
-        const totalUsers = await User.countDocuments();
-        const totalComplaints = await Complaint.countDocuments();
-        const pendingComplaints = await Complaint.countDocuments({ status: 'received' });
-        const resolvedComplaints = await Complaint.countDocuments({ status: 'resolved' });
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalComplaints = await Complaint.countDocuments();
+    const pendingComplaints = await Complaint.countDocuments({ status: 'received' });
+    const resolvedComplaints = await Complaint.countDocuments({ status: 'resolved' });
 
-        res.status(200).json({
-            success: true,
-            data: {
-                totalUsers,
-                totalComplaints,
-                pendingComplaints,
-                resolvedComplaints,
-            },
-        });
-    } catch (error) {
-        console.error("Error fetching admin stats:", error);
-        res.status(500).json({ message: "Server error fetching stats." });
+    res.status(200).json({
+      success: true,
+      data: {
+        totalUsers,
+        totalComplaints,
+        pendingComplaints,
+        resolvedComplaints,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching admin stats:", error);
+    res.status(500).json({ message: "Server error fetching stats." });
+  }
+
+
+};
+
+/**
+ * @desc    Update complaint status by Admin
+ * @route   PATCH /api/admin/complaints/:complaintId/status
+ * @access  Private (Admin only)
+ */
+export const updateComplaintStatusAdmin = async (req, res) => {
+  try {
+    const { complaintId } = req.params;
+    const { status } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(complaintId)) {
+      return res.status(400).json({ message: "Invalid complaint ID." });
     }
+
+    const validStatuses = ["received", "in_review", "resolved", "rejected"];
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid status specified. Valid options: received, in_review, resolved, rejected" });
+    }
+
+    const complaint = await Complaint.findById(complaintId);
+    if (!complaint) {
+      return res.status(404).json({ message: "Complaint not found." });
+    }
+
+    complaint.status = status;
+    await complaint.save();
+
+    res.status(200).json({ success: true, message: `Complaint status updated to ${status}!` });
+  } catch (error) {
+    console.error("Error updating complaint status:", error);
+    res.status(500).json({ message: "Server error updating complaint status." });
+  }
 };
 
 // Add other admin functions here later (e.g., delete user, generate reports)
