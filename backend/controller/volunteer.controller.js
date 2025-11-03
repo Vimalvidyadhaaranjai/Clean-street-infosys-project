@@ -77,7 +77,7 @@ export const getNearbyComplaints = async (req, res) => {
       });
     }
 
-    const maxDistance = parseInt(req.query.maxDistance) || 50; // Default 50km radius
+    const maxDistance = parseInt(req.query.maxDistance) || 70; // Default 70km radius
 
     // Get all complaints that are not resolved or rejected
     const allComplaints = await Complaint.find({
