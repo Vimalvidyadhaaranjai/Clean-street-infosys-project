@@ -1,3 +1,4 @@
+// vimalvidyadhaaranjai/clean-street-infosys-project/Clean-street-infosys-project-4afda1af4d2e3c2fd6612df26770bfc5057750b4/frontend/src/pages/ViewComplaints.jsx
 import React, { useState, useEffect } from "react";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
@@ -224,12 +225,18 @@ const ComplaintCard = ({ complaint, onClick, onUpvote, onDownvote }) => {
       onClick={onClick}
     >
       <div className="flex-grow">
-        <div className="flex items-center gap-4 mb-3">
+        {/* === MODIFIED SECTION: START === */}
+        <div className="flex items-center justify-between mb-3">
             {getStatusBadge(complaint.status)}
-            <p className="text-sm text-gray-500 ml-auto">{formatDate(complaint.createdAt)}</p>
+            <div className="flex items-center gap-2">
+                <UserAvatar user={complaint.user_id} size="sm" />
+                <div className="text-right">
+                    <p className="text-sm font-medium text-gray-800 truncate max-w-[120px]">{complaint.user_id?.name || 'Anonymous'}</p>
+                    <p className="text-xs text-gray-500">{formatDate(complaint.createdAt)}</p>
+                </div>
+            </div>
         </div>
-        
-
+        {/* === MODIFIED SECTION: END === */}
         
         {complaint.photo && (
           <img src={complaint.photo} alt={complaint.title} className="w-full h-48 object-cover rounded-lg mb-4" />
@@ -294,6 +301,15 @@ const ComplaintCard = ({ complaint, onClick, onUpvote, onDownvote }) => {
       </div>
     </div>
   );
+};
+
+const UserAvatar = ({ user, size = 'sm' }) => {
+    const sizeClasses = size === 'sm' ? 'w-8 h-8' : 'w-9 h-9';
+    const apiSize = size === 'sm' ? '32' : '40';
+    const userName = user?.name || 'A';
+    const userPhoto = user?.profilePhoto;
+
+    return (<img src={userPhoto || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=random&color=fff&size=${apiSize}`} alt={userName || 'User'} className={`${sizeClasses} rounded-full object-cover flex-shrink-0 border border-gray-200`} />);
 };
 
 export default ViewComplaints;

@@ -1,3 +1,4 @@
+// vimalvidyadhaaranjai/clean-street-infosys-project/Clean-street-infosys-project-4afda1af4d2e3c2fd6612df26770bfc5057750b4/backend/controller/complaint.controller.js
 import Complaint from "../models/complaint.model.js";
 import mongoose from "mongoose";
 
@@ -266,7 +267,7 @@ export const getCommunityComplaints = async (req, res) => {
   try {
     const complaints = await Complaint.find({})
       .sort({ createdAt: -1 })
-      .populate('user_id', 'name')
+      .populate('user_id', 'name profilePhoto') // <<< MODIFIED: Added profilePhoto
       .populate('comments');
 
     res.status(200).json({
