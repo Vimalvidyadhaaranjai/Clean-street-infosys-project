@@ -6,20 +6,21 @@ import AdminLog from "../models/adminlog.model.js"
  * @access Private (Admin only)
  */
 
-export const recordAdminLog = async(req,res)=>{
+export const recordAdminLog = async(userId, action)=>{
     try {
-        const {user_id,action} = req.body;
+        if (!userId || !action) {
+      console.warn("Admin log missing userId or action:", { userId, action });
+      return;
+    }
         const log = new AdminLog({
-            user_id : user_id,
+            user_id : userId,
             action : action
         });
         await log.save();
-        res.status(201).json({ success: true, data: log });
         
         console.log("Admin action logged:",action);
     } catch (error) {
         console.error("Error saving admin log",error);
-        res.status(500).json({ message: "AdminLog validation failed", error: error.message });
         
     }
 

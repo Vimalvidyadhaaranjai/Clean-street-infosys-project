@@ -136,12 +136,12 @@ export const updateComplaintStatusAdmin = async (req, res) => {
     // log admin action
 
   const adminName = req.user?.name || "unknown Admin";
-  const action = `${adminName} updated complaint (${Complaint._id}) status from ${oldStatus} to '${status}' `;
+  const action = `${adminName} updated complaint (${complaint.title}) status from ${oldStatus} to '${status}' `;
 
   
   
     // Record admin action
-    await recordAdminLog(req.user._id, `Changed complaint ${complaintId} status to ${status}`);
+    await recordAdminLog(req.user?._id, action);
 
     res.status(200).json({ success: true, message: `Complaint status updated to ${status}!` });
 
