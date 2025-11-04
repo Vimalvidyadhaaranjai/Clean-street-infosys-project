@@ -19,6 +19,8 @@ const AdminDashboard = () => {
   const [editingComplaintId, setEditingComplaintId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [isSavingStatus, setIsSavingStatus] = useState(false);
+  const [activities, setActivities] = useState([]);
+
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
@@ -36,13 +38,14 @@ const AdminDashboard = () => {
     setLoading(true);
     setError("");
     try {
-      const [statsRes, usersRes, complaintsRes] = await Promise.all([
+      const [statsRes, usersRes, complaintsRes,logsRes] = await Promise.all([
         fetch(`${backend_Url}/api/admin/stats`, { credentials: "include" }),
         fetch(`${backend_Url}/api/admin/users`, { credentials: "include" }),
         fetch(`${backend_Url}/api/admin/complaints`, { credentials: "include" }),
+        fetch(`${backend_Url}/api/admin/logs`,{credentials: "include"})
       ]);
 
-      if (!statsRes.ok || !usersRes.ok || !complaintsRes.ok) {
+      if (!statsRes.ok || !usersRes.ok || !complaintsRes.ok ) {
          const errorData = await (statsRes.ok ? usersRes.ok ? complaintsRes : usersRes : statsRes).json();
          throw new Error(errorData.message || 'Failed to fetch admin data. Ensure you are logged in as admin.');
       }
@@ -50,11 +53,12 @@ const AdminDashboard = () => {
       const statsData = await statsRes.json();
       const usersData = await usersRes.json();
       const complaintsData = await complaintsRes.json();
+      const logsData = await logsRes.json()
 
       if (statsData.success) setStats(statsData.data);
       if (usersData.success) setUsers(usersData.data);
       if (complaintsData.success) setComplaints(complaintsData.data);
-
+  if (logsData.success) setActivities(logsData.data);
     } catch (err) {
       console.error("Error fetching admin data:", err);
       setError(err.message || "Failed to load data. Please try again.");
@@ -139,6 +143,7 @@ const AdminDashboard = () => {
     }
   };
 
+
    const getStatusBadge = (status) => {
     const styles = {
       received: "bg-yellow-100 text-yellow-800 border border-yellow-200",
@@ -206,18 +211,20 @@ const AdminDashboard = () => {
                <TabButton id="overview" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiActivity />}>Overview</TabButton>
                <TabButton id="users" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiUsers />}>Manage Users ({stats.totalUsers})</TabButton>
                <TabButton id="complaints" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiClipboard />}>View Complaints ({stats.totalComplaints})</TabButton>
+               <TabButton id="recent activities" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiClipboard />}>Recent activities</TabButton>
+
              </nav>
          </div>
 
 
         <div className="animate-fade-in-up">
-          {activeTab === 'overview' && (
-            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {activeTab === 'overview' && (         
+<section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <StatCard icon={<FiUsers className="text-purple-500" />} value={stats.totalUsers} label="Total Users" />
               <StatCard icon={<FiClipboard className="text-blue-500" />} value={stats.totalComplaints} label="Total Complaints" />
               <StatCard icon={<FiClock className="text-yellow-500" />} value={stats.pendingComplaints} label="Pending Complaints" />
               <StatCard icon={<FiCheckCircle className="text-green-500" />} value={stats.resolvedComplaints} label="Resolved Complaints" />
-            </section>
+            </section> 
           )}
 
           {activeTab === 'users' && (
@@ -379,6 +386,26 @@ const AdminDashboard = () => {
                  <p className="text-center text-gray-500 py-6">No complaints found.</p>
                )}
             </section>
+          )}
+          
+          {activeTab === 'recent activities' && ( 
+           
+                   <div className="bg-white rounded-xl shadow p-4">
+  <h2 className="text-xl font-semibold mb-3">Recent Activities</h2>
+  <ul className="space-y-2">
+    {activities.map((log) => (
+      <li key={log._id} className="border-b pb-2">
+        <span className="font-medium text-gray-800">{log.user_id?.name || "Unknown Admin"}</span>
+        {" "}- {log.action}
+        <div className="text-xs text-gray-500">
+          {new Date(log.timestamp).toLocaleString()}
+        </div>
+      </li>
+    ))}
+  </ul>
+</div>
+
+          
           )}
         </div>
 
