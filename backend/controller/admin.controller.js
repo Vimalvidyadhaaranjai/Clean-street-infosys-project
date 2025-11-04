@@ -1,6 +1,7 @@
 import Complaint from "../models/complaint.model.js";
 import User from "../models/user.model.js";
 import mongoose from "mongoose";
+import { recordAdminLog } from "./adminLog.controller.js";
 
 /**
  * @desc    Get all complaints for admin view
@@ -127,15 +128,34 @@ export const updateComplaintStatusAdmin = async (req, res) => {
     if (!complaint) {
       return res.status(404).json({ message: "Complaint not found." });
     }
-
+    
+    const oldStatus = complaint.status;
     complaint.status = status;
     await complaint.save();
 
+    // log admin action
+
+  const adminName = req.user?.name || "unknown Admin";
+  const action = `${adminName} updated complaint (${Complaint._id}) status from ${oldStatus} to '${status}' `;
+
+  
+  
+    // Record admin action
+    await recordAdminLog(req.user._id, `Changed complaint ${complaintId} status to ${status}`);
+
     res.status(200).json({ success: true, message: `Complaint status updated to ${status}!` });
+
+
   } catch (error) {
     console.error("Error updating complaint status:", error);
     res.status(500).json({ message: "Server error updating complaint status." });
+    console.error("Error updating complaint status:", error);
+    res.status(500).json({ message: "Server error updating complaint status." });
   }
+
+  
+
+
 };
 
 // Add other admin functions here later (e.g., delete user, generate reports)
