@@ -6,6 +6,8 @@ import {
   updateComplaintStatusAdmin,
   getAdminStats
 } from "../controller/admin.controller.js";
+
+import {getAllAdminLogs,recordAdminLog} from "../controller/adminLog.controller.js"
 import { protect, authorize } from "../middleware/auth.middleware.js"; // Import authorize
 
 const router = express.Router();
@@ -48,5 +50,8 @@ router.patch("/complaints/:complaintId/status", updateComplaintStatusAdmin);
  * @access  Private (Admin only)
  */
 router.get("/stats", getAdminStats);
+
+router.get("/logs",getAllAdminLogs)
+router.post("/logs",recordAdminLog);
 
 export default router;

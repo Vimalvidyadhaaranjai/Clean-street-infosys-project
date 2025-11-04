@@ -18,6 +18,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -32,7 +33,7 @@ const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`${backend_URL}/api/auth/register`, {
+      const res = await fetch(`${backend_Url}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',
