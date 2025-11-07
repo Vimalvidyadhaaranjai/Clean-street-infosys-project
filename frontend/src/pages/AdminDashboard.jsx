@@ -3,7 +3,7 @@ import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import AdminStatistics from "../Components/AdminStatistics";
 import { useNavigate } from "react-router-dom";
-import { FiUsers, FiClipboard, FiAlertCircle, FiCheckCircle, FiEdit, FiSave, FiX, FiLoader, FiActivity, FiUserCheck, FiClock } from "react-icons/fi";
+import { FiUsers, FiClipboard, FiAlertCircle, FiCheckCircle, FiEdit, FiSave, FiX, FiLoader, FiActivity, FiUserCheck, FiClock, FiDownload } from "react-icons/fi";
 import { Toaster, toast } from "react-hot-toast";
 
 const AdminDashboard = () => {
@@ -21,6 +21,7 @@ const AdminDashboard = () => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [isSavingStatus, setIsSavingStatus] = useState(false);
   const [activities, setActivities] = useState([]);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
@@ -156,6 +157,298 @@ const AdminDashboard = () => {
 
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
+  const downloadReport = async (format) => {
+    try {
+      setShowDownloadModal(false);
+      toast.loading(`Generating ${format.toUpperCase()} report...`);
+      
+      // Fetch detailed statistics
+      const res = await fetch(`${backend_Url}/api/admin/detailed-stats`, {
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch statistics for report");
+      }
+
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error("Failed to generate report");
+      }
+
+      const detailedStats = data.data;
+
+      if (format === 'excel') {
+        downloadExcelReport(detailedStats);
+      } else if (format === 'pdf') {
+        downloadPDFReport(detailedStats);
+      }
+
+      toast.dismiss();
+      toast.success(`${format.toUpperCase()} report downloaded successfully!`);
+    } catch (err) {
+      console.error("Error downloading report:", err);
+      toast.dismiss();
+      toast.error(err.message || "Failed to download report");
+    }
+  };
+
+  const downloadExcelReport = (detailedStats) => {
+    // Generate CSV content (Excel compatible)
+    let csvContent = "Clean Street - Admin Statistical Report\n";
+    csvContent += `Generated on: ${new Date().toLocaleString()}\n\n`;
+
+    // Summary Statistics
+    csvContent += "=== SUMMARY STATISTICS ===\n";
+    csvContent += `Total Users,${stats.totalUsers}\n`;
+    csvContent += `Total Complaints,${stats.totalComplaints}\n`;
+    csvContent += `Pending Complaints,${stats.pendingComplaints}\n`;
+    csvContent += `Resolved Complaints,${stats.resolvedComplaints}\n\n`;
+
+    // Complaint Status Distribution
+    csvContent += "=== COMPLAINT STATUS DISTRIBUTION ===\n";
+    csvContent += "Status,Count\n";
+    detailedStats.complaintsByStatus.forEach(item => {
+      const statusLabel = item._id === 'received' ? 'Pending' : 
+                        item._id === 'in_review' ? 'In Review' : 
+                        item._id === 'resolved' ? 'Resolved' : 
+                        item._id === 'rejected' ? 'Rejected' : item._id;
+      csvContent += `${statusLabel},${item.count}\n`;
+    });
+    csvContent += "\n";
+
+    // Complaint Types Distribution
+    csvContent += "=== COMPLAINT TYPES DISTRIBUTION ===\n";
+    csvContent += "Type,Count\n";
+    detailedStats.complaintsByType.forEach(item => {
+      csvContent += `${item._id || 'Unknown'},${item.count}\n`;
+    });
+    csvContent += "\n";
+
+    // User Roles Distribution
+    csvContent += "=== USER ROLES DISTRIBUTION ===\n";
+    csvContent += "Role,Count\n";
+    detailedStats.usersByRole.forEach(item => {
+      csvContent += `${item._id.charAt(0).toUpperCase() + item._id.slice(1)},${item.count}\n`;
+    });
+    csvContent += "\n";
+
+    // Complaints Over Time (Last 7 Days)
+    csvContent += "=== COMPLAINTS OVER TIME (LAST 7 DAYS) ===\n";
+    csvContent += "Date,Count\n";
+    detailedStats.complaintsOverTime.forEach(item => {
+      csvContent += `${item._id},${item.count}\n`;
+    });
+    csvContent += "\n";
+
+    // Monthly Complaints (Last 6 Months)
+    csvContent += "=== MONTHLY COMPLAINT TRENDS (LAST 6 MONTHS) ===\n";
+    csvContent += "Month,Count\n";
+    detailedStats.monthlyComplaints.forEach(item => {
+      csvContent += `${item._id},${item.count}\n`;
+    });
+    csvContent += "\n";
+
+    // User Registrations (Last 30 Days)
+    csvContent += "=== USER REGISTRATIONS (LAST 30 DAYS) ===\n";
+    csvContent += "Date,Count\n";
+    detailedStats.userRegistrations.forEach(item => {
+      csvContent += `${item._id},${item.count}\n`;
+    });
+    csvContent += "\n";
+
+    // Top Complaint Types
+    csvContent += "=== TOP 5 COMPLAINT TYPES ===\n";
+    csvContent += "Type,Count\n";
+    detailedStats.topComplaintTypes.forEach(item => {
+      csvContent += `${item._id || 'Unknown'},${item.count}\n`;
+    });
+
+    // Create and download the file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    const timestamp = new Date().toISOString().split('T')[0];
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `clean-street-report-${timestamp}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const downloadPDFReport = (detailedStats) => {
+    // Generate HTML content for PDF
+    let htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Clean Street - Statistical Report</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 40px; color: #333; }
+          h1 { color: #4f46e5; border-bottom: 3px solid #4f46e5; padding-bottom: 10px; }
+          h2 { color: #6366f1; margin-top: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
+          .header { text-align: center; margin-bottom: 30px; }
+          .date { color: #6b7280; font-size: 14px; }
+          table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+          th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+          th { background-color: #f3f4f6; font-weight: 600; color: #374151; }
+          tr:hover { background-color: #f9fafb; }
+          .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0; }
+          .summary-card { background: #f9fafb; padding: 20px; border-radius: 8px; border-left: 4px solid #4f46e5; }
+          .summary-card h3 { margin: 0 0 10px 0; color: #6b7280; font-size: 14px; }
+          .summary-card .value { font-size: 32px; font-weight: bold; color: #1f2937; }
+          @media print {
+            body { margin: 20px; }
+            .page-break { page-break-before: always; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>Clean Street - Admin Statistical Report</h1>
+          <p class="date">Generated on: ${new Date().toLocaleString()}</p>
+        </div>
+
+        <h2>Summary Statistics</h2>
+        <div class="summary-grid">
+          <div class="summary-card">
+            <h3>Total Users</h3>
+            <div class="value">${stats.totalUsers}</div>
+          </div>
+          <div class="summary-card">
+            <h3>Total Complaints</h3>
+            <div class="value">${stats.totalComplaints}</div>
+          </div>
+          <div class="summary-card">
+            <h3>Pending Complaints</h3>
+            <div class="value">${stats.pendingComplaints}</div>
+          </div>
+          <div class="summary-card">
+            <h3>Resolved Complaints</h3>
+            <div class="value">${stats.resolvedComplaints}</div>
+          </div>
+        </div>
+
+        <h2>Complaint Status Distribution</h2>
+        <table>
+          <thead>
+            <tr><th>Status</th><th>Count</th></tr>
+          </thead>
+          <tbody>
+            ${detailedStats.complaintsByStatus.map(item => {
+              const statusLabel = item._id === 'received' ? 'Pending' : 
+                                item._id === 'in_review' ? 'In Review' : 
+                                item._id === 'resolved' ? 'Resolved' : 
+                                item._id === 'rejected' ? 'Rejected' : item._id;
+              return `<tr><td>${statusLabel}</td><td>${item.count}</td></tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+
+        <h2>Complaint Types Distribution</h2>
+        <table>
+          <thead>
+            <tr><th>Type</th><th>Count</th></tr>
+          </thead>
+          <tbody>
+            ${detailedStats.complaintsByType.map(item => 
+              `<tr><td>${item._id || 'Unknown'}</td><td>${item.count}</td></tr>`
+            ).join('')}
+          </tbody>
+        </table>
+
+        <div class="page-break"></div>
+
+        <h2>User Roles Distribution</h2>
+        <table>
+          <thead>
+            <tr><th>Role</th><th>Count</th></tr>
+          </thead>
+          <tbody>
+            ${detailedStats.usersByRole.map(item => 
+              `<tr><td>${item._id.charAt(0).toUpperCase() + item._id.slice(1)}</td><td>${item.count}</td></tr>`
+            ).join('')}
+          </tbody>
+        </table>
+
+        <h2>Complaints Over Time (Last 7 Days)</h2>
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Count</th></tr>
+          </thead>
+          <tbody>
+            ${detailedStats.complaintsOverTime.map(item => 
+              `<tr><td>${item._id}</td><td>${item.count}</td></tr>`
+            ).join('')}
+          </tbody>
+        </table>
+
+        <h2>Monthly Complaint Trends (Last 6 Months)</h2>
+        <table>
+          <thead>
+            <tr><th>Month</th><th>Count</th></tr>
+          </thead>
+          <tbody>
+            ${detailedStats.monthlyComplaints.map(item => 
+              `<tr><td>${item._id}</td><td>${item.count}</td></tr>`
+            ).join('')}
+          </tbody>
+        </table>
+
+        <h2>User Registrations (Last 30 Days)</h2>
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Count</th></tr>
+          </thead>
+          <tbody>
+            ${detailedStats.userRegistrations.map(item => 
+              `<tr><td>${item._id}</td><td>${item.count}</td></tr>`
+            ).join('')}
+          </tbody>
+        </table>
+
+        <h2>Top 5 Complaint Types</h2>
+        <table>
+          <thead>
+            <tr><th>Type</th><th>Count</th></tr>
+          </thead>
+          <tbody>
+            ${detailedStats.topComplaintTypes.map(item => 
+              `<tr><td>${item._id || 'Unknown'}</td><td>${item.count}</td></tr>`
+            ).join('')}
+          </tbody>
+        </table>
+      </body>
+      </html>
+    `;
+
+    // Create blob and download
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    const timestamp = new Date().toISOString().split('T')[0];
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `clean-street-report-${timestamp}.html`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Open in new window for printing to PDF
+    const printWindow = window.open(url, '_blank');
+    if (printWindow) {
+      printWindow.onload = () => {
+        setTimeout(() => {
+          printWindow.print();
+        }, 250);
+      };
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
@@ -200,9 +493,18 @@ const AdminDashboard = () => {
       <Toaster position="bottom-center" reverseOrder={false} />
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow">
-        <header className="mb-8 animate-fade-in-down">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 tracking-tight">Admin Dashboard</h1>
-          <p className="text-gray-600 mt-1 text-base">Overview and management tools.</p>
+        <header className="mb-8 animate-fade-in-down flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 tracking-tight">Admin Dashboard</h1>
+            <p className="text-gray-600 mt-1 text-base">Overview and management tools.</p>
+          </div>
+          <button
+            onClick={() => setShowDownloadModal(true)}
+            className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          >
+            <FiDownload size={18} />
+            <span>Download Report</span>
+          </button>
         </header>
 
         <div className="border-b border-gray-200 mb-6">
@@ -413,6 +715,68 @@ const AdminDashboard = () => {
         </div>
 
       </main>
+
+      {/* Download Format Selection Modal */}
+      {showDownloadModal && (
+        <div className="fixed inset-0 backdrop-blur-3xl bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 animate-fade-in-up">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-800">Download Report</h3>
+              <button
+                onClick={() => setShowDownloadModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <FiX size={24} />
+              </button>
+            </div>
+            
+            <p className="text-gray-600 mb-6">Choose your preferred format to download the statistical report:</p>
+            
+            <div className="space-y-3">
+              <button
+                onClick={() => downloadReport('excel')}
+                className="w-full flex items-center gap-4 p-4 border-2 border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
+              >
+                <div className="p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
+                  <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                    <path d="M14 2v6h6M9 15h6M9 11h6M9 19h6"/>
+                  </svg>
+                </div>
+                <div className="text-left flex-1">
+                  <h4 className="font-semibold text-gray-800 group-hover:text-indigo-600">Excel (CSV)</h4>
+                  <p className="text-sm text-gray-500">Download as CSV file for Excel/Sheets</p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => downloadReport('pdf')}
+                className="w-full flex items-center gap-4 p-4 border-2 border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
+              >
+                <div className="p-3 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors">
+                  <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                    <path d="M14 2v6h6"/>
+                    <text x="7" y="18" fontSize="8" fontWeight="bold" fill="currentColor">PDF</text>
+                  </svg>
+                </div>
+                <div className="text-left flex-1">
+                  <h4 className="font-semibold text-gray-800 group-hover:text-indigo-600">PDF</h4>
+                  <p className="text-sm text-gray-500">Download as formatted PDF document</p>
+                </div>
+              </button>
+            </div>
+
+            <button
+              onClick={() => setShowDownloadModal(false)}
+              className="w-full mt-4 px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );
