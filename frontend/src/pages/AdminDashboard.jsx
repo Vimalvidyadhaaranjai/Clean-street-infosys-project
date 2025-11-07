@@ -493,27 +493,34 @@ const AdminDashboard = () => {
       <Toaster position="bottom-center" reverseOrder={false} />
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow">
-        <header className="mb-8 animate-fade-in-down flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <header className="mb-6 sm:mb-8 animate-fade-in-down flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 tracking-tight">Admin Dashboard</h1>
-            <p className="text-gray-600 mt-1 text-base">Overview and management tools.</p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 tracking-tight">Admin Dashboard</h1>
+            <p className="text-gray-600 mt-1 text-sm sm:text-base">Overview and management tools.</p>
           </div>
           <button
             onClick={() => setShowDownloadModal(true)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            className="flex items-center justify-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-indigo-600 text-white text-sm sm:text-base font-semibold rounded-lg shadow hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 w-full sm:w-auto"
           >
             <FiDownload size={18} />
             <span>Download Report</span>
           </button>
         </header>
 
-        <div className="border-b border-gray-200 mb-6">
-          <nav className="flex -mb-px space-x-6" aria-label="Tabs">
-            <TabButton id="overview" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiActivity />}>Overview</TabButton>
-            <TabButton id="users" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiUsers />}>Manage Users ({stats.totalUsers})</TabButton>
-            <TabButton id="complaints" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiClipboard />}>View Complaints ({stats.totalComplaints})</TabButton>
-            <TabButton id="recent activities" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiClipboard />}>Recent activities</TabButton>
-
+        <div className="border-b border-gray-200 mb-4 sm:mb-6">
+          <nav className="flex -mb-px justify-around sm:justify-start sm:space-x-6" aria-label="Tabs">
+            <TabButton id="overview" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiActivity />}>
+              <span className="hidden sm:inline">Overview</span>
+            </TabButton>
+            <TabButton id="users" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiUsers />}>
+              <span className="hidden sm:inline">Manage Users ({stats.totalUsers})</span>
+            </TabButton>
+            <TabButton id="complaints" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiClipboard />}>
+              <span className="hidden sm:inline">View Complaints ({stats.totalComplaints})</span>
+            </TabButton>
+            <TabButton id="recent activities" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiClock />}>
+              <span className="hidden sm:inline">Recent Activities</span>
+            </TabButton>
           </nav>
         </div>
 
@@ -533,182 +540,340 @@ const AdminDashboard = () => {
           )}
 
           {activeTab === 'users' && (
-            <section className="bg-white p-5 sm:p-6 rounded-xl shadow border border-gray-100">
-              <h2 className="text-xl font-semibold text-gray-800 mb-5">User Management</h2>
-              <div className="overflow-x-auto">
+            <section className="bg-white p-4 sm:p-5 lg:p-6 rounded-xl shadow border border-gray-100">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-5">User Management</h2>
+              
+              {/* Mobile Card View */}
+              <div className="block md:hidden space-y-3">
+                {users.map(user => (
+                  <div key={user._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 text-sm truncate">{user.name}</h3>
+                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      </div>
+                      {editingUserId === user._id ? (
+                        <div className="flex items-center gap-2 ml-2">
+                          <button
+                            onClick={() => handleSaveRole(user._id)}
+                            className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-100 rounded disabled:opacity-50"
+                            disabled={isSavingRole}
+                            title="Save Role"
+                          >
+                            {isSavingRole ? <FiLoader className="animate-spin" size={16}/> : <FiSave size={16} />}
+                          </button>
+                          <button
+                            onClick={handleCancelEdit}
+                            className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded disabled:opacity-50"
+                            disabled={isSavingRole}
+                            title="Cancel"
+                          >
+                            <FiX size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handleEditRole(user)}
+                          className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100 rounded disabled:opacity-50 disabled:text-gray-400"
+                          disabled={currentUser._id === user._id}
+                          title={currentUser._id === user._id ? "Cannot edit own role" : "Edit Role"}
+                        >
+                          <FiEdit size={16} />
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-500">Location:</span>
+                        <span className="text-gray-700">{user.location || 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-500">Role:</span>
+                        {editingUserId === user._id ? (
+                          <select
+                            value={selectedRole}
+                            onChange={e => setSelectedRole(e.target.value)}
+                            className="border border-gray-300 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-indigo-500"
+                            disabled={isSavingRole}
+                          >
+                            <option value="user">User</option>
+                            <option value="volunteer">Volunteer</option>
+                            <option value="admin">Admin</option>
+                          </select>
+                        ) : (
+                          <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${user.role === 'admin' ? 'bg-red-100 text-red-800' : user.role === 'volunteer' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                            {user.role}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-500">Joined:</span>
+                        <span className="text-gray-700">{formatDate(user.createdAt)}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                        <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                        <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                        <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                        <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                        <th scope="col" className="px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                       {users.map(user => (
-                        <tr key={user._id} className="hover:bg-gray-50 transition-colors">
-                           <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.name}</td>
-                           <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
-                           <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{user.location || 'N/A'}</td>
-                           <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {editingUserId === user._id ? (
-                              <select
-                                value={selectedRole}
-                                onChange={e => setSelectedRole(e.target.value)}
-                                className="border border-gray-300 rounded px-2 py-1 text-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                                disabled={isSavingRole}
-                              >
-                                <option value="user">User</option>
-                                <option value="volunteer">Volunteer</option>
-                                <option value="admin">Admin</option>
-                              </select>
-                            ) : (
-                              <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-red-100 text-red-800' : user.role === 'volunteer' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                                {user.role}
-                              </span>
-                            )}
-                           </td>
-                           <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(user.createdAt)}</td>
-                           <td className="px-5 py-4 whitespace-nowrap text-center text-sm font-medium">
-                            {editingUserId === user._id ? (
-                              <div className="flex items-center justify-center gap-2">
-                                <button
-                                    onClick={() => handleSaveRole(user._id)}
-                                    className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                                    disabled={isSavingRole}
-                                    title="Save Role"
-                                >
-                                    {isSavingRole ? <FiLoader className="animate-spin" size={16}/> : <FiSave size={16} />}
-                                </button>
-                                <button
-                                    onClick={handleCancelEdit}
-                                    className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded disabled:opacity-50"
-                                    disabled={isSavingRole}
-                                    title="Cancel Edit"
-                                >
-                                    <FiX size={16} />
-                                </button>
-                              </div>
-                            ) : (
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+                      <th scope="col" className="px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {users.map(user => (
+                      <tr key={user._id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.name}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{user.location || 'N/A'}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {editingUserId === user._id ? (
+                            <select
+                              value={selectedRole}
+                              onChange={e => setSelectedRole(e.target.value)}
+                              className="border border-gray-300 rounded px-2 py-1 text-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                              disabled={isSavingRole}
+                            >
+                              <option value="user">User</option>
+                              <option value="volunteer">Volunteer</option>
+                              <option value="admin">Admin</option>
+                            </select>
+                          ) : (
+                            <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-red-100 text-red-800' : user.role === 'volunteer' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                              {user.role}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(user.createdAt)}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-center text-sm font-medium">
+                          {editingUserId === user._id ? (
+                            <div className="flex items-center justify-center gap-2">
                               <button
-                                onClick={() => handleEditRole(user)}
-                                className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100 rounded disabled:opacity-50 disabled:text-gray-400 disabled:hover:bg-transparent"
-                                disabled={currentUser._id === user._id}
-                                title={currentUser._id === user._id ? "Cannot edit own role" : "Edit Role"}
+                                onClick={() => handleSaveRole(user._id)}
+                                className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={isSavingRole}
+                                title="Save Role"
                               >
-                                  <FiEdit size={16} />
+                                {isSavingRole ? <FiLoader className="animate-spin" size={16}/> : <FiSave size={16} />}
                               </button>
-                            )}
-                           </td>
-                        </tr>
-                       ))}
-                    </tbody>
+                              <button
+                                onClick={handleCancelEdit}
+                                className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded disabled:opacity-50"
+                                disabled={isSavingRole}
+                                title="Cancel Edit"
+                              >
+                                <FiX size={16} />
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => handleEditRole(user)}
+                              className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100 rounded disabled:opacity-50 disabled:text-gray-400 disabled:hover:bg-transparent"
+                              disabled={currentUser._id === user._id}
+                              title={currentUser._id === user._id ? "Cannot edit own role" : "Edit Role"}
+                            >
+                              <FiEdit size={16} />
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
                 </table>
-               </div>
+              </div>
             </section>
           )}
 
           {activeTab === 'complaints' && (
-            <section className="bg-white p-5 sm:p-6 rounded-xl shadow border border-gray-100">
-               <h2 className="text-xl font-semibold text-gray-800 mb-5">All Complaints</h2>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                       <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                            <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reported By</th>
-                            <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                            <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned To</th>
-                            <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th className="px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                        {complaints.map(complaint => (
-                            <tr key={complaint._id} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{complaint.title}</td>
-                                <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.user_id?.name || 'Unknown User'}</td>
-                                <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.type}</td>
-                                <td className="px-5 py-4 whitespace-nowrap text-sm">
-                                  {editingComplaintId === complaint._id ? (
-                                    <select
-                                      value={selectedStatus}
-                                      onChange={e => setSelectedStatus(e.target.value)}
-                                      className="border border-gray-300 rounded px-2 py-1 text-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                                      disabled={isSavingStatus}
-                                    >
-                                      <option value="received">Pending</option>
-                                      <option value="in_review">In Review</option>
-                                      <option value="resolved">Resolved</option>
-                                      <option value="rejected">Rejected</option>
-                                    </select>
-                                  ) : (
-                                    getStatusBadge(complaint.status)
-                                  )}
-                                </td>
-                                <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.assigned_to?.name || <span className="text-gray-400 italic">Unassigned</span>}</td>
-                                <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(complaint.createdAt)}</td>
-                                <td className="px-5 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                  {editingComplaintId === complaint._id ? (
-                                    <div className="flex items-center justify-center gap-2">
-                                      <button
-                                          onClick={() => handleSaveStatus(complaint._id)}
-                                          className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                                          disabled={isSavingStatus}
-                                          title="Save Status"
-                                      >
-                                          {isSavingStatus ? <FiLoader className="animate-spin" size={16}/> : <FiSave size={16} />}
-                                      </button>
-                                      <button
-                                          onClick={handleCancelStatusEdit}
-                                          className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded disabled:opacity-50"
-                                          disabled={isSavingStatus}
-                                          title="Cancel Edit"
-                                      >
-                                          <FiX size={16} />
-                                      </button>
-                                    </div>
-                                  ) : (
-                                    <button
-                                      onClick={() => handleEditStatus(complaint)}
-                                      className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100 rounded"
-                                      title="Edit Status"
-                                    >
-                                        <FiEdit size={16} />
-                                    </button>
-                                  )}
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-               </div>
-               {complaints.length === 0 && (
-                 <p className="text-center text-gray-500 py-6">No complaints found.</p>
-               )}
+            <section className="bg-white p-4 sm:p-5 lg:p-6 rounded-xl shadow border border-gray-100">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-5">All Complaints</h2>
+              
+              {/* Mobile Card View */}
+              <div className="block md:hidden space-y-3">
+                {complaints.map(complaint => (
+                  <div key={complaint._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 text-sm mb-1">{complaint.title}</h3>
+                        <p className="text-xs text-gray-500">by {complaint.user_id?.name || 'Unknown User'}</p>
+                      </div>
+                      {editingComplaintId === complaint._id ? (
+                        <div className="flex items-center gap-2 ml-2">
+                          <button
+                            onClick={() => handleSaveStatus(complaint._id)}
+                            className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-100 rounded disabled:opacity-50"
+                            disabled={isSavingStatus}
+                            title="Save"
+                          >
+                            {isSavingStatus ? <FiLoader className="animate-spin" size={16}/> : <FiSave size={16} />}
+                          </button>
+                          <button
+                            onClick={handleCancelStatusEdit}
+                            className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded disabled:opacity-50"
+                            disabled={isSavingStatus}
+                            title="Cancel"
+                          >
+                            <FiX size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handleEditStatus(complaint)}
+                          className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100 rounded"
+                          title="Edit Status"
+                        >
+                          <FiEdit size={16} />
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-500">Type:</span>
+                        <span className="text-gray-700 font-medium">{complaint.type}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-500">Status:</span>
+                        {editingComplaintId === complaint._id ? (
+                          <select
+                            value={selectedStatus}
+                            onChange={e => setSelectedStatus(e.target.value)}
+                            className="border border-gray-300 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-indigo-500"
+                            disabled={isSavingStatus}
+                          >
+                            <option value="received">Pending</option>
+                            <option value="in_review">In Review</option>
+                            <option value="resolved">Resolved</option>
+                            <option value="rejected">Rejected</option>
+                          </select>
+                        ) : (
+                          getStatusBadge(complaint.status)
+                        )}
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-500">Assigned To:</span>
+                        <span className="text-gray-700">{complaint.assigned_to?.name || <span className="text-gray-400 italic">Unassigned</span>}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-500">Date:</span>
+                        <span className="text-gray-700">{formatDate(complaint.createdAt)}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reported By</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned To</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                      <th className="px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {complaints.map(complaint => (
+                      <tr key={complaint._id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{complaint.title}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.user_id?.name || 'Unknown User'}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.type}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm">
+                          {editingComplaintId === complaint._id ? (
+                            <select
+                              value={selectedStatus}
+                              onChange={e => setSelectedStatus(e.target.value)}
+                              className="border border-gray-300 rounded px-2 py-1 text-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                              disabled={isSavingStatus}
+                            >
+                              <option value="received">Pending</option>
+                              <option value="in_review">In Review</option>
+                              <option value="resolved">Resolved</option>
+                              <option value="rejected">Rejected</option>
+                            </select>
+                          ) : (
+                            getStatusBadge(complaint.status)
+                          )}
+                        </td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.assigned_to?.name || <span className="text-gray-400 italic">Unassigned</span>}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(complaint.createdAt)}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-center text-sm font-medium">
+                          {editingComplaintId === complaint._id ? (
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                onClick={() => handleSaveStatus(complaint._id)}
+                                className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={isSavingStatus}
+                                title="Save Status"
+                              >
+                                {isSavingStatus ? <FiLoader className="animate-spin" size={16}/> : <FiSave size={16} />}
+                              </button>
+                              <button
+                                onClick={handleCancelStatusEdit}
+                                className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded disabled:opacity-50"
+                                disabled={isSavingStatus}
+                                title="Cancel Edit"
+                              >
+                                <FiX size={16} />
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => handleEditStatus(complaint)}
+                              className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100 rounded"
+                              title="Edit Status"
+                            >
+                              <FiEdit size={16} />
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              {complaints.length === 0 && (
+                <p className="text-center text-gray-500 py-6 text-sm sm:text-base">No complaints found.</p>
+              )}
             </section>
           )}
           
           {activeTab === 'recent activities' && ( 
-           
-                   <div className="bg-white rounded-xl shadow p-4">
-  <h2 className="text-xl font-semibold mb-3">Recent Activities</h2>
-  <ul className="space-y-2 ">
-    {activities.map((log) => (
-      <li key={log._id} className=" rounded-lg hover:bg-gray-100   px-2 py-3">
-        <span className="font-medium text-gray-800">{log.user_id?.name || "Unknown Admin"}</span>
-        {" "}- {log.action}
-        <div className="text-xs text-gray-500">
-          {new Date(log.timestamp).toLocaleString()}
-        </div>
-      </li>
-    ))}
-  </ul>
-</div>
+            <div className="bg-white rounded-xl shadow p-4 sm:p-5 lg:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Recent Activities</h2>
+              <ul className="space-y-2">
+                {activities.map((log) => (
+                  <li key={log._id} className="rounded-lg hover:bg-gray-100 px-3 sm:px-4 py-3 transition-colors">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <span className="font-medium text-gray-800 text-sm sm:text-base">{log.user_id?.name || "Unknown Admin"}</span>
+                      <span className="hidden sm:inline text-gray-500">-</span>
+                      <span className="text-gray-700 text-xs sm:text-sm">{log.action}</span>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {new Date(log.timestamp).toLocaleString()}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              {activities.length === 0 && (
+                <p className="text-center text-gray-500 py-6 text-sm sm:text-base">No recent activities.</p>
+              )}
+            </div>
 
           
           )}
@@ -718,10 +883,10 @@ const AdminDashboard = () => {
 
       {/* Download Format Selection Modal */}
       {showDownloadModal && (
-        <div className="fixed inset-0 backdrop-blur-3xl bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 animate-fade-in-up">
+        <div className="fixed inset-0 backdrop-blur-sm bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-5 sm:p-6 animate-fade-in-up mx-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-800">Download Report</h3>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800">Download Report</h3>
               <button
                 onClick={() => setShowDownloadModal(false)}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -730,46 +895,46 @@ const AdminDashboard = () => {
               </button>
             </div>
             
-            <p className="text-gray-600 mb-6">Choose your preferred format to download the statistical report:</p>
+            <p className="text-gray-600 mb-5 sm:mb-6 text-sm sm:text-base">Choose your preferred format to download the statistical report:</p>
             
             <div className="space-y-3">
               <button
                 onClick={() => downloadReport('excel')}
-                className="w-full flex items-center gap-4 p-4 border-2 border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
+                className="w-full flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-2 border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
               >
-                <div className="p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
-                  <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                <div className="p-2 sm:p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors flex-shrink-0">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
                     <path d="M14 2v6h6M9 15h6M9 11h6M9 19h6"/>
                   </svg>
                 </div>
-                <div className="text-left flex-1">
-                  <h4 className="font-semibold text-gray-800 group-hover:text-indigo-600">Excel (CSV)</h4>
-                  <p className="text-sm text-gray-500">Download as CSV file for Excel/Sheets</p>
+                <div className="text-left flex-1 min-w-0">
+                  <h4 className="font-semibold text-gray-800 group-hover:text-indigo-600 text-sm sm:text-base">Excel (CSV)</h4>
+                  <p className="text-xs sm:text-sm text-gray-500">Download as CSV file for Excel/Sheets</p>
                 </div>
               </button>
 
               <button
                 onClick={() => downloadReport('pdf')}
-                className="w-full flex items-center gap-4 p-4 border-2 border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
+                className="w-full flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-2 border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
               >
-                <div className="p-3 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors">
-                  <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                <div className="p-2 sm:p-3 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors flex-shrink-0">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
                     <path d="M14 2v6h6"/>
                     <text x="7" y="18" fontSize="8" fontWeight="bold" fill="currentColor">PDF</text>
                   </svg>
                 </div>
-                <div className="text-left flex-1">
-                  <h4 className="font-semibold text-gray-800 group-hover:text-indigo-600">PDF</h4>
-                  <p className="text-sm text-gray-500">Download as formatted PDF document</p>
+                <div className="text-left flex-1 min-w-0">
+                  <h4 className="font-semibold text-gray-800 group-hover:text-indigo-600 text-sm sm:text-base">PDF</h4>
+                  <p className="text-xs sm:text-sm text-gray-500">Download as formatted PDF document</p>
                 </div>
               </button>
             </div>
 
             <button
               onClick={() => setShowDownloadModal(false)}
-              className="w-full mt-4 px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+              className="w-full mt-4 px-4 py-2 text-sm sm:text-base text-gray-600 hover:text-gray-800 font-medium transition-colors"
             >
               Cancel
             </button>
@@ -784,13 +949,13 @@ const AdminDashboard = () => {
 
 
 const StatCard = ({ icon, value, label }) => (
-  <div className="bg-white p-5 rounded-xl shadow border border-gray-100 flex items-center gap-4 transition-all duration-300 ease-in-out hover:shadow-lg hover:border-indigo-100 transform hover:-translate-y-1">
-    <div className="p-3 rounded-full bg-gradient-to-br from-gray-100 to-blue-100 text-2xl flex-shrink-0">
+  <div className="bg-white p-4 sm:p-5 rounded-xl shadow border border-gray-100 flex items-center gap-3 sm:gap-4 transition-all duration-300 ease-in-out hover:shadow-lg hover:border-indigo-100 transform hover:-translate-y-1">
+    <div className="p-2 sm:p-3 rounded-full bg-gradient-to-br from-gray-100 to-blue-100 text-xl sm:text-2xl flex-shrink-0">
       {icon}
     </div>
-    <div>
-      <p className="text-2xl font-bold text-gray-800 capitalize">{value}</p>
-      <p className="text-sm font-medium text-gray-500">{label}</p>
+    <div className="min-w-0">
+      <p className="text-xl sm:text-2xl font-bold text-gray-800 capitalize truncate">{value}</p>
+      <p className="text-xs sm:text-sm font-medium text-gray-500">{label}</p>
     </div>
   </div>
 );
@@ -798,14 +963,15 @@ const StatCard = ({ icon, value, label }) => (
  const TabButton = ({ id, activeTab, setActiveTab, icon, children }) => (
    <button
       onClick={() => setActiveTab(id)}
-      className={`flex items-center gap-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none focus-visible:bg-indigo-50 rounded-t
+      className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2.5 sm:py-3 px-3 sm:px-4 border-b-2 font-medium text-xs sm:text-sm transition-colors duration-200 focus:outline-none focus-visible:bg-indigo-50 rounded-t flex-1 sm:flex-initial
         ${activeTab === id
           ? "border-indigo-600 text-indigo-600"
           : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
         }`}
+      title={id}
     >
-      {React.cloneElement(icon, { size: 16 })}
-      <span>{children}</span>
+      {React.cloneElement(icon, { size: 20, className: "sm:w-4 sm:h-4" })}
+      {children}
    </button>
  );
 
