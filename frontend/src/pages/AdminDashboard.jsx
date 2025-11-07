@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
+import AdminStatistics from "../Components/AdminStatistics";
 import { useNavigate } from "react-router-dom";
 import { FiUsers, FiClipboard, FiAlertCircle, FiCheckCircle, FiEdit, FiSave, FiX, FiLoader, FiActivity, FiUserCheck, FiClock } from "react-icons/fi";
 import { Toaster, toast } from "react-hot-toast";
@@ -21,7 +22,6 @@ const AdminDashboard = () => {
   const [isSavingStatus, setIsSavingStatus] = useState(false);
   const [activities, setActivities] = useState([]);
 
-
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
 
@@ -38,34 +38,34 @@ const AdminDashboard = () => {
     setLoading(true);
     setError("");
     try {
-      const [statsRes, usersRes, complaintsRes,logsRes] = await Promise.all([
+      const [statsRes, usersRes, complaintsRes, logsRes] = await Promise.all([
         fetch(`${backend_Url}/api/admin/stats`, { credentials: "include" }),
         fetch(`${backend_Url}/api/admin/users`, { credentials: "include" }),
         fetch(`${backend_Url}/api/admin/complaints`, { credentials: "include" }),
-        fetch(`${backend_Url}/api/admin/logs`,{credentials: "include"})
+        fetch(`${backend_Url}/api/admin/logs`, { credentials: "include" }),
       ]);
 
-      if (!statsRes.ok || !usersRes.ok || !complaintsRes.ok ) {
-         const errorData = await (statsRes.ok ? usersRes.ok ? complaintsRes : usersRes : statsRes).json();
-         throw new Error(errorData.message || 'Failed to fetch admin data. Ensure you are logged in as admin.');
+      if (!statsRes.ok || !usersRes.ok || !complaintsRes.ok) {
+        const errorData = await (statsRes.ok ? usersRes.ok ? complaintsRes : usersRes : statsRes).json();
+        throw new Error(errorData.message || 'Failed to fetch admin data. Ensure you are logged in as admin.');
       }
 
       const statsData = await statsRes.json();
       const usersData = await usersRes.json();
       const complaintsData = await complaintsRes.json();
-      const logsData = await logsRes.json()
+      const logsData = await logsRes.json();
 
       if (statsData.success) setStats(statsData.data);
       if (usersData.success) setUsers(usersData.data);
       if (complaintsData.success) setComplaints(complaintsData.data);
-  if (logsData.success) setActivities(logsData.data);
+      if (logsData.success) setActivities(logsData.data);
     } catch (err) {
       console.error("Error fetching admin data:", err);
       setError(err.message || "Failed to load data. Please try again.");
-       if (err.message.includes('403') || err.message.includes('401') || err.message.includes('logged in')) {
-           toast.error("Authentication failed or forbidden access. Please log in as an admin.");
-           navigate('/login');
-       }
+      if (err.message.includes('403') || err.message.includes('401') || err.message.includes('logged in')) {
+        toast.error("Authentication failed or forbidden access. Please log in as an admin.");
+        navigate('/login');
+      }
     } finally {
       setLoading(false);
     }
@@ -103,7 +103,7 @@ const AdminDashboard = () => {
       console.error("Error updating role:", err);
       toast.error(`Error: ${err.message}`);
     } finally {
-        setIsSavingRole(false);
+      setIsSavingRole(false);
     }
   };
 
@@ -139,12 +139,11 @@ const AdminDashboard = () => {
       console.error("Error updating status:", err);
       toast.error(`Error: ${err.message}`);
     } finally {
-        setIsSavingStatus(false);
+      setIsSavingStatus(false);
     }
   };
 
-
-   const getStatusBadge = (status) => {
+  const getStatusBadge = (status) => {
     const styles = {
       received: "bg-yellow-100 text-yellow-800 border border-yellow-200",
       in_review: "bg-blue-100 text-blue-800 border border-blue-200",
@@ -153,45 +152,45 @@ const AdminDashboard = () => {
     };
     const labels = { received: "Pending", in_review: "In Review", resolved: "Resolved", rejected: "Rejected" };
     return <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full ${styles[status] || 'bg-gray-100 text-gray-800 border-gray-200'}`}>{labels[status] || status}</span>;
-   };
+  };
 
-   const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
         <Toaster position="bottom-center" reverseOrder={false} />
         <Navbar />
-         <div className="flex-grow flex items-center justify-center">
-             <div className="text-center">
-                 <svg className="animate-spin mx-auto h-12 w-12 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                 </svg>
-                 <p className="mt-4 text-lg font-medium text-gray-600">Loading Admin Dashboard...</p>
-             </div>
+        <div className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <svg className="animate-spin mx-auto h-12 w-12 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p className="mt-4 text-lg font-medium text-gray-600">Loading Admin Dashboard...</p>
+          </div>
         </div>
         <Footer />
       </div>
     );
   }
 
-   if (error) {
+  if (error) {
     return (
-       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
         <Toaster position="bottom-center" reverseOrder={false} />
         <Navbar />
-         <div className="flex-grow flex items-center justify-center p-4">
-           <div className="text-center bg-red-50 p-6 rounded-lg shadow border border-red-200 max-w-lg w-full">
-               <FiAlertCircle className="mx-auto text-red-500 text-4xl mb-3"/>
-               <p className="font-semibold text-red-800 text-lg">Error Loading Dashboard</p>
-               <p className="text-red-700 text-sm mt-1">{error}</p>
-               <button onClick={() => navigate('/login')} className="mt-5 px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 transition-colors">
-                 Go to Login
-               </button>
-           </div>
+        <div className="flex-grow flex items-center justify-center p-4">
+          <div className="text-center bg-red-50 p-6 rounded-lg shadow border border-red-200 max-w-lg w-full">
+            <FiAlertCircle className="mx-auto text-red-500 text-4xl mb-3" />
+            <p className="font-semibold text-red-800 text-lg">Error Loading Dashboard</p>
+            <p className="text-red-700 text-sm mt-1">{error}</p>
+            <button onClick={() => navigate('/login')} className="mt-5 px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 transition-colors">
+              Go to Login
+            </button>
+          </div>
         </div>
-        <Footer/>
+        <Footer />
       </div>
     );
   }
@@ -207,30 +206,34 @@ const AdminDashboard = () => {
         </header>
 
         <div className="border-b border-gray-200 mb-6">
-            <nav className="flex -mb-px space-x-6" aria-label="Tabs">
-               <TabButton id="overview" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiActivity />}>Overview</TabButton>
-               <TabButton id="users" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiUsers />}>Manage Users ({stats.totalUsers})</TabButton>
-               <TabButton id="complaints" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiClipboard />}>View Complaints ({stats.totalComplaints})</TabButton>
-               <TabButton id="recent activities" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiClipboard />}>Recent activities</TabButton>
+          <nav className="flex -mb-px space-x-6" aria-label="Tabs">
+            <TabButton id="overview" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiActivity />}>Overview</TabButton>
+            <TabButton id="users" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiUsers />}>Manage Users ({stats.totalUsers})</TabButton>
+            <TabButton id="complaints" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiClipboard />}>View Complaints ({stats.totalComplaints})</TabButton>
+            <TabButton id="recent activities" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiClipboard />}>Recent activities</TabButton>
 
-             </nav>
-         </div>
-
+          </nav>
+        </div>
 
         <div className="animate-fade-in-up">
-          {activeTab === 'overview' && (         
-<section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <StatCard icon={<FiUsers className="text-purple-500" />} value={stats.totalUsers} label="Total Users" />
-              <StatCard icon={<FiClipboard className="text-blue-500" />} value={stats.totalComplaints} label="Total Complaints" />
-              <StatCard icon={<FiClock className="text-yellow-500" />} value={stats.pendingComplaints} label="Pending Complaints" />
-              <StatCard icon={<FiCheckCircle className="text-green-500" />} value={stats.resolvedComplaints} label="Resolved Complaints" />
-            </section> 
+          {activeTab === 'overview' && (
+            <div className="space-y-8">
+              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <StatCard icon={<FiUsers className="text-purple-500" />} value={stats.totalUsers} label="Total Users" />
+                <StatCard icon={<FiClipboard className="text-blue-500" />} value={stats.totalComplaints} label="Total Complaints" />
+                <StatCard icon={<FiClock className="text-yellow-500" />} value={stats.pendingComplaints} label="Pending Complaints" />
+                <StatCard icon={<FiCheckCircle className="text-green-500" />} value={stats.resolvedComplaints} label="Resolved Complaints" />
+              </section>
+              
+              {/* Statistics Section */}
+              <AdminStatistics />
+            </div>
           )}
 
           {activeTab === 'users' && (
             <section className="bg-white p-5 sm:p-6 rounded-xl shadow border border-gray-100">
-               <h2 className="text-xl font-semibold text-gray-800 mb-5">User Management</h2>
-               <div className="overflow-x-auto">
+              <h2 className="text-xl font-semibold text-gray-800 mb-5">User Management</h2>
+              <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
