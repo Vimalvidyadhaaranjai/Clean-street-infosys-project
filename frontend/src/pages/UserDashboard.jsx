@@ -1,22 +1,23 @@
-// src/pages/UserDashboard.jsx
+// src/pages/UserDashboard.jsx - CORRECTED FILE (FiShield)
 
 import React, { useState, useEffect } from "react";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import { useNavigate } from "react-router-dom";
+// Using Fi icons for consistency - CORRECTED IMPORTS
 import {
-  FaClipboardList,
-  FaCheckCircle,
-  FaSpinner,
-  FaUserShield,
-  FaArrowLeft,
-  FaTrashAlt,
-  FaPlusCircle,
-  FaMapMarkerAlt,
-  FaExclamationTriangle,
-  FaSyncAlt,
-} from "react-icons/fa";
-import { FiActivity } from "react-icons/fi";
+  FiClipboard,
+  FiCheckCircle,
+  FiLoader,
+  FiShield, // <-- CORRECTED: Was FiUserShield
+  FiArrowLeft,
+  FiTrash2,
+  FiPlusCircle,
+  FiMapPin, 
+  FiAlertTriangle,
+  FiRotateCw,
+  FiActivity
+} from "react-icons/fi";
 import { Toaster, toast } from "react-hot-toast";
 
 const UserDashboard = () => {
@@ -124,10 +125,10 @@ const UserDashboard = () => {
 
   const getStatusBadge = (status) => {
     const styles = {
-      received: "bg-yellow-100 text-yellow-800 border border-yellow-200",
-      in_review: "bg-blue-100 text-blue-800 border border-blue-200",
-      resolved: "bg-green-100 text-green-800 border border-green-200",
-      rejected: "bg-red-100 text-red-800 border border-red-200",
+      received: "bg-[var(--color-primary-accent)]/20 text-[var(--color-primary-accent)] border border-[var(--color-primary-accent)]/30",
+      in_review: "bg-[var(--color-light-bg)]/50 text-[var(--color-text-light)] border border-[var(--color-light-bg)]",
+      resolved: "bg-green-900/50 text-green-300 border border-green-700",
+      rejected: "bg-red-900/50 text-red-300 border border-red-700",
     };
     const labels = {
       received: "Pending",
@@ -138,7 +139,7 @@ const UserDashboard = () => {
     return (
       <span
         className={`inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full ${
-          styles[status] || "bg-gray-100 text-gray-800 border border-gray-200"
+          styles[status] || "bg-gray-700 text-gray-200 border-gray-600"
         }`}
       >
         {labels[status] || status}
@@ -154,10 +155,10 @@ const UserDashboard = () => {
       <>
         <Navbar />
         <Toaster position="bottom-center" reverseOrder={false} />
-        <div className="min-h-[calc(100vh-theme(space.20))] flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+        <div className="min-h-[calc(100vh-theme(space.20))] flex items-center justify-center bg-[var(--color-dark-bg)]">
           <div className="text-center">
             <svg
-              className="animate-spin mx-auto h-12 w-12 text-indigo-600"
+              className="animate-spin mx-auto h-12 w-12 text-[var(--color-primary-accent)]"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -169,7 +170,7 @@ const UserDashboard = () => {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            <p className="mt-4 text-lg font-medium text-gray-600">Loading Your Dashboard...</p>
+            <p className="mt-4 text-lg font-medium text-[var(--color-text-light)]/70">Loading Your Dashboard...</p>
           </div>
         </div>
         <Footer />
@@ -178,7 +179,7 @@ const UserDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+    <div className="min-h-screen bg-[var(--color-dark-bg)] flex flex-col">
       <Toaster position="bottom-center" reverseOrder={false} />
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow">
@@ -186,46 +187,46 @@ const UserDashboard = () => {
           <div className="animate-fade-in-up">
             <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10">
               <div>
-                <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 tracking-tight">
-                  Welcome, <span className="text-indigo-600">{user?.name || "User"}</span>!
+                <h1 className="text-3xl sm:text-4xl font-bold text-[var(--color-text-light)] tracking-tight">
+                  Welcome, <span className="text-[var(--color-primary-accent)]">{user?.name || "User"}</span>!
                 </h1>
-                <p className="text-gray-600 mt-1 text-base">Here's an overview of your reports.</p>
+                <p className="text-[var(--color-text-light)]/70 mt-1 text-base">Here's an overview of your reports.</p>
               </div>
               <button
                 onClick={() => navigate("/ReportIssue")}
-                className="mt-4 sm:mt-0 inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold px-5 py-2.5 rounded-lg shadow hover:shadow-md transition-all duration-300 transform hover:scale-105"
+                className="mt-4 sm:mt-0 inline-flex items-center gap-2 bg-gradient-to-r from-[var(--color-primary-accent)] to-[var(--color-secondary-accent)] text-[var(--color-text-dark)] font-semibold px-5 py-2.5 rounded-lg shadow hover:shadow-md transition-all duration-300 transform hover:scale-105"
               >
-                <FaPlusCircle /> Report New Issue
+                <FiPlusCircle /> Report New Issue
               </button>
             </header>
 
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              <StatCard icon={<FaClipboardList className="text-blue-500" />} value={dashboardData.stats.totalReports} label="Total Reports" />
-              <StatCard icon={<FaExclamationTriangle className="text-yellow-500" />} value={dashboardData.stats.pendingReports} label="Pending" />
-              <StatCard icon={<FaSyncAlt className="text-orange-500" />} value={dashboardData.stats.inProgressReports} label="In Progress" />
-              <StatCard icon={<FaCheckCircle className="text-green-500" />} value={dashboardData.stats.resolvedReports} label="Resolved" />
+              <StatCard icon={<FiClipboard className="text-[var(--color-primary-accent)]" />} value={dashboardData.stats.totalReports} label="Total Reports" />
+              <StatCard icon={<FiAlertTriangle className="text-[var(--color-secondary-accent)]" />} value={dashboardData.stats.pendingReports} label="Pending" />
+              <StatCard icon={<FiRotateCw className="text-[var(--color-primary-accent)]" />} value={dashboardData.stats.inProgressReports} label="In Progress" />
+              <StatCard icon={<FiCheckCircle className="text-green-400" />} value={dashboardData.stats.resolvedReports} label="Resolved" />
             </section>
 
             {/* === Recent Updates Section === */}
             <section className="mb-12">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold text-gray-700 flex items-center gap-2">
-                  <FiActivity className="text-indigo-500" /> Recent Updates
+                <h2 className="text-2xl font-semibold text-[var(--color-text-light)] flex items-center gap-2">
+                  <FiActivity className="text-[var(--color-primary-accent)]" /> Recent Updates
                 </h2>
               </div>
               {activities.length === 0 ? (
-                <div className="bg-white rounded-xl shadow border border-gray-100 p-6 text-center">
-                  <p className="text-gray-500 text-sm">No recent updates from admin yet.</p>
+                <div className="bg-[var(--color-medium-bg)] rounded-xl shadow border border-[var(--color-light-bg)] p-6 text-center">
+                  <p className="text-[var(--color-text-light)]/70 text-sm">No recent updates from admin yet.</p>
                 </div>
               ) : (
-                <ul className="bg-white rounded-xl shadow border border-gray-100 divide-y divide-gray-200">
+                <ul className="bg-[var(--color-medium-bg)] rounded-xl shadow border border-[var(--color-light-bg)] divide-y divide-[var(--color-light-bg)]">
                   {activities.map((log) => (
-                    <li key={log._id} className="p-4 hover:bg-gray-50 transition-colors">
+                    <li key={log._id} className="p-4 hover:bg-[var(--color-light-bg)]/50 transition-colors">
                       <div className="flex justify-between items-start">
-                        <p className="text-gray-800 text-sm">
+                        <p className="text-[var(--color-text-light)] text-sm">
                           {log.action}
                         </p>
-                        <span className="text-xs text-gray-500">{new Date(log.timestamp).toLocaleString()}</span>
+                        <span className="text-xs text-[var(--color-text-light)]/70">{new Date(log.timestamp).toLocaleString()}</span>
                       </div>
                     </li>
                   ))}
@@ -236,25 +237,25 @@ const UserDashboard = () => {
             {/* === Recent Reports === */}
             <section>
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold text-gray-700">Recent Reports</h2>
+                <h2 className="text-2xl font-semibold text-[var(--color-text-light)]">Recent Reports</h2>
                 {dashboardData.complaints.length > 3 && (
                   <button
                     onClick={() => setShowAllReports(true)}
-                    className="text-sm font-semibold text-indigo-600 hover:text-indigo-800 hover:underline transition-colors"
+                    className="text-sm font-semibold text-[var(--color-primary-accent)] hover:text-[var(--color-secondary-accent)] hover:underline transition-colors"
                   >
                     View All ({dashboardData.complaints.length})
                   </button>
                 )}
               </div>
               {dashboardData.complaints.length === 0 ? (
-                <div className="text-center bg-white rounded-xl shadow border border-gray-100 p-12">
-                  <FaClipboardList className="mx-auto text-5xl text-gray-300 mb-4" />
-                  <p className="text-gray-500 mb-4 text-lg font-medium">You haven't reported any issues yet.</p>
+                <div className="text-center bg-[var(--color-medium-bg)] rounded-xl shadow border border-[var(--color-light-bg)] p-12">
+                  <FiClipboard className="mx-auto text-5xl text-[var(--color-light-bg)] mb-4" />
+                  <p className="text-[var(--color-text-light)]/70 mb-4 text-lg font-medium">You haven't reported any issues yet.</p>
                   <button
                     onClick={() => navigate("/ReportIssue")}
-                    className="inline-flex items-center gap-2 bg-indigo-100 text-indigo-700 font-semibold px-5 py-2.5 rounded-lg hover:bg-indigo-200 transition-colors"
+                    className="inline-flex items-center gap-2 bg-[var(--color-primary-accent)] text-[var(--color-text-dark)] font-semibold px-5 py-2.5 rounded-lg hover:bg-[var(--color-secondary-accent)] transition-colors"
                   >
-                    <FaPlusCircle /> Report Your First Issue
+                    <FiPlusCircle /> Report Your First Issue
                   </button>
                 </div>
               ) : (
@@ -273,14 +274,14 @@ const UserDashboard = () => {
             <header className="flex items-center gap-4 mb-8">
               <button
                 onClick={() => setShowAllReports(false)}
-                className="flex items-center justify-center bg-white shadow hover:shadow-md text-gray-700 hover:text-indigo-600 p-2.5 rounded-full transition-all duration-300"
+                className="flex items-center justify-center bg-[var(--color-medium-bg)] shadow hover:shadow-md text-[var(--color-text-light)] hover:text-[var(--color-primary-accent)] p-2.5 rounded-full transition-all duration-300"
                 title="Back to Overview"
               >
-                <FaArrowLeft className="text-lg" />
+                <FiArrowLeft className="text-lg" />
               </button>
               <div>
-                <h1 className="text-3xl font-bold text-gray-800">All My Reports</h1>
-                <p className="text-gray-500 text-base">
+                <h1 className="text-3xl font-bold text-[var(--color-text-light)]">All My Reports</h1>
+                <p className="text-[var(--color-text-light)]/70 text-base">
                   A complete history of your submissions ({dashboardData.complaints.length}).
                 </p>
               </div>
@@ -299,23 +300,23 @@ const UserDashboard = () => {
 };
 
 const StatCard = ({ icon, value, label }) => (
-  <div className="bg-white p-5 rounded-xl shadow border border-gray-100 flex items-center gap-4 transition-all duration-300 ease-in-out hover:shadow-lg hover:border-indigo-100 transform hover:-translate-y-1">
-    <div className="p-3 rounded-full bg-gradient-to-br from-gray-100 to-blue-100 text-2xl flex-shrink-0">{icon}</div>
+  <div className="bg-[var(--color-medium-bg)] p-5 rounded-xl shadow border border-[var(--color-light-bg)] flex items-center gap-4 transition-all duration-300 ease-in-out hover:shadow-lg hover:border-[var(--color-primary-accent)] transform hover:-translate-y-1">
+    <div className="p-3 rounded-full bg-gradient-to-br from-[var(--color-light-bg)] to-[var(--color-medium-bg)] text-2xl flex-shrink-0">{icon}</div>
     <div>
-      <p className="text-2xl font-bold text-gray-800 capitalize">{value}</p>
-      <p className="text-sm font-medium text-gray-500">{label}</p>
+      <p className="text-2xl font-bold text-[var(--color-text-light)] capitalize">{value}</p>
+      <p className="text-sm font-medium text-[var(--color-text-light)]/70">{label}</p>
     </div>
   </div>
 );
 
 const ReportCard = ({ complaint, formatDate, getStatusBadge, handleDelete }) => (
-  <div className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg transform hover:-translate-y-1 group flex flex-col">
-    <div className="relative h-40 bg-gray-100 overflow-hidden">
+  <div className="bg-[var(--color-medium-bg)] rounded-xl shadow border border-[var(--color-light-bg)] overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg transform hover:-translate-y-1 group flex flex-col hover:border-[var(--color-primary-accent)]/50">
+    <div className="relative h-40 bg-[var(--color-dark-bg)] overflow-hidden">
       {complaint.photo ? (
         <img src={complaint.photo} alt={complaint.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
       ) : (
-        <div className="w-full h-full flex items-center justify-center text-gray-400">
-          <FaMapMarkerAlt size={40} />
+        <div className="w-full h-full flex items-center justify-center text-[var(--color-light-bg)]">
+          <FiMapPin size={40} />
         </div>
       )}
       <button
@@ -326,23 +327,23 @@ const ReportCard = ({ complaint, formatDate, getStatusBadge, handleDelete }) => 
         className="absolute top-2 right-2 p-1.5 bg-black/40 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black/50"
         title="Delete Report"
       >
-        <FaTrashAlt size={14} />
+        <FiTrash2 size={14} />
       </button>
     </div>
     <div className="p-4 flex flex-col flex-grow">
       <div className="flex justify-between items-center mb-2">{getStatusBadge(complaint.status)}</div>
-      <h3 className="font-semibold text-base text-gray-800 mb-2 line-clamp-2 flex-grow group-hover:text-indigo-700 transition-colors">
+      <h3 className="font-semibold text-base text-[var(--color-text-light)] mb-2 line-clamp-2 flex-grow group-hover:text-[var(--color-primary-accent)] transition-colors">
         {complaint.title}
       </h3>
-      <div className="space-y-1 text-xs text-gray-500 mt-auto pt-2 border-t border-gray-100">
+      <div className="space-y-1 text-xs text-[var(--color-text-light)]/70 mt-auto pt-2 border-t border-[var(--color-light-bg)]">
         <p className="line-clamp-1">
-          <span className="font-medium text-gray-600">Type:</span> {complaint.type}
+          <span className="font-medium text-[var(--color-text-light)]/90">Type:</span> {complaint.type}
         </p>
         <p className="line-clamp-1">
-          <span className="font-medium text-gray-600">Reported:</span> {formatDate(complaint.createdAt)}
+          <span className="font-medium text-[var(--color-text-light)]/90">Reported:</span> {formatDate(complaint.createdAt)}
         </p>
         <div className="flex items-start pt-1">
-          <FaMapMarkerAlt className="mr-1.5 mt-0.5 flex-shrink-0 text-gray-400" size={12} />
+          <FiMapPin className="mr-1.5 mt-0.5 flex-shrink-0 text-[var(--color-text-light)]/50" size={12} />
           <span className="line-clamp-2 leading-snug">{complaint.address}</span>
         </div>
       </div>
@@ -350,4 +351,5 @@ const ReportCard = ({ complaint, formatDate, getStatusBadge, handleDelete }) => 
   </div>
 );
 
-export default UserDashboard;
+export default UserDashboard
+;

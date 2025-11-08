@@ -1,4 +1,4 @@
-// src/pages/VolunteerDashboard.jsx
+// src/pages/VolunteerDashboard.jsx - MODIFIED WITH NEW PALETTE
 
 import React, { useState, useEffect } from "react";
 import Navbar from "../Components/Navbar";
@@ -35,8 +35,7 @@ const VolunteerDashboard = () => {
   const [error, setError] = useState("");
   const [volunteerLocation, setVolunteerLocation] = useState("");
   const [actionLoading, setActionLoading] = useState({});
-  const [activities, setActivities] = useState([]); // ✅ NEW STATE FOR ADMIN LOGS
-
+  const [activities, setActivities] = useState([]);
   const user = JSON.parse(localStorage.getItem("user"));
   const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
 
@@ -82,12 +81,11 @@ const VolunteerDashboard = () => {
         throw new Error(assignmentsData.message || "Failed to fetch assignments.");
       }
 
-      // ✅ Fetch admin logs (Recent Updates)
       try {
         const logsRes = await fetch(`${backendUrl}/api/admin/logs`, { credentials: "include" });
         const logsData = await logsRes.json();
         if (logsRes.ok && logsData.success) {
-          setActivities(logsData.data.slice(0, 5)); // Show top 5 logs
+          setActivities(logsData.data.slice(0, 5));
         }
       } catch (error) {
         console.error("Error fetching admin logs:", error);
@@ -148,11 +146,11 @@ const VolunteerDashboard = () => {
   const handleUnassign = (complaintId) => {
     toast(
       (t) => (
-        <span>
+        <span className="bg-[var(--color-light-bg)] text-[var(--color-text-light)] p-3 rounded-md shadow-lg">
           Are you sure you want to unassign this task?
           <div className="mt-2 flex gap-2">
             <button
-              className="px-3 py-1 bg-gray-200 rounded text-gray-700 text-xs font-semibold"
+              className="px-3 py-1 bg-gray-600 rounded text-white text-xs font-semibold"
               onClick={() => toast.dismiss(t.id)}
             >
               Cancel
@@ -169,16 +167,17 @@ const VolunteerDashboard = () => {
           </div>
         </span>
       ),
-      { duration: 6000 }
+      { duration: 6000, style: { background: 'transparent', boxShadow: 'none' } } // Custom style for dark toast
     );
   };
 
+  // CHANGED: Badge colors for dark theme
   const getStatusBadge = (status) => {
     const styles = {
-      received: "bg-yellow-100 text-yellow-800 border border-yellow-200",
-      in_review: "bg-blue-100 text-blue-800 border border-blue-200",
-      resolved: "bg-green-100 text-green-800 border border-green-200",
-      rejected: "bg-red-100 text-red-800 border border-red-200",
+      received: "bg-[var(--color-primary-accent)]/20 text-[var(--color-primary-accent)] border border-[var(--color-primary-accent)]/30",
+      in_review: "bg-[var(--color-light-bg)]/50 text-[var(--color-text-light)] border border-[var(--color-light-bg)]",
+      resolved: "bg-green-900/50 text-green-300 border border-green-700",
+      rejected: "bg-red-900/50 text-red-300 border border-red-700",
     };
     const labels = {
       received: "Pending",
@@ -189,7 +188,7 @@ const VolunteerDashboard = () => {
     return (
       <span
         className={`inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full ${
-          styles[status] || "bg-gray-100 text-gray-800 border-gray-200"
+          styles[status] || "bg-gray-700 text-gray-200 border-gray-600"
         }`}
       >
         {labels[status] || status}
@@ -197,11 +196,12 @@ const VolunteerDashboard = () => {
     );
   };
 
+  // CHANGED: Badge colors for dark theme
   const getPriorityBadge = (priority) => {
     const styles = {
-      Low: "bg-gray-100 text-gray-700 border border-gray-200",
-      Medium: "bg-orange-100 text-orange-700 border border-orange-200",
-      High: "bg-red-100 text-red-700 border border-red-200",
+      Low: "bg-gray-700 text-gray-200 border border-gray-600",
+      Medium: "bg-orange-800/50 text-orange-300 border border-orange-700",
+      High: "bg-red-900/50 text-red-300 border border-red-700",
     };
     return (
       <span
@@ -221,15 +221,16 @@ const VolunteerDashboard = () => {
       day: "numeric",
     });
 
+  // CHANGED: Loading state styling
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+      <div className="min-h-screen bg-[var(--color-dark-bg)] flex flex-col">
         <Toaster position="top-right" reverseOrder={false} />
         <Navbar />
         <div className="flex-grow flex items-center justify-center">
           <div className="text-center">
             <svg
-              className="animate-spin mx-auto h-12 w-12 text-indigo-600"
+              className="animate-spin mx-auto h-12 w-12 text-[var(--color-primary-accent)]"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -248,7 +249,7 @@ const VolunteerDashboard = () => {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            <p className="mt-4 text-lg font-medium text-gray-600">Loading Volunteer Dashboard...</p>
+            <p className="mt-4 text-lg font-medium text-[var(--color-text-light)]/70">Loading Volunteer Dashboard...</p>
           </div>
         </div>
         <Footer />
@@ -256,19 +257,20 @@ const VolunteerDashboard = () => {
     );
   }
 
+  // CHANGED: Error state styling
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+      <div className="min-h-screen bg-[var(--color-dark-bg)] flex flex-col">
         <Toaster position="top-right" reverseOrder={false} />
         <Navbar />
         <div className="flex-grow flex items-center justify-center p-4">
-          <div className="text-center bg-red-50 p-6 rounded-lg shadow border border-red-200 max-w-lg w-full">
-            <FiAlertCircle className="mx-auto text-red-500 text-4xl mb-3" />
-            <p className="font-semibold text-red-800 text-lg">Error Loading Dashboard</p>
-            <p className="text-red-700 text-sm mt-1">{error}</p>
+          <div className="text-center bg-red-900/50 p-6 rounded-lg shadow border border-red-700 max-w-lg w-full">
+            <FiAlertCircle className="mx-auto text-red-300 text-4xl mb-3" />
+            <p className="font-semibold text-red-200 text-lg">Error Loading Dashboard</p>
+            <p className="text-red-300 text-sm mt-1">{error}</p>
             <button
               onClick={() => fetchData()}
-              className="mt-5 px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 transition-colors"
+              className="mt-5 px-4 py-2 bg-[var(--color-primary-accent)] text-[var(--color-text-dark)] text-sm font-semibold rounded hover:bg-[var(--color-secondary-accent)] transition-colors"
             >
               Retry Loading
             </button>
@@ -280,45 +282,51 @@ const VolunteerDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+    // CHANGED: Main background
+    <div className="min-h-screen bg-[var(--color-dark-bg)] flex flex-col">
       <Toaster position="top-right" reverseOrder={false} />
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow">
         <div className="animate-fade-in-up">
           <header className="mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 tracking-tight">
+            {/* CHANGED: Text colors */}
+            <h1 className="text-3xl sm:text-4xl font-bold text-[var(--color-text-light)] tracking-tight">
               Volunteer Dashboard
             </h1>
-            <p className="text-gray-600 mt-1 text-base">
+            <p className="text-[var(--color-text-light)]/70 mt-1 text-base">
               Manage complaints {volunteerLocation && `in ${volunteerLocation}`}
             </p>
           </header>
 
           <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-            <StatCard icon={<FiTool className="text-blue-500" />} value={stats.totalAssignments} label="Total Assignments" />
-            <StatCard icon={<FiClock className="text-yellow-500" />} value={stats.pendingAssignments} label="Pending Pickup" />
-            <StatCard icon={<FiRotateCw className="text-orange-500" />} value={stats.inProgressAssignments} label="In Progress" />
-            <StatCard icon={<FiCheckCircle className="text-green-500" />} value={stats.resolvedAssignments} label="Resolved" />
+            {/* CHANGED: StatCard icons to use accent colors */}
+            <StatCard icon={<FiTool className="text-[var(--color-primary-accent)]" />} value={stats.totalAssignments} label="Total Assignments" />
+            <StatCard icon={<FiClock className="text-[var(--color-secondary-accent)]" />} value={stats.pendingAssignments} label="Pending Pickup" />
+            <StatCard icon={<FiRotateCw className="text-orange-400" />} value={stats.inProgressAssignments} label="In Progress" />
+            <StatCard icon={<FiCheckCircle className="text-green-400" />} value={stats.resolvedAssignments} label="Resolved" />
           </section>
 
-          {/* ✅ Recent Updates Section (Admin Logs) */}
+          {/* === Recent Updates Section === */}
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
-              <FiActivity className="text-indigo-500" /> Recent Updates
+             {/* CHANGED: Text and icon colors */}
+            <h2 className="text-2xl font-semibold text-[var(--color-text-light)] mb-4 flex items-center gap-2">
+              <FiActivity className="text-[var(--color-primary-accent)]" /> Recent Updates
             </h2>
             {activities.length === 0 ? (
-              <div className="bg-white rounded-xl shadow border border-gray-100 p-6 text-center">
-                <p className="text-gray-500 text-sm">No recent updates from admin yet.</p>
+              // CHANGED: Card and text colors
+              <div className="bg-[var(--color-medium-bg)] rounded-xl shadow border border-[var(--color-light-bg)] p-6 text-center">
+                <p className="text-[var(--color-text-light)]/70 text-sm">No recent updates from admin yet.</p>
               </div>
             ) : (
-              <ul className="bg-white rounded-xl shadow border border-gray-100 divide-y divide-gray-200">
+              // CHANGED: Card, text, border, and hover colors
+              <ul className="bg-[var(--color-medium-bg)] rounded-xl shadow border border-[var(--color-light-bg)] divide-y divide-[var(--color-light-bg)]">
                 {activities.map((log) => (
-                  <li key={log._id} className="p-4 hover:bg-gray-50 transition-colors">
+                  <li key={log._id} className="p-4 hover:bg-[var(--color-light-bg)]/50 transition-colors">
                     <div className="flex justify-between items-start">
-                      <p className="text-gray-800 text-sm">
+                      <p className="text-[var(--color-text-light)] text-sm">
                         {log.action}
                       </p>
-                      <span className="text-xs text-gray-500">{new Date(log.timestamp).toLocaleString()}</span>
+                      <span className="text-xs text-[var(--color-text-light)]/70">{new Date(log.timestamp).toLocaleString()}</span>
                     </div>
                   </li>
                 ))}
@@ -327,7 +335,8 @@ const VolunteerDashboard = () => {
           </section>
 
           {/* === Tabs Section === */}
-          <div className="border-b border-gray-200 mb-6">
+          {/* CHANGED: Border color */}
+          <div className="border-b border-[var(--color-light-bg)] mb-6">
             <nav className="flex -mb-px space-x-6" aria-label="Tabs">
               <TabButton id="nearby" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiMapPin />}>
                 Nearby ({nearbyComplaints.length})
@@ -342,9 +351,10 @@ const VolunteerDashboard = () => {
             {activeTab === "nearby" ? (
               <section>
                 {nearbyComplaints.length === 0 ? (
-                  <div className="text-center bg-white rounded-xl shadow border border-gray-100 p-12">
-                    <FiMapPin className="mx-auto text-5xl text-gray-300 mb-4" />
-                    <p className="text-gray-500 text-lg font-medium">
+                  // CHANGED: Card, icon, and text colors
+                  <div className="text-center bg-[var(--color-medium-bg)] rounded-xl shadow border border-[var(--color-light-bg)] p-12">
+                    <FiMapPin className="mx-auto text-5xl text-[var(--color-light-bg)]/50 mb-4" />
+                    <p className="text-[var(--color-text-light)]/70 text-lg font-medium">
                       No unassigned complaints found nearby.
                     </p>
                   </div>
@@ -367,12 +377,13 @@ const VolunteerDashboard = () => {
             ) : (
               <section>
                 {myAssignments.length === 0 ? (
-                  <div className="text-center bg-white rounded-xl shadow border border-gray-100 p-12">
-                    <FiClipboard className="mx-auto text-5xl text-gray-300 mb-4" />
-                    <p className="text-gray-500 text-lg font-medium">
+                   // CHANGED: Card, icon, and text colors
+                  <div className="text-center bg-[var(--color-medium-bg)] rounded-xl shadow border border-[var(--color-light-bg)] p-12">
+                    <FiClipboard className="mx-auto text-5xl text-[var(--color-light-bg)]/50 mb-4" />
+                    <p className="text-[var(--color-text-light)]/70 text-lg font-medium">
                       You don't have any assigned complaints currently.
                     </p>
-                    <p className="text-sm text-gray-400 mt-2">
+                    <p className="text-sm text-[var(--color-text-light)]/50 mt-2">
                       Check the "Nearby" tab to pick up tasks.
                     </p>
                   </div>
@@ -402,25 +413,27 @@ const VolunteerDashboard = () => {
   );
 };
 
+// CHANGED: StatCard component styling
 const StatCard = ({ icon, value, label }) => (
-  <div className="bg-white p-5 rounded-xl shadow border border-gray-100 flex items-center gap-4 transition-all duration-300 ease-in-out hover:shadow-lg hover:border-indigo-100 transform hover:-translate-y-1">
-    <div className="p-3 rounded-full bg-gradient-to-br from-gray-100 to-blue-100 text-2xl flex-shrink-0">
+  <div className="bg-[var(--color-medium-bg)] p-5 rounded-xl shadow border border-[var(--color-light-bg)] flex items-center gap-4 transition-all duration-300 ease-in-out hover:shadow-lg hover:border-[var(--color-primary-accent)] transform hover:-translate-y-1">
+    <div className="p-3 rounded-full bg-gradient-to-br from-[var(--color-light-bg)] to-[var(--color-medium-bg)] text-2xl flex-shrink-0">
       {icon}
     </div>
     <div>
-      <p className="text-2xl font-bold text-gray-800 capitalize">{value}</p>
-      <p className="text-sm font-medium text-gray-500">{label}</p>
+      <p className="text-2xl font-bold text-[var(--color-text-light)] capitalize">{value}</p>
+      <p className="text-sm font-medium text-[var(--color-text-light)]/70">{label}</p>
     </div>
   </div>
 );
 
+// CHANGED: TabButton component styling
 const TabButton = ({ id, activeTab, setActiveTab, icon, children }) => (
   <button
     onClick={() => setActiveTab(id)}
-    className={`flex items-center gap-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none focus-visible:bg-indigo-50/50 rounded-t whitespace-nowrap ${
+    className={`flex items-center gap-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none focus-visible:bg-[var(--color-light-bg)]/20 rounded-t whitespace-nowrap ${
       activeTab === id
-        ? "border-indigo-600 text-indigo-600"
-        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+        ? "border-[var(--color-primary-accent)] text-[var(--color-primary-accent)]"
+        : "border-transparent text-[var(--color-text-light)]/60 hover:text-[var(--color-text-light)] hover:border-[var(--color-light-bg)]"
     }`}
   >
     {React.cloneElement(icon, { size: 16 })}
@@ -428,6 +441,7 @@ const TabButton = ({ id, activeTab, setActiveTab, icon, children }) => (
   </button>
 );
 
+// CHANGED: NearbyComplaintCard component styling
 const NearbyComplaintCard = ({
   complaint,
   formatDate,
@@ -436,9 +450,9 @@ const NearbyComplaintCard = ({
   handleAssignToSelf,
   isLoading,
 }) => (
-  <div className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg transform hover:-translate-y-1 group flex flex-col">
+  <div className="bg-[var(--color-medium-bg)] rounded-xl shadow border border-[var(--color-light-bg)] overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg transform hover:-translate-y-1 group flex flex-col hover:border-[var(--color-primary-accent)]/50">
     {complaint.photo && (
-      <div className="h-40 bg-gray-100 overflow-hidden">
+      <div className="h-40 bg-[var(--color-dark-bg)] overflow-hidden">
         <img
           src={complaint.photo}
           alt={complaint.title}
@@ -451,35 +465,36 @@ const NearbyComplaintCard = ({
         {getStatusBadge(complaint.status)}
         {getPriorityBadge(complaint.priority)}
       </div>
-      <h3 className="font-semibold text-base text-gray-800 mb-2 line-clamp-2 group-hover:text-indigo-700 transition-colors">
+      <h3 className="font-semibold text-base text-[var(--color-text-light)] mb-2 line-clamp-2 group-hover:text-[var(--color-primary-accent)] transition-colors">
         {complaint.title}
       </h3>
-      <div className="space-y-1 text-xs text-gray-500 mb-3">
+      <div className="space-y-1 text-xs text-[var(--color-text-light)]/70 mb-3">
         <p>
-          <span className="font-medium text-gray-600">Type:</span> {complaint.type}
+          <span className="font-medium text-[var(--color-text-light)]/90">Type:</span> {complaint.type}
         </p>
         <p>
-          <span className="font-medium text-gray-600">Reported:</span> {formatDate(complaint.createdAt)}
+          <span className="font-medium text-[var(--color-text-light)]/90">Reported:</span> {formatDate(complaint.createdAt)}
         </p>
         {complaint.distance && (
           <p>
-            <span className="font-medium text-gray-600">Distance:</span> ≈{complaint.distance} km
+            <span className="font-medium text-[var(--color-text-light)]/90">Distance:</span> ≈{complaint.distance} km
           </p>
         )}
       </div>
-      <div className="flex items-start text-xs text-gray-500 mb-4">
-        <FiMapPin className="mr-1.5 mt-0.5 flex-shrink-0 text-gray-400" size={12} />
+      <div className="flex items-start text-xs text-[var(--color-text-light)]/70 mb-4">
+        <FiMapPin className="mr-1.5 mt-0.5 flex-shrink-0 text-[var(--color-text-light)]/50" size={12} />
         <span className="line-clamp-2 leading-snug">{complaint.address}</span>
       </div>
+      {/* CHANGED: Button colors */}
       <button
         onClick={() => handleAssignToSelf(complaint._id)}
         disabled={complaint.assigned_to || isLoading}
         className={`w-full mt-auto py-2 px-4 rounded-md font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
           complaint.assigned_to
-            ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+            ? "bg-gray-600 text-gray-400 cursor-not-allowed"
             : isLoading
-            ? "bg-indigo-300 text-white cursor-wait"
-            : "bg-indigo-600 text-white hover:bg-indigo-700"
+            ? "bg-[var(--color-primary-accent)]/50 text-[var(--color-text-dark)] cursor-wait"
+            : "bg-[var(--color-primary-accent)] text-[var(--color-text-dark)] hover:bg-[var(--color-secondary-accent)]"
         }`}
       >
         {isLoading ? <FiLoader className="animate-spin" /> : <FiUserPlus size={16} />}
@@ -489,6 +504,7 @@ const NearbyComplaintCard = ({
   </div>
 );
 
+// CHANGED: AssignedComplaintCard component styling
 const AssignedComplaintCard = ({
   complaint,
   formatDate,
@@ -498,9 +514,9 @@ const AssignedComplaintCard = ({
   handleUnassign,
   isLoading,
 }) => (
-  <div className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg transform hover:-translate-y-1 group flex flex-col">
+  <div className="bg-[var(--color-medium-bg)] rounded-xl shadow border border-[var(--color-light-bg)] overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg transform hover:-translate-y-1 group flex flex-col hover:border-[var(--color-primary-accent)]/50">
     {complaint.photo && (
-      <div className="h-40 bg-gray-100 overflow-hidden">
+      <div className="h-40 bg-[var(--color-dark-bg)] overflow-hidden">
         <img
           src={complaint.photo}
           alt={complaint.title}
@@ -513,31 +529,33 @@ const AssignedComplaintCard = ({
         {getStatusBadge(complaint.status)}
         {getPriorityBadge(complaint.priority)}
       </div>
-      <h3 className="font-semibold text-base text-gray-800 mb-2 line-clamp-2 group-hover:text-indigo-700 transition-colors">
+      <h3 className="font-semibold text-base text-[var(--color-text-light)] mb-2 line-clamp-2 group-hover:text-[var(--color-primary-accent)] transition-colors">
         {complaint.title}
       </h3>
-      <div className="space-y-1 text-xs text-gray-500 mb-3">
+      <div className="space-y-1 text-xs text-[var(--color-text-light)]/70 mb-3">
         <p>
-          <span className="font-medium text-gray-600">Type:</span> {complaint.type}
+          <span className="font-medium text-[var(--color-text-light)]/90">Type:</span> {complaint.type}
         </p>
         <p>
-          <span className="font-medium text-gray-600">Reported:</span> {formatDate(complaint.createdAt)}
+          <span className="font-medium text-[var(--color-text-light)]/90">Reported:</span> {formatDate(complaint.createdAt)}
         </p>
       </div>
-      <div className="flex items-start text-xs text-gray-500 mb-4">
-        <FiMapPin className="mr-1.5 mt-0.5 flex-shrink-0 text-gray-400" size={12} />
+      <div className="flex items-start text-xs text-[var(--color-text-light)]/70 mb-4">
+        <FiMapPin className="mr-1.5 mt-0.5 flex-shrink-0 text-[var(--color-text-light)]/50" size={12} />
         <span className="line-clamp-2 leading-snug">{complaint.address}</span>
       </div>
-      <div className="mt-auto space-y-2 pt-3 border-t border-gray-100">
-        <label className="text-xs font-semibold text-gray-500 block mb-1">
+      <div className="mt-auto space-y-2 pt-3 border-t border-[var(--color-light-bg)]">
+        {/* CHANGED: Label text color */}
+        <label className="text-xs font-semibold text-[var(--color-text-light)]/70 block mb-1">
           Update Status:
         </label>
         <div className="grid grid-cols-2 gap-2">
+          {/* CHANGED: StatusButton colors */}
           {complaint.status !== "in_review" && (
             <StatusButton
               onClick={() => handleUpdateStatus(complaint._id, "in_review")}
               isLoading={isLoading}
-              className="bg-blue-100 text-blue-700 hover:bg-blue-200"
+              className="bg-[var(--color-light-bg)]/70 text-[var(--color-text-light)] hover:bg-[var(--color-light-bg)]"
             >
               In Progress
             </StatusButton>
@@ -546,7 +564,7 @@ const AssignedComplaintCard = ({
             <StatusButton
               onClick={() => handleUpdateStatus(complaint._id, "resolved")}
               isLoading={isLoading}
-              className="bg-green-100 text-green-700 hover:bg-green-200"
+              className="bg-green-700/70 text-green-200 hover:bg-green-700"
             >
               Resolved
             </StatusButton>
@@ -555,7 +573,7 @@ const AssignedComplaintCard = ({
             <StatusButton
               onClick={() => handleUpdateStatus(complaint._id, "rejected")}
               isLoading={isLoading}
-              className="bg-red-100 text-red-700 hover:bg-red-200"
+              className="bg-red-700/70 text-red-200 hover:bg-red-700"
             >
               Reject
             </StatusButton>
@@ -563,7 +581,7 @@ const AssignedComplaintCard = ({
           <StatusButton
             onClick={() => handleUnassign(complaint._id)}
             isLoading={isLoading}
-            className="bg-gray-100 text-gray-700 hover:bg-gray-200"
+            className="bg-gray-600 text-gray-200 hover:bg-gray-500"
           >
             <FiUserMinus size={14} className="inline mr-1" /> Unassign
           </StatusButton>
@@ -573,6 +591,7 @@ const AssignedComplaintCard = ({
   </div>
 );
 
+// CHANGED: StatusButton component styling
 const StatusButton = ({ onClick, children, className = "", isLoading = false }) => (
   <button
     onClick={onClick}
@@ -583,4 +602,5 @@ const StatusButton = ({ onClick, children, className = "", isLoading = false }) 
   </button>
 );
 
-export default VolunteerDashboard;
+export default VolunteerDashboard
+;

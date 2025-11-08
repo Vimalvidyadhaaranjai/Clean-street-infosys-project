@@ -1,3 +1,5 @@
+// src/pages/AdminDashboard.jsx - MODIFIED WITH NEW PALETTE
+
 import React, { useState, useEffect } from "react";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
@@ -148,33 +150,31 @@ const AdminDashboard = () => {
     }
   };
 
+  // CHANGED: Badge colors for dark theme
   const getStatusBadge = (status) => {
     const styles = {
-      received: "bg-yellow-100 text-yellow-800 border border-yellow-200",
-      in_review: "bg-blue-100 text-blue-800 border border-blue-200",
-      resolved: "bg-green-100 text-green-800 border border-green-200",
-      rejected: "bg-red-100 text-red-800 border border-red-200",
+      received: "bg-[var(--color-primary-accent)]/20 text-[var(--color-primary-accent)] border border-[var(--color-primary-accent)]/30",
+      in_review: "bg-[var(--color-light-bg)]/50 text-[var(--color-text-light)] border border-[var(--color-light-bg)]",
+      resolved: "bg-green-900/50 text-green-300 border border-green-700",
+      rejected: "bg-red-900/50 text-red-300 border border-red-700",
     };
     const labels = { received: "Pending", in_review: "In Review", resolved: "Resolved", rejected: "Rejected" };
-    return <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full ${styles[status] || 'bg-gray-100 text-gray-800 border-gray-200'}`}>{labels[status] || status}</span>;
+    return <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full ${styles[status] || 'bg-gray-700 text-gray-200 border-gray-600'}`}>{labels[status] || status}</span>;
   };
 
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-  // Get unique locations from users (case-insensitive)
   const locationMap = new Map();
   users.forEach(user => {
     if (user.location) {
       const lowerLocation = user.location.toLowerCase();
       if (!locationMap.has(lowerLocation)) {
-        // Store the first occurrence with proper capitalization
         locationMap.set(lowerLocation, user.location);
       }
     }
   });
   const uniqueLocations = Array.from(locationMap.values()).sort();
 
-  // Filter users based on location and role (case-insensitive for location)
   const filteredUsers = users.filter(user => {
     const matchesLocation = !locationFilter || 
       (user.location && user.location.toLowerCase() === locationFilter.toLowerCase());
@@ -182,7 +182,6 @@ const AdminDashboard = () => {
     return matchesLocation && matchesRole;
   });
 
-  // Get unique locations from complaints (case-insensitive)
   const complaintLocationMap = new Map();
   complaints.forEach(complaint => {
     const location = complaint.user_id?.location;
@@ -195,7 +194,6 @@ const AdminDashboard = () => {
   });
   const uniqueComplaintLocations = Array.from(complaintLocationMap.values()).sort();
 
-  // Get unique assigned volunteers
   const assignedToMap = new Map();
   complaints.forEach(complaint => {
     if (complaint.assigned_to && complaint.assigned_to._id) {
@@ -207,7 +205,6 @@ const AdminDashboard = () => {
   });
   const uniqueAssignedTo = Array.from(assignedToMap.values()).sort((a, b) => a.name.localeCompare(b.name));
 
-  // Filter complaints based on location and assignment
   const filteredComplaints = complaints.filter(complaint => {
     const matchesLocation = !complaintLocationFilter || 
       (complaint.user_id?.location && complaint.user_id.location.toLowerCase() === complaintLocationFilter.toLowerCase());
@@ -216,12 +213,12 @@ const AdminDashboard = () => {
     return matchesLocation && matchesAssignment;
   });
 
+  // (downloadReport functions remain the same logic, not modifying internals)
   const downloadReport = async (format) => {
     try {
       setShowDownloadModal(false);
       toast.loading(`Generating ${format.toUpperCase()} report...`);
       
-      // Fetch detailed statistics
       const res = await fetch(`${backend_Url}/api/admin/detailed-stats`, {
         credentials: "include",
       });
@@ -251,20 +248,14 @@ const AdminDashboard = () => {
       toast.error(err.message || "Failed to download report");
     }
   };
-
   const downloadExcelReport = (detailedStats) => {
-    // Generate CSV content (Excel compatible)
     let csvContent = "Clean Street - Admin Statistical Report\n";
     csvContent += `Generated on: ${new Date().toLocaleString()}\n\n`;
-
-    // Summary Statistics
     csvContent += "=== SUMMARY STATISTICS ===\n";
     csvContent += `Total Users,${stats.totalUsers}\n`;
     csvContent += `Total Complaints,${stats.totalComplaints}\n`;
     csvContent += `Pending Complaints,${stats.pendingComplaints}\n`;
     csvContent += `Resolved Complaints,${stats.resolvedComplaints}\n\n`;
-
-    // Complaint Status Distribution
     csvContent += "=== COMPLAINT STATUS DISTRIBUTION ===\n";
     csvContent += "Status,Count\n";
     detailedStats.complaintsByStatus.forEach(item => {
@@ -275,55 +266,41 @@ const AdminDashboard = () => {
       csvContent += `${statusLabel},${item.count}\n`;
     });
     csvContent += "\n";
-
-    // Complaint Types Distribution
     csvContent += "=== COMPLAINT TYPES DISTRIBUTION ===\n";
     csvContent += "Type,Count\n";
     detailedStats.complaintsByType.forEach(item => {
       csvContent += `${item._id || 'Unknown'},${item.count}\n`;
     });
     csvContent += "\n";
-
-    // User Roles Distribution
     csvContent += "=== USER ROLES DISTRIBUTION ===\n";
     csvContent += "Role,Count\n";
     detailedStats.usersByRole.forEach(item => {
       csvContent += `${item._id.charAt(0).toUpperCase() + item._id.slice(1)},${item.count}\n`;
     });
     csvContent += "\n";
-
-    // Complaints Over Time (Last 7 Days)
     csvContent += "=== COMPLAINTS OVER TIME (LAST 7 DAYS) ===\n";
     csvContent += "Date,Count\n";
     detailedStats.complaintsOverTime.forEach(item => {
       csvContent += `${item._id},${item.count}\n`;
     });
     csvContent += "\n";
-
-    // Monthly Complaints (Last 6 Months)
     csvContent += "=== MONTHLY COMPLAINT TRENDS (LAST 6 MONTHS) ===\n";
     csvContent += "Month,Count\n";
     detailedStats.monthlyComplaints.forEach(item => {
       csvContent += `${item._id},${item.count}\n`;
     });
     csvContent += "\n";
-
-    // User Registrations (Last 30 Days)
     csvContent += "=== USER REGISTRATIONS (LAST 30 DAYS) ===\n";
     csvContent += "Date,Count\n";
     detailedStats.userRegistrations.forEach(item => {
       csvContent += `${item._id},${item.count}\n`;
     });
     csvContent += "\n";
-
-    // Top Complaint Types
     csvContent += "=== TOP 5 COMPLAINT TYPES ===\n";
     csvContent += "Type,Count\n";
     detailedStats.topComplaintTypes.forEach(item => {
       csvContent += `${item._id || 'Unknown'},${item.count}\n`;
     });
-
-    // Create and download the file
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -336,9 +313,7 @@ const AdminDashboard = () => {
     link.click();
     document.body.removeChild(link);
   };
-
   const downloadPDFReport = (detailedStats) => {
-    // Generate HTML content for PDF
     let htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -370,7 +345,6 @@ const AdminDashboard = () => {
           <h1>Clean Street - Admin Statistical Report</h1>
           <p class="date">Generated on: ${new Date().toLocaleString()}</p>
         </div>
-
         <h2>Summary Statistics</h2>
         <div class="summary-grid">
           <div class="summary-card">
@@ -390,7 +364,6 @@ const AdminDashboard = () => {
             <div class="value">${stats.resolvedComplaints}</div>
           </div>
         </div>
-
         <h2>Complaint Status Distribution</h2>
         <table>
           <thead>
@@ -406,7 +379,6 @@ const AdminDashboard = () => {
             }).join('')}
           </tbody>
         </table>
-
         <h2>Complaint Types Distribution</h2>
         <table>
           <thead>
@@ -418,9 +390,7 @@ const AdminDashboard = () => {
             ).join('')}
           </tbody>
         </table>
-
         <div class="page-break"></div>
-
         <h2>User Roles Distribution</h2>
         <table>
           <thead>
@@ -432,7 +402,6 @@ const AdminDashboard = () => {
             ).join('')}
           </tbody>
         </table>
-
         <h2>Complaints Over Time (Last 7 Days)</h2>
         <table>
           <thead>
@@ -444,7 +413,6 @@ const AdminDashboard = () => {
             ).join('')}
           </tbody>
         </table>
-
         <h2>Monthly Complaint Trends (Last 6 Months)</h2>
         <table>
           <thead>
@@ -456,7 +424,6 @@ const AdminDashboard = () => {
             ).join('')}
           </tbody>
         </table>
-
         <h2>User Registrations (Last 30 Days)</h2>
         <table>
           <thead>
@@ -468,7 +435,6 @@ const AdminDashboard = () => {
             ).join('')}
           </tbody>
         </table>
-
         <h2>Top 5 Complaint Types</h2>
         <table>
           <thead>
@@ -483,8 +449,6 @@ const AdminDashboard = () => {
       </body>
       </html>
     `;
-
-    // Create blob and download
     const blob = new Blob([htmlContent], { type: 'text/html' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -497,7 +461,6 @@ const AdminDashboard = () => {
     link.click();
     document.body.removeChild(link);
     
-    // Open in new window for printing to PDF
     const printWindow = window.open(url, '_blank');
     if (printWindow) {
       printWindow.onload = () => {
@@ -508,18 +471,19 @@ const AdminDashboard = () => {
     }
   };
 
+  // CHANGED: Loading state styling
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+      <div className="min-h-screen bg-[var(--color-dark-bg)] flex flex-col">
         <Toaster position="bottom-center" reverseOrder={false} />
         <Navbar />
         <div className="flex-grow flex items-center justify-center">
           <div className="text-center">
-            <svg className="animate-spin mx-auto h-12 w-12 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg className="animate-spin mx-auto h-12 w-12 text-[var(--color-primary-accent)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <p className="mt-4 text-lg font-medium text-gray-600">Loading Admin Dashboard...</p>
+            <p className="mt-4 text-lg font-medium text-[var(--color-text-light)]/70">Loading Admin Dashboard...</p>
           </div>
         </div>
         <Footer />
@@ -527,17 +491,18 @@ const AdminDashboard = () => {
     );
   }
 
+  // CHANGED: Error state styling
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+      <div className="min-h-screen bg-[var(--color-dark-bg)] flex flex-col">
         <Toaster position="bottom-center" reverseOrder={false} />
         <Navbar />
         <div className="flex-grow flex items-center justify-center p-4">
-          <div className="text-center bg-red-50 p-6 rounded-lg shadow border border-red-200 max-w-lg w-full">
-            <FiAlertCircle className="mx-auto text-red-500 text-4xl mb-3" />
-            <p className="font-semibold text-red-800 text-lg">Error Loading Dashboard</p>
-            <p className="text-red-700 text-sm mt-1">{error}</p>
-            <button onClick={() => navigate('/login')} className="mt-5 px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 transition-colors">
+          <div className="text-center bg-red-900/50 p-6 rounded-lg shadow border border-red-700 max-w-lg w-full">
+            <FiAlertCircle className="mx-auto text-red-300 text-4xl mb-3" />
+            <p className="font-semibold text-red-200 text-lg">Error Loading Dashboard</p>
+            <p className="text-red-300 text-sm mt-1">{error}</p>
+            <button onClick={() => navigate('/login')} className="mt-5 px-4 py-2 bg-[var(--color-primary-accent)] text-[var(--color-text-dark)] text-sm font-semibold rounded hover:bg-[var(--color-secondary-accent)] transition-colors">
               Go to Login
             </button>
           </div>
@@ -548,25 +513,29 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+    // CHANGED: Main background
+    <div className="min-h-screen bg-[var(--color-dark-bg)] flex flex-col">
       <Toaster position="bottom-center" reverseOrder={false} />
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow">
         <header className="mb-6 sm:mb-8 animate-fade-in-down flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 tracking-tight">Admin Dashboard</h1>
-            <p className="text-gray-600 mt-1 text-sm sm:text-base">Overview and management tools.</p>
+            {/* CHANGED: Text colors */}
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[var(--color-text-light)] tracking-tight">Admin Dashboard</h1>
+            <p className="text-[var(--color-text-light)]/70 mt-1 text-sm sm:text-base">Overview and management tools.</p>
           </div>
+          {/* CHANGED: Button colors */}
           <button
             onClick={() => setShowDownloadModal(true)}
-            className="flex items-center justify-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-indigo-600 text-white text-sm sm:text-base font-semibold rounded-lg shadow hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 w-full sm:w-auto"
+            className="flex items-center justify-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-[var(--color-primary-accent)] text-[var(--color-text-dark)] text-sm sm:text-base font-semibold rounded-lg shadow hover:bg-[var(--color-secondary-accent)] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-accent)] focus:ring-offset-2 focus:ring-offset-[var(--color-dark-bg)] w-full sm:w-auto"
           >
             <FiDownload size={18} />
             <span>Download Report</span>
           </button>
         </header>
 
-        <div className="border-b border-gray-200 mb-4 sm:mb-6">
+        {/* CHANGED: Tab border color */}
+        <div className="border-b border-[var(--color-light-bg)] mb-4 sm:mb-6">
           <nav className="flex -mb-px justify-around sm:justify-start sm:space-x-6" aria-label="Tabs">
             <TabButton id="overview" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiActivity />}>
               <span className="hidden sm:inline">Overview</span>
@@ -587,33 +556,36 @@ const AdminDashboard = () => {
           {activeTab === 'overview' && (
             <div className="space-y-8">
               <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard icon={<FiUsers className="text-purple-500" />} value={stats.totalUsers} label="Total Users" />
-                <StatCard icon={<FiClipboard className="text-blue-500" />} value={stats.totalComplaints} label="Total Complaints" />
-                <StatCard icon={<FiClock className="text-yellow-500" />} value={stats.pendingComplaints} label="Pending Complaints" />
-                <StatCard icon={<FiCheckCircle className="text-green-500" />} value={stats.resolvedComplaints} label="Resolved Complaints" />
+                {/* CHANGED: Icon colors */}
+                <StatCard icon={<FiUsers className="text-[var(--color-primary-accent)]" />} value={stats.totalUsers} label="Total Users" />
+                <StatCard icon={<FiClipboard className="text-[var(--color-secondary-accent)]" />} value={stats.totalComplaints} label="Total Complaints" />
+                <StatCard icon={<FiClock className="text-[var(--color-primary-accent)]" />} value={stats.pendingComplaints} label="Pending Complaints" />
+                <StatCard icon={<FiCheckCircle className="text-green-400" />} value={stats.resolvedComplaints} label="Resolved Complaints" />
               </section>
               
-              {/* Statistics Section */}
               <AdminStatistics />
             </div>
           )}
 
           {activeTab === 'users' && (
-            <section className="bg-white p-4 sm:p-5 lg:p-6 rounded-xl shadow border border-gray-100">
+            // CHANGED: Card bg and border
+            <section className="bg-[var(--color-medium-bg)] p-4 sm:p-5 lg:p-6 rounded-xl shadow-lg border border-[var(--color-light-bg)]">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-5">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-800">User Management</h2>
+                {/* CHANGED: Text color */}
+                <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-text-light)]">User Management</h2>
                 
-                {/* Filters */}
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center">
-                  <div className="flex items-center gap-2 text-gray-600">
+                  {/* CHANGED: Filter text color */}
+                  <div className="flex items-center gap-2 text-[var(--color-text-light)]/70">
                     <FiFilter size={18} />
                     <span className="text-sm font-medium">Filters:</span>
                   </div>
                   
+                  {/* CHANGED: Select dropdown colors */}
                   <select
                     value={locationFilter}
                     onChange={(e) => setLocationFilter(e.target.value)}
-                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white hover:border-indigo-400 transition-colors"
+                    className="px-3 py-2 text-sm border border-[var(--color-light-bg)] rounded-lg focus:ring-2 focus:ring-[var(--color-primary-accent)] focus:border-[var(--color-primary-accent)] bg-[var(--color-dark-bg)] text-[var(--color-text-light)] hover:border-[var(--color-primary-accent)]/50 transition-colors"
                   >
                     <option value="">All Locations</option>
                     {uniqueLocations.map(location => (
@@ -621,10 +593,11 @@ const AdminDashboard = () => {
                     ))}
                   </select>
                   
+                  {/* CHANGED: Select dropdown colors */}
                   <select
                     value={roleFilter}
                     onChange={(e) => setRoleFilter(e.target.value)}
-                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white hover:border-indigo-400 transition-colors"
+                    className="px-3 py-2 text-sm border border-[var(--color-light-bg)] rounded-lg focus:ring-2 focus:ring-[var(--color-primary-accent)] focus:border-[var(--color-primary-accent)] bg-[var(--color-dark-bg)] text-[var(--color-text-light)] hover:border-[var(--color-primary-accent)]/50 transition-colors"
                   >
                     <option value="">All Roles</option>
                     <option value="user">User</option>
@@ -632,13 +605,14 @@ const AdminDashboard = () => {
                     <option value="admin">Admin</option>
                   </select>
                   
+                  {/* CHANGED: Clear button colors */}
                   {(locationFilter || roleFilter) && (
                     <button
                       onClick={() => {
                         setLocationFilter("");
                         setRoleFilter("");
                       }}
-                      className="px-3 py-2 text-sm text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors font-medium"
+                      className="px-3 py-2 text-sm text-[var(--color-primary-accent)] hover:text-[var(--color-secondary-accent)] hover:bg-[var(--color-light-bg)]/30 rounded-lg transition-colors font-medium"
                     >
                       Clear Filters
                     </button>
@@ -646,25 +620,26 @@ const AdminDashboard = () => {
                 </div>
               </div>
               
-              {/* Results count */}
-              <p className="text-sm text-gray-600 mb-3">
+              {/* CHANGED: Results text color */}
+              <p className="text-sm text-[var(--color-text-light)]/70 mb-3">
                 Showing {filteredUsers.length} of {users.length} users
               </p>
               
               {/* Mobile Card View */}
               <div className="block md:hidden space-y-3">
                 {filteredUsers.map(user => (
-                  <div key={user._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  // CHANGED: Card colors
+                  <div key={user._id} className="border border-[var(--color-light-bg)] rounded-lg p-4 hover:shadow-md transition-shadow bg-[var(--color-dark-bg)]/50">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 text-sm truncate">{user.name}</h3>
-                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                        <h3 className="font-semibold text-[var(--color-text-light)] text-sm truncate">{user.name}</h3>
+                        <p className="text-xs text-[var(--color-text-light)]/60 truncate">{user.email}</p>
                       </div>
                       {editingUserId === user._id ? (
                         <div className="flex items-center gap-2 ml-2">
                           <button
                             onClick={() => handleSaveRole(user._id)}
-                            className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-100 rounded disabled:opacity-50"
+                            className="p-1.5 text-green-400 hover:text-green-300 hover:bg-green-800/50 rounded disabled:opacity-50"
                             disabled={isSavingRole}
                             title="Save Role"
                           >
@@ -672,7 +647,7 @@ const AdminDashboard = () => {
                           </button>
                           <button
                             onClick={handleCancelEdit}
-                            className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded disabled:opacity-50"
+                            className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-800/50 rounded disabled:opacity-50"
                             disabled={isSavingRole}
                             title="Cancel"
                           >
@@ -682,7 +657,7 @@ const AdminDashboard = () => {
                       ) : (
                         <button
                           onClick={() => handleEditRole(user)}
-                          className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100 rounded disabled:opacity-50 disabled:text-gray-400"
+                          className="p-1.5 text-[var(--color-primary-accent)] hover:text-[var(--color-secondary-accent)] hover:bg-[var(--color-light-bg)]/50 rounded disabled:opacity-50 disabled:text-gray-600"
                           disabled={currentUser._id === user._id}
                           title={currentUser._id === user._id ? "Cannot edit own role" : "Edit Role"}
                         >
@@ -693,16 +668,16 @@ const AdminDashboard = () => {
                     
                     <div className="space-y-2 text-xs">
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-500">Location:</span>
-                        <span className="text-gray-700">{user.location || 'N/A'}</span>
+                        <span className="text-[var(--color-text-light)]/60">Location:</span>
+                        <span className="text-[var(--color-text-light)]/90">{user.location || 'N/A'}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-500">Role:</span>
+                        <span className="text-[var(--color-text-light)]/60">Role:</span>
                         {editingUserId === user._id ? (
                           <select
                             value={selectedRole}
                             onChange={e => setSelectedRole(e.target.value)}
-                            className="border border-gray-300 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-indigo-500"
+                            className="border border-[var(--color-light-bg)] rounded px-2 py-1 text-xs focus:ring-1 focus:ring-[var(--color-primary-accent)] bg-[var(--color-dark-bg)] text-[var(--color-text-light)]"
                             disabled={isSavingRole}
                           >
                             <option value="user">User</option>
@@ -710,14 +685,14 @@ const AdminDashboard = () => {
                             <option value="admin">Admin</option>
                           </select>
                         ) : (
-                          <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${user.role === 'admin' ? 'bg-red-100 text-red-800' : user.role === 'volunteer' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                          <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${user.role === 'admin' ? 'bg-red-900/50 text-red-300' : user.role === 'volunteer' ? 'bg-green-900/50 text-green-300' : 'bg-gray-700 text-gray-200'}`}>
                             {user.role}
                           </span>
                         )}
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-500">Joined:</span>
-                        <span className="text-gray-700">{formatDate(user.createdAt)}</span>
+                        <span className="text-[var(--color-text-light)]/60">Joined:</span>
+                        <span className="text-[var(--color-text-light)]/90">{formatDate(user.createdAt)}</span>
                       </div>
                     </div>
                   </div>
@@ -726,29 +701,31 @@ const AdminDashboard = () => {
 
               {/* Desktop Table View */}
               <div className="hidden md:block overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-[var(--color-light-bg)]">
+                  {/* CHANGED: Table header colors */}
+                  <thead className="bg-[var(--color-dark-bg)]">
                     <tr>
-                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                      <th scope="col" className="px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-[var(--color-text-light)]/70 uppercase tracking-wider">Name</th>
+                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-[var(--color-text-light)]/70 uppercase tracking-wider">Email</th>
+                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-[var(--color-text-light)]/70 uppercase tracking-wider">Location</th>
+                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-[var(--color-text-light)]/70 uppercase tracking-wider">Role</th>
+                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-[var(--color-text-light)]/70 uppercase tracking-wider">Joined</th>
+                      <th scope="col" className="px-5 py-3 text-center text-xs font-medium text-[var(--color-text-light)]/70 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  {/* CHANGED: Table body colors */}
+                  <tbody className="bg-[var(--color-medium-bg)] divide-y divide-[var(--color-light-bg)]">
                     {filteredUsers.map(user => (
-                      <tr key={user._id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.name}</td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{user.location || 'N/A'}</td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <tr key={user._id} className="hover:bg-[var(--color-light-bg)]/30 transition-colors">
+                        <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-[var(--color-text-light)]">{user.name}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-[var(--color-text-light)]/70">{user.email}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-[var(--color-text-light)]/70">{user.location || 'N/A'}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-[var(--color-text-light)]/70">
                           {editingUserId === user._id ? (
                             <select
                               value={selectedRole}
                               onChange={e => setSelectedRole(e.target.value)}
-                              className="border border-gray-300 rounded px-2 py-1 text-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                              className="border border-[var(--color-light-bg)] rounded px-2 py-1 text-sm focus:ring-1 focus:ring-[var(--color-primary-accent)] bg-[var(--color-dark-bg)] text-[var(--color-text-light)]"
                               disabled={isSavingRole}
                             >
                               <option value="user">User</option>
@@ -756,18 +733,18 @@ const AdminDashboard = () => {
                               <option value="admin">Admin</option>
                             </select>
                           ) : (
-                            <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-red-100 text-red-800' : user.role === 'volunteer' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                            <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-red-900/50 text-red-300' : user.role === 'volunteer' ? 'bg-green-900/50 text-green-300' : 'bg-gray-700 text-gray-200'}`}>
                               {user.role}
                             </span>
                           )}
                         </td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(user.createdAt)}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-[var(--color-text-light)]/70">{formatDate(user.createdAt)}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-center text-sm font-medium">
                           {editingUserId === user._id ? (
                             <div className="flex items-center justify-center gap-2">
                               <button
                                 onClick={() => handleSaveRole(user._id)}
-                                className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="p-1.5 text-green-400 hover:text-green-300 hover:bg-green-800/50 rounded disabled:opacity-50"
                                 disabled={isSavingRole}
                                 title="Save Role"
                               >
@@ -775,7 +752,7 @@ const AdminDashboard = () => {
                               </button>
                               <button
                                 onClick={handleCancelEdit}
-                                className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded disabled:opacity-50"
+                                className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-800/50 rounded disabled:opacity-50"
                                 disabled={isSavingRole}
                                 title="Cancel Edit"
                               >
@@ -785,7 +762,7 @@ const AdminDashboard = () => {
                           ) : (
                             <button
                               onClick={() => handleEditRole(user)}
-                              className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100 rounded disabled:opacity-50 disabled:text-gray-400 disabled:hover:bg-transparent"
+                              className="p-1.5 text-[var(--color-primary-accent)] hover:text-[var(--color-secondary-accent)] hover:bg-[var(--color-light-bg)]/50 rounded disabled:opacity-50 disabled:text-gray-600 disabled:hover:bg-transparent"
                               disabled={currentUser._id === user._id}
                               title={currentUser._id === user._id ? "Cannot edit own role" : "Edit Role"}
                             >
@@ -800,19 +777,19 @@ const AdminDashboard = () => {
               </div>
               
               {filteredUsers.length === 0 && (
-                <p className="text-center text-gray-500 py-6 text-sm sm:text-base">No users found matching the selected filters.</p>
+                <p className="text-center text-[var(--color-text-light)]/60 py-6 text-sm sm:text-base">No users found matching the selected filters.</p>
               )}
             </section>
           )}
 
           {activeTab === 'complaints' && (
-            <section className="bg-white p-4 sm:p-5 lg:p-6 rounded-xl shadow border border-gray-100">
+            // CHANGED: Card bg and border
+            <section className="bg-[var(--color-medium-bg)] p-4 sm:p-5 lg:p-6 rounded-xl shadow-lg border border-[var(--color-light-bg)]">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-5">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-800">All Complaints</h2>
+                <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-text-light)]">All Complaints</h2>
                 
-                {/* Filters */}
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center">
-                  <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center gap-2 text-[var(--color-text-light)]/70">
                     <FiFilter size={18} />
                     <span className="text-sm font-medium">Filters:</span>
                   </div>
@@ -820,7 +797,7 @@ const AdminDashboard = () => {
                   <select
                     value={complaintLocationFilter}
                     onChange={(e) => setComplaintLocationFilter(e.target.value)}
-                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white hover:border-indigo-400 transition-colors"
+                    className="px-3 py-2 text-sm border border-[var(--color-light-bg)] rounded-lg focus:ring-2 focus:ring-[var(--color-primary-accent)] focus:border-[var(--color-primary-accent)] bg-[var(--color-dark-bg)] text-[var(--color-text-light)] hover:border-[var(--color-primary-accent)]/50 transition-colors"
                   >
                     <option value="">All Locations</option>
                     {uniqueComplaintLocations.map(location => (
@@ -831,7 +808,7 @@ const AdminDashboard = () => {
                   <select
                     value={assignedToFilter}
                     onChange={(e) => setAssignedToFilter(e.target.value)}
-                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white hover:border-indigo-400 transition-colors"
+                    className="px-3 py-2 text-sm border border-[var(--color-light-bg)] rounded-lg focus:ring-2 focus:ring-[var(--color-primary-accent)] focus:border-[var(--color-primary-accent)] bg-[var(--color-dark-bg)] text-[var(--color-text-light)] hover:border-[var(--color-primary-accent)]/50 transition-colors"
                   >
                     <option value="">All Assignments</option>
                     <option value="unassigned">Unassigned</option>
@@ -846,7 +823,7 @@ const AdminDashboard = () => {
                         setComplaintLocationFilter("");
                         setAssignedToFilter("");
                       }}
-                      className="px-3 py-2 text-sm text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors font-medium"
+                      className="px-3 py-2 text-sm text-[var(--color-primary-accent)] hover:text-[var(--color-secondary-accent)] hover:bg-[var(--color-light-bg)]/30 rounded-lg transition-colors font-medium"
                     >
                       Clear Filters
                     </button>
@@ -854,25 +831,24 @@ const AdminDashboard = () => {
                 </div>
               </div>
               
-              {/* Results count */}
-              <p className="text-sm text-gray-600 mb-3">
+              <p className="text-sm text-[var(--color-text-light)]/70 mb-3">
                 Showing {filteredComplaints.length} of {complaints.length} complaints
               </p>
               
               {/* Mobile Card View */}
               <div className="block md:hidden space-y-3">
                 {filteredComplaints.map(complaint => (
-                  <div key={complaint._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div key={complaint._id} className="border border-[var(--color-light-bg)] rounded-lg p-4 hover:shadow-md transition-shadow bg-[var(--color-dark-bg)]/50">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 text-sm mb-1">{complaint.title}</h3>
-                        <p className="text-xs text-gray-500">by {complaint.user_id?.name || 'Unknown User'}</p>
+                        <h3 className="font-semibold text-[var(--color-text-light)] text-sm mb-1">{complaint.title}</h3>
+                        <p className="text-xs text-[var(--color-text-light)]/60">by {complaint.user_id?.name || 'Unknown User'}</p>
                       </div>
                       {editingComplaintId === complaint._id ? (
                         <div className="flex items-center gap-2 ml-2">
                           <button
                             onClick={() => handleSaveStatus(complaint._id)}
-                            className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-100 rounded disabled:opacity-50"
+                            className="p-1.5 text-green-400 hover:text-green-300 hover:bg-green-800/50 rounded disabled:opacity-50"
                             disabled={isSavingStatus}
                             title="Save"
                           >
@@ -880,7 +856,7 @@ const AdminDashboard = () => {
                           </button>
                           <button
                             onClick={handleCancelStatusEdit}
-                            className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded disabled:opacity-50"
+                            className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-800/50 rounded disabled:opacity-50"
                             disabled={isSavingStatus}
                             title="Cancel"
                           >
@@ -890,7 +866,7 @@ const AdminDashboard = () => {
                       ) : (
                         <button
                           onClick={() => handleEditStatus(complaint)}
-                          className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100 rounded"
+                          className="p-1.5 text-[var(--color-primary-accent)] hover:text-[var(--color-secondary-accent)] hover:bg-[var(--color-light-bg)]/50 rounded"
                           title="Edit Status"
                         >
                           <FiEdit size={16} />
@@ -900,20 +876,20 @@ const AdminDashboard = () => {
                     
                     <div className="space-y-2 text-xs">
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-500">Type:</span>
-                        <span className="text-gray-700 font-medium">{complaint.type}</span>
+                        <span className="text-[var(--color-text-light)]/60">Type:</span>
+                        <span className="text-[var(--color-text-light)]/90 font-medium">{complaint.type}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-500">Location:</span>
-                        <span className="text-gray-700">{complaint.user_id?.location || 'N/A'}</span>
+                        <span className="text-[var(--color-text-light)]/60">Location:</span>
+                        <span className="text-[var(--color-text-light)]/90">{complaint.user_id?.location || 'N/A'}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-500">Status:</span>
+                        <span className="text-[var(--color-text-light)]/60">Status:</span>
                         {editingComplaintId === complaint._id ? (
                           <select
                             value={selectedStatus}
                             onChange={e => setSelectedStatus(e.target.value)}
-                            className="border border-gray-300 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-indigo-500"
+                            className="border border-[var(--color-light-bg)] rounded px-2 py-1 text-xs focus:ring-1 focus:ring-[var(--color-primary-accent)] bg-[var(--color-dark-bg)] text-[var(--color-text-light)]"
                             disabled={isSavingStatus}
                           >
                             <option value="received">Pending</option>
@@ -926,12 +902,12 @@ const AdminDashboard = () => {
                         )}
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-500">Assigned To:</span>
-                        <span className="text-gray-700">{complaint.assigned_to?.name || <span className="text-gray-400 italic">Unassigned</span>}</span>
+                        <span className="text-[var(--color-text-light)]/60">Assigned To:</span>
+                        <span className="text-[var(--color-text-light)]/90">{complaint.assigned_to?.name || <span className="text-gray-500 italic">Unassigned</span>}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-500">Date:</span>
-                        <span className="text-gray-700">{formatDate(complaint.createdAt)}</span>
+                        <span className="text-[var(--color-text-light)]/60">Date:</span>
+                        <span className="text-[var(--color-text-light)]/90">{formatDate(complaint.createdAt)}</span>
                       </div>
                     </div>
                   </div>
@@ -940,32 +916,32 @@ const AdminDashboard = () => {
 
               {/* Desktop Table View */}
               <div className="hidden md:block overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-[var(--color-light-bg)]">
+                  <thead className="bg-[var(--color-dark-bg)]">
                     <tr>
-                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reported By</th>
-                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned To</th>
-                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                      <th className="px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-[var(--color-text-light)]/70 uppercase tracking-wider">Title</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-[var(--color-text-light)]/70 uppercase tracking-wider">Reported By</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-[var(--color-text-light)]/70 uppercase tracking-wider">Location</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-[var(--color-text-light)]/70 uppercase tracking-wider">Type</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-[var(--color-text-light)]/70 uppercase tracking-wider">Status</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-[var(--color-text-light)]/70 uppercase tracking-wider">Assigned To</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-[var(--color-text-light)]/70 uppercase tracking-wider">Date</th>
+                      <th className="px-5 py-3 text-center text-xs font-medium text-[var(--color-text-light)]/70 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-[var(--color-medium-bg)] divide-y divide-[var(--color-light-bg)]">
                     {filteredComplaints.map(complaint => (
-                      <tr key={complaint._id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{complaint.title}</td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.user_id?.name || 'Unknown User'}</td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.user_id?.location || 'N/A'}</td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.type}</td>
+                      <tr key={complaint._id} className="hover:bg-[var(--color-light-bg)]/30 transition-colors">
+                        <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-[var(--color-text-light)]">{complaint.title}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-[var(--color-text-light)]/70">{complaint.user_id?.name || 'Unknown User'}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-[var(--color-text-light)]/70">{complaint.user_id?.location || 'N/A'}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-[var(--color-text-light)]/70">{complaint.type}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-sm">
                           {editingComplaintId === complaint._id ? (
                             <select
                               value={selectedStatus}
                               onChange={e => setSelectedStatus(e.target.value)}
-                              className="border border-gray-300 rounded px-2 py-1 text-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                              className="border border-[var(--color-light-bg)] rounded px-2 py-1 text-sm focus:ring-1 focus:ring-[var(--color-primary-accent)] bg-[var(--color-dark-bg)] text-[var(--color-text-light)]"
                               disabled={isSavingStatus}
                             >
                               <option value="received">Pending</option>
@@ -977,14 +953,14 @@ const AdminDashboard = () => {
                             getStatusBadge(complaint.status)
                           )}
                         </td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.assigned_to?.name || <span className="text-gray-400 italic">Unassigned</span>}</td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(complaint.createdAt)}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-[var(--color-text-light)]/70">{complaint.assigned_to?.name || <span className="text-gray-500 italic">Unassigned</span>}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-[var(--color-text-light)]/70">{formatDate(complaint.createdAt)}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-center text-sm font-medium">
                           {editingComplaintId === complaint._id ? (
                             <div className="flex items-center justify-center gap-2">
                               <button
                                 onClick={() => handleSaveStatus(complaint._id)}
-                                className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="p-1.5 text-green-400 hover:text-green-300 hover:bg-green-800/50 rounded disabled:opacity-50"
                                 disabled={isSavingStatus}
                                 title="Save Status"
                               >
@@ -992,7 +968,7 @@ const AdminDashboard = () => {
                               </button>
                               <button
                                 onClick={handleCancelStatusEdit}
-                                className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded disabled:opacity-50"
+                                className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-800/50 rounded disabled:opacity-50"
                                 disabled={isSavingStatus}
                                 title="Cancel Edit"
                               >
@@ -1002,7 +978,7 @@ const AdminDashboard = () => {
                           ) : (
                             <button
                               onClick={() => handleEditStatus(complaint)}
-                              className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100 rounded"
+                              className="p-1.5 text-[var(--color-primary-accent)] hover:text-[var(--color-secondary-accent)] hover:bg-[var(--color-light-bg)]/50 rounded"
                               title="Edit Status"
                             >
                               <FiEdit size={16} />
@@ -1016,7 +992,7 @@ const AdminDashboard = () => {
               </div>
               
               {filteredComplaints.length === 0 && (
-                <p className="text-center text-gray-500 py-6 text-sm sm:text-base">
+                <p className="text-center text-[var(--color-text-light)]/60 py-6 text-sm sm:text-base">
                   {complaints.length === 0 ? "No complaints found." : "No complaints found matching the selected filters."}
                 </p>
               )}
@@ -1024,28 +1000,27 @@ const AdminDashboard = () => {
           )}
           
           {activeTab === 'recent activities' && ( 
-            <div className="bg-white rounded-xl shadow p-4 sm:p-5 lg:p-6">
-              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Recent Activities</h2>
+            // CHANGED: Card bg, text, border, and hover colors
+            <div className="bg-[var(--color-medium-bg)] rounded-xl shadow-lg p-4 sm:p-5 lg:p-6 border border-[var(--color-light-bg)]">
+              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-[var(--color-text-light)]">Recent Activities</h2>
               <ul className="space-y-2">
                 {activities.map((log) => (
-                  <li key={log._id} className="rounded-lg hover:bg-gray-100 px-3 sm:px-4 py-3 transition-colors">
+                  <li key={log._id} className="rounded-lg hover:bg-[var(--color-light-bg)]/30 px-3 sm:px-4 py-3 transition-colors">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                      <span className="font-medium text-gray-800 text-sm sm:text-base">{log.user_id?.name || "Unknown Admin"}</span>
-                      <span className="hidden sm:inline text-gray-500">-</span>
-                      <span className="text-gray-700 text-xs sm:text-sm">{log.action}</span>
+                      <span className="font-medium text-[var(--color-secondary-accent)] text-sm sm:text-base">{log.user_id?.name || "Unknown Admin"}</span>
+                      <span className="hidden sm:inline text-[var(--color-text-light)]/50">-</span>
+                      <span className="text-[var(--color-text-light)]/90 text-xs sm:text-sm">{log.action}</span>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className="text-xs text-[var(--color-text-light)]/60 mt-1">
                       {new Date(log.timestamp).toLocaleString()}
                     </div>
                   </li>
                 ))}
               </ul>
               {activities.length === 0 && (
-                <p className="text-center text-gray-500 py-6 text-sm sm:text-base">No recent activities.</p>
+                <p className="text-center text-[var(--color-text-light)]/60 py-6 text-sm sm:text-base">No recent activities.</p>
               )}
             </div>
-
-          
           )}
         </div>
 
@@ -1054,57 +1029,59 @@ const AdminDashboard = () => {
       {/* Download Format Selection Modal */}
       {showDownloadModal && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-5 sm:p-6 animate-fade-in-up mx-4">
+          {/* CHANGED: Modal bg, border, and text colors */}
+          <div className="bg-[var(--color-medium-bg)] rounded-xl shadow-2xl max-w-md w-full p-5 sm:p-6 animate-fade-in-up mx-4 border border-[var(--color-light-bg)]">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg sm:text-xl font-bold text-gray-800">Download Report</h3>
+              <h3 className="text-lg sm:text-xl font-bold text-[var(--color-text-light)]">Download Report</h3>
               <button
                 onClick={() => setShowDownloadModal(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-400 hover:text-gray-200 transition-colors"
               >
                 <FiX size={24} />
               </button>
             </div>
             
-            <p className="text-gray-600 mb-5 sm:mb-6 text-sm sm:text-base">Choose your preferred format to download the statistical report:</p>
+            <p className="text-[var(--color-text-light)]/80 mb-5 sm:mb-6 text-sm sm:text-base">Choose your preferred format to download the statistical report:</p>
             
             <div className="space-y-3">
+              {/* CHANGED: Button bg, border, text, and hover colors */}
               <button
                 onClick={() => downloadReport('excel')}
-                className="w-full flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-2 border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
+                className="w-full flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-2 border-[var(--color-light-bg)] rounded-lg hover:border-[var(--color-primary-accent)] hover:bg-[var(--color-light-bg)]/30 transition-all group"
               >
-                <div className="p-2 sm:p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors flex-shrink-0">
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                <div className="p-2 sm:p-3 bg-green-900/50 rounded-lg group-hover:bg-green-800/50 transition-colors flex-shrink-0">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-300" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
                     <path d="M14 2v6h6M9 15h6M9 11h6M9 19h6"/>
                   </svg>
                 </div>
                 <div className="text-left flex-1 min-w-0">
-                  <h4 className="font-semibold text-gray-800 group-hover:text-indigo-600 text-sm sm:text-base">Excel (CSV)</h4>
-                  <p className="text-xs sm:text-sm text-gray-500">Download as CSV file for Excel/Sheets</p>
+                  <h4 className="font-semibold text-[var(--color-text-light)] group-hover:text-[var(--color-primary-accent)] text-sm sm:text-base">Excel (CSV)</h4>
+                  <p className="text-xs sm:text-sm text-[var(--color-text-light)]/70">Download as CSV file for Excel/Sheets</p>
                 </div>
               </button>
 
               <button
                 onClick={() => downloadReport('pdf')}
-                className="w-full flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-2 border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
+                className="w-full flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-2 border-[var(--color-light-bg)] rounded-lg hover:border-[var(--color-primary-accent)] hover:bg-[var(--color-light-bg)]/30 transition-all group"
               >
-                <div className="p-2 sm:p-3 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors flex-shrink-0">
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                <div className="p-2 sm:p-3 bg-red-900/50 rounded-lg group-hover:bg-red-800/50 transition-colors flex-shrink-0">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-red-300" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
                     <path d="M14 2v6h6"/>
                     <text x="7" y="18" fontSize="8" fontWeight="bold" fill="currentColor">PDF</text>
                   </svg>
                 </div>
                 <div className="text-left flex-1 min-w-0">
-                  <h4 className="font-semibold text-gray-800 group-hover:text-indigo-600 text-sm sm:text-base">PDF</h4>
-                  <p className="text-xs sm:text-sm text-gray-500">Download as formatted PDF document</p>
+                  <h4 className="font-semibold text-[var(--color-text-light)] group-hover:text-[var(--color-primary-accent)] text-sm sm:text-base">PDF</h4>
+                  <p className="text-xs sm:text-sm text-[var(--color-text-light)]/70">Download as formatted PDF document</p>
                 </div>
               </button>
             </div>
 
             <button
               onClick={() => setShowDownloadModal(false)}
-              className="w-full mt-4 px-4 py-2 text-sm sm:text-base text-gray-600 hover:text-gray-800 font-medium transition-colors"
+              className="w-full mt-4 px-4 py-2 text-sm sm:text-base text-[var(--color-text-light)]/70 hover:text-[var(--color-text-light)] font-medium transition-colors"
             >
               Cancel
             </button>
@@ -1117,26 +1094,27 @@ const AdminDashboard = () => {
   );
 };
 
-
+// CHANGED: StatCard component styling
 const StatCard = ({ icon, value, label }) => (
-  <div className="bg-white p-4 sm:p-5 rounded-xl shadow border border-gray-100 flex items-center gap-3 sm:gap-4 transition-all duration-300 ease-in-out hover:shadow-lg hover:border-indigo-100 transform hover:-translate-y-1">
-    <div className="p-2 sm:p-3 rounded-full bg-gradient-to-br from-gray-100 to-blue-100 text-xl sm:text-2xl flex-shrink-0">
+  <div className="bg-[var(--color-medium-bg)] p-4 sm:p-5 rounded-xl shadow-lg border border-[var(--color-light-bg)] flex items-center gap-3 sm:gap-4 transition-all duration-300 ease-in-out hover:shadow-xl hover:border-[var(--color-primary-accent)] transform hover:-translate-y-1">
+    <div className="p-2 sm:p-3 rounded-full bg-gradient-to-br from-[var(--color-light-bg)] to-[var(--color-medium-bg)] text-xl sm:text-2xl flex-shrink-0">
       {icon}
     </div>
     <div className="min-w-0">
-      <p className="text-xl sm:text-2xl font-bold text-gray-800 capitalize truncate">{value}</p>
-      <p className="text-xs sm:text-sm font-medium text-gray-500">{label}</p>
+      <p className="text-xl sm:text-2xl font-bold text-[var(--color-text-light)] capitalize truncate">{value}</p>
+      <p className="text-xs sm:text-sm font-medium text-[var(--color-text-light)]/70">{label}</p>
     </div>
   </div>
 );
 
+// CHANGED: TabButton component styling
  const TabButton = ({ id, activeTab, setActiveTab, icon, children }) => (
    <button
       onClick={() => setActiveTab(id)}
-      className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2.5 sm:py-3 px-3 sm:px-4 border-b-2 font-medium text-xs sm:text-sm transition-colors duration-200 focus:outline-none focus-visible:bg-indigo-50 rounded-t flex-1 sm:flex-initial
+      className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2.5 sm:py-3 px-3 sm:px-4 border-b-2 font-medium text-xs sm:text-sm transition-colors duration-200 focus:outline-none focus-visible:bg-[var(--color-light-bg)]/30 rounded-t flex-1 sm:flex-initial
         ${activeTab === id
-          ? "border-indigo-600 text-indigo-600"
-          : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+          ? "border-[var(--color-primary-accent)] text-[var(--color-primary-accent)]"
+          : "border-transparent text-[var(--color-text-light)]/60 hover:text-[var(--color-text-light)] hover:border-[var(--color-light-bg)]"
         }`}
       title={id}
     >

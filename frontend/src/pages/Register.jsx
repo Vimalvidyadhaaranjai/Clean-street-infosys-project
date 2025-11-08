@@ -1,9 +1,9 @@
-// src/pages/Register.jsx
+// src/pages/Register.jsx - MODIFIED WITH NEW PALETTE
 
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FiUser, FiMail, FiMapPin, FiLock, FiBriefcase, FiEye, FiEyeOff } from "react-icons/fi";
-import { Toaster, toast } from "react-hot-toast"; // <-- Add this import
+import { Toaster, toast } from "react-hot-toast";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ export default function Register() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
+  const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -45,7 +45,7 @@ const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      toast.success("Registration successful!"); // <-- Use toast instead of alert
+      toast.success("Registration successful!"); 
 
       setTimeout(() => {
         if (data.user.role === "admin") {
@@ -59,22 +59,20 @@ const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
 
     } catch (err) {
       setError(err.message || "An error occurred during registration.");
-      toast.error(err.message || "An error occurred during registration."); // <-- Show error toast
+      toast.error(err.message || "An error occurred during registration."); 
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-blue-50 via-indigo-50 to-white">
-      <Toaster position="top-right" reverseOrder={false} /> {/* <-- Add Toaster */}
-      {/* Left Column - Image and Welcome Text */}
-      {/* === IMAGE UPDATE: Changed to street1.png === */}
-      {/* === STYLE UPDATE: Refined overlay and text styles === */}
+    // === STYLE UPDATE: Use dark-bg for the whole page ===
+    <div className="min-h-screen flex bg-[var(--color-dark-bg)]">
+      <Toaster position="top-right" reverseOrder={false} /> 
+      
+      {/* Left Column - Image and Welcome Text (Already dark-themed) */}
       <div className="hidden lg:flex w-1/2 bg-cover bg-center relative group overflow-hidden" style={{ backgroundImage: "url('/images/street1.png')" }}>
-         {/* Subtle zoom effect on hover */}
         <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-110" style={{ backgroundImage: "url('/images/street1.png')" }}></div>
-        {/* Slightly adjusted overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500"></div>
         <div className="relative z-10 flex flex-col justify-center items-center text-white p-16 text-center space-y-6">
           <Link to="/" className="block mb-6 transform transition-transform duration-300 hover:scale-105">
@@ -88,45 +86,55 @@ const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
       </div>
 
       {/* Right Column - Registration Form */}
-      {/* === STYLE UPDATE: Centered form with card styling === */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 overflow-y-auto"> {/* Added overflow-y-auto */}
-        <div className="w-full max-w-lg bg-white p-8 sm:p-10 rounded-2xl shadow-xl border border-gray-100 animate-fade-in-up my-8"> {/* Added my-8 for vertical spacing */}
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800">Create Your Account</h2>
-            <p className="text-gray-500 mt-2">Let's get you started!</p>
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 overflow-y-auto">
+        {/* === STYLE UPDATE: Changed card to dark theme === */}
+        <div className="w-full max-w-lg bg-[var(--color-medium-bg)] p-8 sm:p-10 rounded-2xl shadow-xl border border-[var(--color-light-bg)] animate-fade-in-up ">
+          <div className="text-center ">
+            {/* CHANGED: text colors */}
+            <h2 className="text-3xl font-bold text-[var(--color-secondary-accent)]">Create Your Account</h2>
+            <p className="text-[var(--color-text-light)]/70 mt-2">Let's get you started!</p>
           </div>
 
           <form className="space-y-5" onSubmit={handleSubmit}>
             {/* Name & Location Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
+                {/* CHANGED: text color */}
+                <label htmlFor="name" className="block text-sm font-medium text-[var(--color-text-light)]/90 mb-1.5">Full Name</label>
                 <div className="relative group">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none transition-colors group-focus-within:text-indigo-600"><FiUser size={18} /></span>
-                  <input id="name" type="text" name="name" placeholder="John Doe" className="w-full pl-11 pr-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 ease-in-out placeholder-gray-400" value={form.name} onChange={handleChange} required />
+                  {/* CHANGED: icon and focus colors */}
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-[var(--color-text-light)]/50 pointer-events-none transition-colors group-focus-within:text-[var(--color-primary-accent)]"><FiUser size={18} /></span>
+                  {/* CHANGED: input field colors */}
+                  <input id="name" type="text" name="name" placeholder="John Doe" className="w-full pl-11 pr-3 py-3 bg-[var(--color-dark-bg)] border border-[var(--color-light-bg)] rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-accent)] focus:border-transparent transition duration-200 ease-in-out text-[var(--color-text-light)] placeholder-[var(--color-text-light)]/50" value={form.name} onChange={handleChange} required />
                 </div>
               </div>
               <div>
-                <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1.5">Location</label>
+                {/* CHANGED: text color */}
+                <label htmlFor="location" className="block text-sm font-medium text-[var(--color-text-light)]/90 mb-1.5">Location</label>
                 <div className="relative group">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none transition-colors group-focus-within:text-indigo-600"><FiMapPin size={18} /></span>
-                  <input id="location" type="text" name="location" placeholder="Your City, State" className="w-full pl-11 pr-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 ease-in-out placeholder-gray-400" value={form.location} onChange={handleChange} required />
+                  {/* CHANGED: icon and focus colors */}
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-[var(--color-text-light)]/50 pointer-events-none transition-colors group-focus-within:text-[var(--color-primary-accent)]"><FiMapPin size={18} /></span>
+                  {/* CHANGED: input field colors */}
+                  <input id="location" type="text" name="location" placeholder="Your City, State" className="w-full pl-11 pr-3 py-3 bg-[var(--color-dark-bg)] border border-[var(--color-light-bg)] rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-accent)] focus:border-transparent transition duration-200 ease-in-out text-[var(--color-text-light)] placeholder-[var(--color-text-light)]/50" value={form.location} onChange={handleChange} required />
                 </div>
               </div>
             </div>
 
             {/* Role Select */}
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1.5">I want to register as a...</label>
+              {/* CHANGED: text color */}
+              <label htmlFor="role" className="block text-sm font-medium text-[var(--color-text-light)]/90 mb-1.5">I want to register as a...</label>
               <div className="relative group">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none transition-colors group-focus-within:text-indigo-600"><FiBriefcase size={18} /></span>
-                <select id="role" name="role" className="w-full pl-11 pr-10 py-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 ease-in-out appearance-none text-gray-700" value={form.role} onChange={handleChange} required>
+                 {/* CHANGED: icon and focus colors */}
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-[var(--color-text-light)]/50 pointer-events-none transition-colors group-focus-within:text-[var(--color-primary-accent)]"><FiBriefcase size={18} /></span>
+                {/* CHANGED: select field colors */}
+                <select id="role" name="role" className="w-full pl-11 pr-10 py-3 bg-[var(--color-dark-bg)] border border-[var(--color-light-bg)] rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-accent)] focus:border-transparent transition duration-200 ease-in-out appearance-none text-[var(--color-text-light)]" value={form.role} onChange={handleChange} required>
                   <option value="user">Community User (Report issues)</option>
                   <option value="volunteer">Volunteer (Help resolve issues)</option>
-                  {/* === ADDED BACK: Admin option === */}
                   <option value="admin">Admin</option>
                 </select>
-                <span className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 pointer-events-none">
+                {/* CHANGED: icon color */}
+                <span className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[var(--color-text-light)]/50 pointer-events-none">
                      <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fillRule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.24a.75.75 0 011.06 0L10 15.147l2.7-2.907a.75.75 0 111.06 1.06l-3.25 3.5a.75.75 0 01-1.06 0l-3.25-3.5a.75.75 0 010-1.06z" clipRule="evenodd" />
                     </svg>
@@ -136,34 +144,40 @@ const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
 
             {/* Email Input */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+              {/* CHANGED: text color */}
+              <label htmlFor="email" className="block text-sm font-medium text-[var(--color-text-light)]/90 mb-1.5">Email</label>
               <div className="relative group">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none transition-colors group-focus-within:text-indigo-600"><FiMail size={18} /></span>
-                <input id="email" type="email" name="email" placeholder="you@example.com" className="w-full pl-11 pr-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 ease-in-out placeholder-gray-400" value={form.email} onChange={handleChange} required />
+                {/* CHANGED: icon and focus colors */}
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-[var(--color-text-light)]/50 pointer-events-none transition-colors group-focus-within:text-[var(--color-primary-accent)]"><FiMail size={18} /></span>
+                {/* CHANGED: input field colors */}
+                <input id="email" type="email" name="email" placeholder="you@example.com" className="w-full pl-11 pr-3 py-3 bg-[var(--color-dark-bg)] border border-[var(--color-light-bg)] rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-accent)] focus:border-transparent transition duration-200 ease-in-out text-[var(--color-text-light)] placeholder-[var(--color-text-light)]/50" value={form.email} onChange={handleChange} required />
               </div>
             </div>
 
             {/* Password Input */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+              {/* CHANGED: text color */}
+              <label htmlFor="password" className="block text-sm font-medium text-[var(--color-text-light)]/90 mb-1.5">Password</label>
               <div className="relative group">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none transition-colors group-focus-within:text-indigo-600"><FiLock size={18} /></span>
+                {/* CHANGED: icon and focus colors */}
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-[var(--color-text-light)]/50 pointer-events-none transition-colors group-focus-within:text-[var(--color-primary-accent)]"><FiLock size={18} /></span>
                 <input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder="Minimum 6 characters"
-                    className="w-full pl-11 pr-10 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 ease-in-out placeholder-gray-400"
+                    // CHANGED: input field colors
+                    className="w-full pl-11 pr-10 py-3 bg-[var(--color-dark-bg)] border border-[var(--color-light-bg)] rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-accent)] focus:border-transparent transition duration-200 ease-in-out text-[var(--color-text-light)] placeholder-[var(--color-text-light)]/50"
                     value={form.password}
                     onChange={handleChange}
                     required
-                    minLength={6} // Add minLength attribute
+                    minLength={6}
                  />
-                 {/* === NEW BUTTON: Password visibility toggle === */}
+                {/* CHANGED: icon and hover colors */}
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 hover:text-gray-600 focus:outline-none"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[var(--color-text-light)]/50 hover:text-[var(--color-primary-accent)] focus:outline-none"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
@@ -173,7 +187,8 @@ const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
 
              {/* Error Message */}
             {error && (
-              <p className="text-red-600 text-sm text-center bg-red-50 p-2.5 rounded-md border border-red-200">
+              // CHANGED: Dark-mode error colors
+              <p className="text-red-300 text-sm text-center bg-red-900/50 p-2.5 rounded-md border border-red-700">
                 {error}
               </p>
             )}
@@ -181,12 +196,14 @@ const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
             {/* Submit Button */}
             <button
                 type="submit"
-                className={`w-full flex justify-center items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3.5 rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 transition-all duration-300 ease-in-out transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed`}
+                // CHANGED: Button colors to yellow accent
+                className={`w-full flex justify-center items-center gap-2 bg-gradient-to-r from-[var(--color-primary-accent)] to-[var(--color-secondary-accent)] text-[var(--color-text-dark)] font-semibold py-3.5 rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[var(--color-primary-accent)]/50 transition-all duration-300 ease-in-out transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed`}
                 disabled={loading}
             >
               {loading ? (
                  <>
-                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  {/* CHANGED: text color */}
+                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-[var(--color-text-dark)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
@@ -200,9 +217,10 @@ const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
 
           {/* Link to Login */}
           <div className="text-center mt-6">
-            <p className="text-sm text-gray-600">
+            {/* CHANGED: text and link colors */}
+            <p className="text-sm text-[var(--color-text-light)]/70">
               Already have an account?{" "}
-              <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-700 hover:underline transition-colors">
+              <Link to="/login" className="font-semibold text-[var(--color-primary-accent)] hover:text-[var(--color-secondary-accent)] hover:underline transition-colors">
                 Login
               </Link>
             </p>
