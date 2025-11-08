@@ -66,7 +66,7 @@ const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
   };
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-blue-50 via-indigo-50 to-white">
+    <div className="min-h-screen  flex bg-gradient-to-br from-blue-50 via-indigo-50 to-white">
       <Toaster position="top-right" reverseOrder={false} /> {/* <-- Add Toaster */}
       {/* Left Column - Image and Welcome Text */}
       {/* === IMAGE UPDATE: Changed to street1.png === */}
@@ -90,8 +90,8 @@ const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
       {/* Right Column - Registration Form */}
       {/* === STYLE UPDATE: Centered form with card styling === */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 overflow-y-auto"> {/* Added overflow-y-auto */}
-        <div className="w-full max-w-lg bg-white p-8 sm:p-10 rounded-2xl shadow-xl border border-gray-100 animate-fade-in-up my-8"> {/* Added my-8 for vertical spacing */}
-          <div className="text-center mb-8">
+        <div className="w-full max-w-lg bg-white p-8 sm:p-10 rounded-2xl shadow-xl border border-gray-100 animate-fade-in-up "> {/* Added my-8 for vertical spacing */}
+          <div className="text-center ">
             <h2 className="text-3xl font-bold text-gray-800">Create Your Account</h2>
             <p className="text-gray-500 mt-2">Let's get you started!</p>
           </div>
