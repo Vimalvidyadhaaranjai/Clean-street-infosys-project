@@ -546,12 +546,4 @@ button, a, [role="button"] {
   transition: filter 0.3s ease;
 }
 
-/* Keep white logo as is (already white for dark backgrounds) */
-.dark img[src*="white_logo.png"] {
-  filter: none;
-}
-
-/* Hover effect for logo in dark mode */
-.dark img[src*="logo.png"]:hover {
-  filter: invert(1) brightness(1.4);
-}
+/* Keep white logo as is (already white for dark backgrounds) 
