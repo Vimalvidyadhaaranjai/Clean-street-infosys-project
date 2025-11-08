@@ -223,7 +223,7 @@ const VolunteerDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col transition-colors duration-300">
         <Toaster position="top-right" reverseOrder={false} />
         <Navbar />
         <div className="flex-grow flex items-center justify-center">
@@ -258,7 +258,7 @@ const VolunteerDashboard = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col transition-colors duration-300">
         <Toaster position="top-right" reverseOrder={false} />
         <Navbar />
         <div className="flex-grow flex items-center justify-center p-4">
@@ -280,7 +280,7 @@ const VolunteerDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col transition-colors duration-300">
       <Toaster position="top-right" reverseOrder={false} />
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow">

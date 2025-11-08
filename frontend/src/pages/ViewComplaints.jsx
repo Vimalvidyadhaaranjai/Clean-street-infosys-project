@@ -127,7 +127,7 @@ const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
 
   if (loading) {
     return (
-      <div className="bg-gray-50 flex justify-center items-center min-h-screen">
+      <div className="bg-gray-50 flex justify-center items-center min-h-screen transition-colors duration-300">
         <div className="text-center">
           <FaSpinner className="animate-spin text-blue-600 text-5xl mx-auto mb-4" />
           <p className="text-gray-600 text-lg">Loading Community Reports...</p>
@@ -137,7 +137,7 @@ const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col transition-colors duration-300">
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12 flex-grow">
         <div className="text-center mb-12 animate-fade-in-down">
@@ -164,7 +164,7 @@ const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
               ))
             ) : (
               <div className="text-center bg-white rounded-xl shadow-md p-12 lg:col-span-3">
-                <p className="text-gray-500 text-lg">No community reports have been filed yet.</p>
+                <p className="text-lg text-gray-500">No community reports have been filed yet.</p>
               </div>
             )}
           </div>

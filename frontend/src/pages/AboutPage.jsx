@@ -1,11 +1,11 @@
 import React from 'react';
 import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
-import { FiInfo, FiTarget, FiUsers } from 'react-icons/fi'; // Example icons
+import { FiInfo, FiTarget, FiUsers } from 'react-icons/fi';
 
 const AboutPage = () => {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col transition-colors duration-300">
             <Navbar />
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow animate-fade-in-up">
                 <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sm:p-10 max-w-8xl mx-auto">
@@ -31,8 +31,6 @@ const AboutPage = () => {
                         <p>
                             We are a community-focused initiative leveraging technology to address common urban challenges like garbage disposal, road damage, and infrastructure maintenance. Our platform connects people who care about their local environment with the resources and channels needed to make a tangible difference.
                         </p>
-
-
                     </section>
                 </div>
             </main>

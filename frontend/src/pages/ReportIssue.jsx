@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiUpload, FiXCircle, FiMapPin, FiInfo, FiImage, FiLoader, FiCheckCircle, FiAlertCircle } from "react-icons/fi"; // Replaced Fa with Fi
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { useTheme } from "../context/ThemeContext";
 
 // Marker icon setup (Keep original)
 const markerIcon = new L.Icon({
@@ -45,6 +46,7 @@ const FormStatus = ({ message, type }) => {
 
 const ReportIssue = () => {
   const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
   const [position, setPosition] = useState(null);
   const [photo, setPhoto] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null); // State for image preview URL
@@ -134,7 +136,11 @@ const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
 
   return (
     // === STYLE UPDATE: Consistent gradient background ===
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+    <div className={`min-h-screen flex flex-col transition-colors duration-300 ${
+      isDarkMode 
+        ? 'bg-gradient-to-br from-black via-black to-black' 
+        : 'bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50'
+    }`}>
       <Navbar />
       {/* === STYLE UPDATE: Adjusted padding === */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow">
@@ -153,7 +159,9 @@ const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
 
         {/* Main Content Card */}
         {/* === STYLE UPDATE: Card styling, subtle animation === */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sm:p-10 animate-fade-in-up">
+        <div className={`rounded-xl shadow-lg border p-6 sm:p-10 animate-fade-in-up ${
+          isDarkMode ? 'bg-[#001D3D] border-[#003566]' : 'bg-white border-gray-100'
+        }`}>
             {/* Header */}
             <div className="text-center mb-10">
                 <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 tracking-tight">Report an Issue</h1>

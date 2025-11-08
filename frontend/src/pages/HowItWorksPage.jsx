@@ -1,11 +1,11 @@
 import React from 'react';
 import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
-import { FiHelpCircle, FiEdit3, FiEye, FiTool, FiUserCheck } from 'react-icons/fi'; // Example icons
+import { FiHelpCircle, FiEdit3, FiEye, FiTool, FiUserCheck } from 'react-icons/fi';
 
 const HowItWorksPage = () => {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col transition-colors duration-300">
             <Navbar />
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow animate-fade-in-up">
                 <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sm:p-10 max-w-8xl mx-auto">
@@ -26,7 +26,7 @@ const HowItWorksPage = () => {
                                 See a problem like overflowing bins, potholes, or broken streetlights? Use our simple reporting form. Pinpoint the location on the map, add a description, select the issue type and priority, and optionally upload a photo. Your detailed report helps volunteers and authorities act faster.
                             </p>
                         </div>
-                        <div className='bg-gray-300/15 rounded-2xl p-4' >
+                        <div className='bg-gray-300/15 rounded-2xl p-4'>
                             <h2 className="text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2">
                                 <FiEye className="text-purple-600" /> 2. Track Progress
                             </h2>

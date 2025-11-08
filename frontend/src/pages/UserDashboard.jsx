@@ -154,7 +154,7 @@ const UserDashboard = () => {
       <>
         <Navbar />
         <Toaster position="bottom-center" reverseOrder={false} />
-        <div className="min-h-[calc(100vh-theme(space.20))] flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+        <div className="min-h-[calc(100vh-theme(space.20))] bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex items-center justify-center transition-colors duration-300">
           <div className="text-center">
             <svg
               className="animate-spin mx-auto h-12 w-12 text-indigo-600"
@@ -178,7 +178,7 @@ const UserDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col transition-colors duration-300">
       <Toaster position="bottom-center" reverseOrder={false} />
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow">

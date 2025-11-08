@@ -2,11 +2,17 @@
 
 import React from 'react';
 import { FiHeart } from 'react-icons/fi';
+import { useTheme } from '../context/ThemeContext';
 
 const Footer = () => {
-  // === STYLE UPDATE: Reduced vertical padding from py-6 to py-4 ===
+  const { isDarkMode } = useTheme();
+  
   return (
-    <footer className='bg-gray-800 text-gray-400 py-4 text-center text-sm mt-auto'> {/* Changed py-6 to py-4 */}
+    <footer className={`py-4 text-center text-sm mt-auto transition-colors duration-300 ${
+      isDarkMode 
+        ? 'bg-[#001D3D] text-white' 
+        : 'bg-gray-800 text-gray-400'
+    }`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-center items-center gap-2">
             <p>&copy; {new Date().getFullYear()} Clean Street Initiative.</p>
