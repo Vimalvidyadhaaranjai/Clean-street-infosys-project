@@ -855,7 +855,6 @@ const AdminDashboard = () => {
                     <tr>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reported By</th>
-                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned To</th>
@@ -868,7 +867,6 @@ const AdminDashboard = () => {
                       <tr key={complaint._id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{complaint.title}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.user_id?.name || 'Unknown User'}</td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{user.location || 'N/A'}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.type}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-sm">
                           {editingComplaintId === complaint._id ? (
