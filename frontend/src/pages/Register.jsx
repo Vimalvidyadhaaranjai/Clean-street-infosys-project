@@ -5,7 +5,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { FiUser, FiMail, FiMapPin, FiLock, FiBriefcase, FiEye, FiEyeOff } from "react-icons/fi";
 import { Toaster, toast } from "react-hot-toast";
 
-export default function Register() {
+export default function Register()
+ {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
