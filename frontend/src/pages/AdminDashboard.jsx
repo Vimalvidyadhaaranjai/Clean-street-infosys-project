@@ -3,7 +3,7 @@ import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import AdminStatistics from "../Components/AdminStatistics";
 import { useNavigate } from "react-router-dom";
-import { FiUsers, FiClipboard, FiAlertCircle, FiCheckCircle, FiEdit, FiSave, FiX, FiLoader, FiActivity, FiUserCheck, FiClock, FiDownload } from "react-icons/fi";
+import { FiUsers, FiClipboard, FiAlertCircle, FiCheckCircle, FiEdit, FiSave, FiX, FiLoader, FiActivity, FiUserCheck, FiClock, FiDownload, FiFilter } from "react-icons/fi";
 import { Toaster, toast } from "react-hot-toast";
 
 const AdminDashboard = () => {
@@ -22,6 +22,8 @@ const AdminDashboard = () => {
   const [isSavingStatus, setIsSavingStatus] = useState(false);
   const [activities, setActivities] = useState([]);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [locationFilter, setLocationFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
@@ -156,6 +158,27 @@ const AdminDashboard = () => {
   };
 
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+  // Get unique locations from users (case-insensitive)
+  const locationMap = new Map();
+  users.forEach(user => {
+    if (user.location) {
+      const lowerLocation = user.location.toLowerCase();
+      if (!locationMap.has(lowerLocation)) {
+        // Store the first occurrence with proper capitalization
+        locationMap.set(lowerLocation, user.location);
+      }
+    }
+  });
+  const uniqueLocations = Array.from(locationMap.values()).sort();
+
+  // Filter users based on location and role (case-insensitive for location)
+  const filteredUsers = users.filter(user => {
+    const matchesLocation = !locationFilter || 
+      (user.location && user.location.toLowerCase() === locationFilter.toLowerCase());
+    const matchesRole = !roleFilter || user.role === roleFilter;
+    return matchesLocation && matchesRole;
+  });
 
   const downloadReport = async (format) => {
     try {
@@ -541,11 +564,60 @@ const AdminDashboard = () => {
 
           {activeTab === 'users' && (
             <section className="bg-white p-4 sm:p-5 lg:p-6 rounded-xl shadow border border-gray-100">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-5">User Management</h2>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-5">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-800">User Management</h2>
+                
+                {/* Filters */}
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <FiFilter size={18} />
+                    <span className="text-sm font-medium">Filters:</span>
+                  </div>
+                  
+                  <select
+                    value={locationFilter}
+                    onChange={(e) => setLocationFilter(e.target.value)}
+                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white hover:border-indigo-400 transition-colors"
+                  >
+                    <option value="">All Locations</option>
+                    {uniqueLocations.map(location => (
+                      <option key={location} value={location}>{location}</option>
+                    ))}
+                  </select>
+                  
+                  <select
+                    value={roleFilter}
+                    onChange={(e) => setRoleFilter(e.target.value)}
+                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white hover:border-indigo-400 transition-colors"
+                  >
+                    <option value="">All Roles</option>
+                    <option value="user">User</option>
+                    <option value="volunteer">Volunteer</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  
+                  {(locationFilter || roleFilter) && (
+                    <button
+                      onClick={() => {
+                        setLocationFilter("");
+                        setRoleFilter("");
+                      }}
+                      className="px-3 py-2 text-sm text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors font-medium"
+                    >
+                      Clear Filters
+                    </button>
+                  )}
+                </div>
+              </div>
+              
+              {/* Results count */}
+              <p className="text-sm text-gray-600 mb-3">
+                Showing {filteredUsers.length} of {users.length} users
+              </p>
               
               {/* Mobile Card View */}
               <div className="block md:hidden space-y-3">
-                {users.map(user => (
+                {filteredUsers.map(user => (
                   <div key={user._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
@@ -630,7 +702,7 @@ const AdminDashboard = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {users.map(user => (
+                    {filteredUsers.map(user => (
                       <tr key={user._id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.name}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
@@ -690,6 +762,10 @@ const AdminDashboard = () => {
                   </tbody>
                 </table>
               </div>
+              
+              {filteredUsers.length === 0 && (
+                <p className="text-center text-gray-500 py-6 text-sm sm:text-base">No users found matching the selected filters.</p>
+              )}
             </section>
           )}
 
@@ -779,6 +855,7 @@ const AdminDashboard = () => {
                     <tr>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reported By</th>
+                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned To</th>
@@ -791,6 +868,7 @@ const AdminDashboard = () => {
                       <tr key={complaint._id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{complaint.title}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.user_id?.name || 'Unknown User'}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{user.location || 'N/A'}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.type}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-sm">
                           {editingComplaintId === complaint._id ? (
