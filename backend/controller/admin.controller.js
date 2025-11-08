@@ -12,7 +12,7 @@ export const getAllComplaintsAdmin = async (req, res) => {
   try {
     const complaints = await Complaint.find({})
       .sort({ createdAt: -1 })
-      .populate('user_id', 'name email') // User who reported
+      .populate('user_id', 'name email location') // User who reported - include location
       .populate('assigned_to', 'name email'); // User assigned (volunteer/admin)
 
     res.status(200).json({ success: true, count: complaints.length, data: complaints });

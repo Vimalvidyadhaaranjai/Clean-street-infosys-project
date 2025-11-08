@@ -24,6 +24,8 @@ const AdminDashboard = () => {
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [locationFilter, setLocationFilter] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
+  const [complaintLocationFilter, setComplaintLocationFilter] = useState("");
+  const [assignedToFilter, setAssignedToFilter] = useState("");
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
@@ -178,6 +180,36 @@ const AdminDashboard = () => {
       (user.location && user.location.toLowerCase() === locationFilter.toLowerCase());
     const matchesRole = !roleFilter || user.role === roleFilter;
     return matchesLocation && matchesRole;
+  });
+
+  // Get unique locations from complaints (from user profiles)
+  const complaintLocationMap = new Map();
+  complaints.forEach(complaint => {
+    if (complaint.user_id?.location) {
+      const lowerLocation = complaint.user_id.location.toLowerCase();
+      if (!complaintLocationMap.has(lowerLocation)) {
+        complaintLocationMap.set(lowerLocation, complaint.user_id.location);
+      }
+    }
+  });
+  const uniqueComplaintLocations = Array.from(complaintLocationMap.values()).sort();
+
+  // Get unique volunteers/admins who are assigned to complaints
+  const assignedToMap = new Map();
+  complaints.forEach(complaint => {
+    if (complaint.assigned_to) {
+      assignedToMap.set(complaint.assigned_to._id, complaint.assigned_to.name);
+    }
+  });
+  const uniqueAssignedTo = Array.from(assignedToMap.entries()).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
+
+  // Filter complaints based on location and assigned volunteer
+  const filteredComplaints = complaints.filter(complaint => {
+    const matchesLocation = !complaintLocationFilter || 
+      (complaint.user_id?.location && complaint.user_id.location.toLowerCase() === complaintLocationFilter.toLowerCase());
+    const matchesAssignedTo = !assignedToFilter || 
+      (assignedToFilter === 'unassigned' ? !complaint.assigned_to : complaint.assigned_to?._id === assignedToFilter);
+    return matchesLocation && matchesAssignedTo;
   });
 
   const downloadReport = async (format) => {
@@ -771,11 +803,61 @@ const AdminDashboard = () => {
 
           {activeTab === 'complaints' && (
             <section className="bg-white p-4 sm:p-5 lg:p-6 rounded-xl shadow border border-gray-100">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-5">All Complaints</h2>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-5">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-800">All Complaints</h2>
+                
+                {/* Filters */}
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <FiFilter size={18} />
+                    <span className="text-sm font-medium">Filters:</span>
+                  </div>
+                  
+                  <select
+                    value={complaintLocationFilter}
+                    onChange={(e) => setComplaintLocationFilter(e.target.value)}
+                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white hover:border-indigo-400 transition-colors"
+                  >
+                    <option value="">All Locations</option>
+                    {uniqueComplaintLocations.map(location => (
+                      <option key={location} value={location}>{location}</option>
+                    ))}
+                  </select>
+                  
+                  <select
+                    value={assignedToFilter}
+                    onChange={(e) => setAssignedToFilter(e.target.value)}
+                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white hover:border-indigo-400 transition-colors"
+                  >
+                    <option value="">All Assignments</option>
+                    <option value="unassigned">Unassigned</option>
+                    {uniqueAssignedTo.map(volunteer => (
+                      <option key={volunteer.id} value={volunteer.id}>{volunteer.name}</option>
+                    ))}
+                  </select>
+                  
+                  {(complaintLocationFilter || assignedToFilter) && (
+                    <button
+                      onClick={() => {
+                        setComplaintLocationFilter("");
+                        setAssignedToFilter("");
+                      }}
+                      className="px-3 py-2 text-sm text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors font-medium"
+                    >
+                      Clear Filters
+                    </button>
+                  )}
+                </div>
+              </div>
+              
+              {/* Results count */}
+              <p className="text-sm text-gray-600 mb-3">
+                Showing {filteredComplaints.length} of {complaints.length} complaints
+              </p>
               
               {/* Mobile Card View */}
               <div className="block md:hidden space-y-3">
-                {complaints.map(complaint => (
+                {filteredComplaints.map(complaint => (
                   <div key={complaint._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
@@ -818,6 +900,10 @@ const AdminDashboard = () => {
                         <span className="text-gray-700 font-medium">{complaint.type}</span>
                       </div>
                       <div className="flex justify-between items-center">
+                        <span className="text-gray-500">Location:</span>
+                        <span className="text-gray-700">{complaint.user_id?.location || 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
                         <span className="text-gray-500">Status:</span>
                         {editingComplaintId === complaint._id ? (
                           <select
@@ -855,6 +941,7 @@ const AdminDashboard = () => {
                     <tr>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reported By</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned To</th>
@@ -863,10 +950,11 @@ const AdminDashboard = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {complaints.map(complaint => (
+                    {filteredComplaints.map(complaint => (
                       <tr key={complaint._id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{complaint.title}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.user_id?.name || 'Unknown User'}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.user_id?.location || 'N/A'}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.type}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-sm">
                           {editingComplaintId === complaint._id ? (
@@ -923,8 +1011,10 @@ const AdminDashboard = () => {
                 </table>
               </div>
               
-              {complaints.length === 0 && (
-                <p className="text-center text-gray-500 py-6 text-sm sm:text-base">No complaints found.</p>
+              {filteredComplaints.length === 0 && (
+                <p className="text-center text-gray-500 py-6 text-sm sm:text-base">
+                  {complaints.length === 0 ? "No complaints found." : "No complaints found matching the selected filters."}
+                </p>
               )}
             </section>
           )}
