@@ -24,8 +24,6 @@ const AdminDashboard = () => {
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [locationFilter, setLocationFilter] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
-  const [complaintLocationFilter, setComplaintLocationFilter] = useState("");
-  const [assignedToFilter, setAssignedToFilter] = useState("");
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
@@ -180,36 +178,6 @@ const AdminDashboard = () => {
       (user.location && user.location.toLowerCase() === locationFilter.toLowerCase());
     const matchesRole = !roleFilter || user.role === roleFilter;
     return matchesLocation && matchesRole;
-  });
-
-  // Get unique locations from complaints (from user profiles)
-  const complaintLocationMap = new Map();
-  complaints.forEach(complaint => {
-    if (complaint.user_id?.location) {
-      const lowerLocation = complaint.user_id.location.toLowerCase();
-      if (!complaintLocationMap.has(lowerLocation)) {
-        complaintLocationMap.set(lowerLocation, complaint.user_id.location);
-      }
-    }
-  });
-  const uniqueComplaintLocations = Array.from(complaintLocationMap.values()).sort();
-
-  // Get unique volunteers/admins who are assigned to complaints
-  const assignedToMap = new Map();
-  complaints.forEach(complaint => {
-    if (complaint.assigned_to) {
-      assignedToMap.set(complaint.assigned_to._id, complaint.assigned_to.name);
-    }
-  });
-  const uniqueAssignedTo = Array.from(assignedToMap.entries()).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
-
-  // Filter complaints based on location and assigned volunteer
-  const filteredComplaints = complaints.filter(complaint => {
-    const matchesLocation = !complaintLocationFilter || 
-      (complaint.user_id?.location && complaint.user_id.location.toLowerCase() === complaintLocationFilter.toLowerCase());
-    const matchesAssignedTo = !assignedToFilter || 
-      (assignedToFilter === 'unassigned' ? !complaint.assigned_to : complaint.assigned_to?._id === assignedToFilter);
-    return matchesLocation && matchesAssignedTo;
   });
 
   const downloadReport = async (format) => {
@@ -941,7 +909,7 @@ const AdminDashboard = () => {
                     <tr>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reported By</th>
-                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                      <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned To</th>
@@ -954,7 +922,7 @@ const AdminDashboard = () => {
                       <tr key={complaint._id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{complaint.title}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.user_id?.name || 'Unknown User'}</td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.user_id?.location || 'N/A'}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{user.location || 'N/A'}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">{complaint.type}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-sm">
                           {editingComplaintId === complaint._id ? (
