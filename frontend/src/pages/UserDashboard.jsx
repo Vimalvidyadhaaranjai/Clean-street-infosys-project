@@ -218,7 +218,7 @@ const UserDashboard = () => {
                   <p className="text-gray-500 text-sm">No recent updates from admin yet.</p>
                 </div>
               ) : (
-                <ul className="bg-white rounded-xl shadow border border-gray-100 divide-y divide-gray-200">
+                <ul className="bg-white rounded-xl shadow">
                   {activities.map((log) => (
                     <li key={log._id} className="p-4 hover:bg-gray-50 transition-colors">
                       <div className="flex justify-between items-start">
