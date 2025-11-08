@@ -1,4 +1,4 @@
-// src/pages/LandingPage.jsx
+// src/pages/LandingPage.jsx - NO CHANGES NEEDED
 
 import React from 'react';
 import Navbar from '../Components/Navbar';
@@ -8,9 +8,9 @@ import Footer from '../Components/Footer';
 const LandingPage = () => {
     return (
         <div>
-            <Navbar /> {/* Assuming you're using the updated Navbar */}
+            <Navbar />
             <Hero/>   {/* This now renders the restyled Hero component */}
-            <Footer/> {/* Assuming Footer is fine or updated separately */}
+            <Footer/> {/* This now renders the corrected Footer component */}
         </div>
     );
 };

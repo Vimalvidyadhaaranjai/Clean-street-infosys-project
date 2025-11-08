@@ -1,19 +1,28 @@
+// src/Components/AdminStatistics.jsx - MODIFIED WITH NEW PALETTE
+
 import React, { useState, useEffect } from "react";
 import { FiTrendingUp, FiPieChart, FiBarChart2, FiActivity } from "react-icons/fi";
 import { toast } from "react-hot-toast";
 
+// CHANGED: Updated COLORS to use new palette
 const COLORS = {
-  primary: ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981"],
+  primary: [
+    "var(--color-primary-accent)",
+    "var(--color-secondary-accent)",
+    "var(--color-light-bg)",
+    "#10b981", // green
+    "#3b82f6", // blue
+  ],
   status: {
-    received: "#fbbf24",
-    in_review: "#3b82f6",
-    resolved: "#10b981",
-    rejected: "#ef4444",
+    received: "var(--color-primary-accent)",
+    in_review: "var(--color-light-bg)",
+    resolved: "#10b981", // green
+    rejected: "#ef4444", // red
   },
   roles: {
-    user: "#6b7280",
-    volunteer: "#10b981",
-    admin: "#ef4444",
+    user: "var(--color-text-light)",
+    volunteer: "#10b981", // green
+    admin: "#ef4444", // red
   },
 };
 
@@ -52,10 +61,11 @@ const AdminStatistics = () => {
 
   if (loading) {
     return (
+      // CHANGED: Loading spinner and text for dark theme
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <svg
-            className="animate-spin mx-auto h-12 w-12 text-indigo-600"
+            className="animate-spin mx-auto h-12 w-12 text-[var(--color-primary-accent)]"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -74,7 +84,7 @@ const AdminStatistics = () => {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             ></path>
           </svg>
-          <p className="mt-4 text-lg font-medium text-gray-600">Loading Statistics...</p>
+          <p className="mt-4 text-lg font-medium text-[var(--color-text-light)]/70">Loading Statistics...</p>
         </div>
       </div>
     );
@@ -82,8 +92,9 @@ const AdminStatistics = () => {
 
   if (!stats) {
     return (
+      // CHANGED: Text color for dark theme
       <div className="text-center py-10">
-        <p className="text-gray-500">No statistics available</p>
+        <p className="text-[var(--color-text-light)]/70">No statistics available</p>
       </div>
     );
   }
@@ -132,10 +143,11 @@ const AdminStatistics = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <FiBarChart2 className="text-3xl text-indigo-600" />
+        {/* CHANGED: Icon and text colors */}
+        <FiBarChart2 className="text-3xl text-[var(--color-primary-accent)]" />
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Statistics & Analytics</h2>
-          <p className="text-sm text-gray-600">Visual insights into complaints and user data</p>
+          <h2 className="text-2xl font-bold text-[var(--color-text-light)]">Statistics & Analytics</h2>
+          <p className="text-sm text-[var(--color-text-light)]/70">Visual insights into complaints and user data</p>
         </div>
       </div>
 
@@ -157,7 +169,7 @@ const AdminStatistics = () => {
       {/* Line Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard title="Complaints (Last 7 Days)" icon={<FiTrendingUp />}>
-          <LineChart data={complaintsTimeData} dataKey="complaints" color="#6366f1" />
+          <LineChart data={complaintsTimeData} dataKey="complaints" color="var(--color-primary-accent)" />
         </ChartCard>
 
         <ChartCard title="User Registrations (Last 30 Days)" icon={<FiTrendingUp />}>
@@ -168,7 +180,7 @@ const AdminStatistics = () => {
       {/* Bar Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard title="Monthly Complaint Trends (6 Months)" icon={<FiBarChart2 />}>
-          <BarChart data={monthlyData} dataKey="complaints" color="#8b5cf6" />
+          <BarChart data={monthlyData} dataKey="complaints" color="var(--color-secondary-accent)" />
         </ChartCard>
 
         <ChartCard title="Top 5 Complaint Types" icon={<FiActivity />}>
@@ -213,7 +225,7 @@ const PieChart = ({ data }) => {
             <path
               d={slice.path}
               fill={slice.color}
-              stroke="white"
+              stroke="var(--color-medium-bg)" // CHANGED: Stroke to match card bg
               strokeWidth="2"
               className="transition-opacity cursor-pointer"
               opacity={hoveredIndex === null || hoveredIndex === slice.index ? 1 : 0.5}
@@ -233,9 +245,11 @@ const PieChart = ({ data }) => {
           >
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-              <span className="text-gray-700">{item.name}</span>
+              {/* CHANGED: Text color */}
+              <span className="text-[var(--color-text-light)]/90">{item.name}</span>
             </div>
-            <span className="font-semibold text-gray-900">
+            {/* CHANGED: Text color */}
+            <span className="font-semibold text-[var(--color-text-light)]">
               {item.value} ({slices[index].percentage.toFixed(1)}%)
             </span>
           </div>
@@ -246,7 +260,7 @@ const PieChart = ({ data }) => {
 };
 
 const LineChart = ({ data, dataKey, color }) => {
-  if (!data || data.length === 0) return <div className="text-center text-gray-500 py-10">No data available</div>;
+  if (!data || data.length === 0) return <div className="text-center text-[var(--color-text-light)]/70 py-10">No data available</div>;
 
   const maxValue = Math.max(...data.map((d) => d[dataKey]));
   const padding = 40;
@@ -274,7 +288,7 @@ const LineChart = ({ data, dataKey, color }) => {
             y1={padding + (i * chartHeight) / 4}
             x2={width - padding}
             y2={padding + (i * chartHeight) / 4}
-            stroke="#e5e7eb"
+            stroke="var(--color-light-bg)" // CHANGED: Gridline color
             strokeDasharray="3,3"
           />
         ))}
@@ -294,7 +308,7 @@ const LineChart = ({ data, dataKey, color }) => {
             x={point.x}
             y={height - 10}
             textAnchor="middle"
-            className="text-xs fill-gray-600"
+            className="text-xs fill-[var(--color-text-light)]/70" // CHANGED: Label color
           >
             {point.label}
           </text>
@@ -305,7 +319,7 @@ const LineChart = ({ data, dataKey, color }) => {
 };
 
 const BarChart = ({ data, dataKey, color }) => {
-  if (!data || data.length === 0) return <div className="text-center text-gray-500 py-10">No data available</div>;
+  if (!data || data.length === 0) return <div className="text-center text-[var(--color-text-light)]/70 py-10">No data available</div>;
 
   const maxValue = Math.max(...data.map((d) => d[dataKey]));
   const padding = 40;
@@ -330,7 +344,7 @@ const BarChart = ({ data, dataKey, color }) => {
                 width={barWidth}
                 height={barHeight}
                 fill={color}
-                className="cursor-pointer hover:opacity-80 transition-opacity"
+                className="cursor-pointer opacity-80 hover:opacity-100 transition-opacity"
               >
                 <title>{`${item.month}: ${item[dataKey]}`}</title>
               </rect>
@@ -338,7 +352,7 @@ const BarChart = ({ data, dataKey, color }) => {
                 x={x + barWidth / 2}
                 y={height - 10}
                 textAnchor="middle"
-                className="text-xs fill-gray-600"
+                className="text-xs fill-[var(--color-text-light)]/70" // CHANGED: Label color
               >
                 {item.month}
               </text>
@@ -351,7 +365,7 @@ const BarChart = ({ data, dataKey, color }) => {
 };
 
 const HorizontalBarChart = ({ data }) => {
-  if (!data || data.length === 0) return <div className="text-center text-gray-500 py-10">No data available</div>;
+  if (!data || data.length === 0) return <div className="text-center text-[var(--color-text-light)]/70 py-10">No data available</div>;
 
   const maxValue = Math.max(...data.map((d) => d.count));
 
@@ -359,11 +373,13 @@ const HorizontalBarChart = ({ data }) => {
     <div className="space-y-3 py-4">
       {data.map((item, index) => (
         <div key={index} className="flex items-center gap-3">
-          <div className="w-24 text-sm text-gray-700 truncate" title={item.type}>
+          {/* CHANGED: Label color */}
+          <div className="w-24 text-sm text-[var(--color-text-light)]/90 truncate" title={item.type}>
             {item.type}
           </div>
           <div className="flex-1">
-            <div className="bg-gray-200 rounded-full h-8 relative">
+            {/* CHANGED: Bar background color */}
+            <div className="bg-[var(--color-light-bg)]/50 rounded-full h-8 relative">
               <div
                 className="h-8 rounded-full flex items-center justify-end pr-3 text-white text-sm font-semibold transition-all"
                 style={{
@@ -381,18 +397,19 @@ const HorizontalBarChart = ({ data }) => {
   );
 };
 
+// CHANGED: ChartCard component styling
 const ChartCard = ({ title, icon, children }) => (
-  <div className="bg-white p-5 rounded-xl shadow border border-gray-100">
+  <div className="bg-[var(--color-medium-bg)] p-5 rounded-xl shadow-lg border border-[var(--color-light-bg)]">
     <div className="flex items-center gap-2 mb-4">
-      <span className="text-indigo-600 text-xl">{icon}</span>
-      <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+      {/* CHANGED: Icon and text colors */}
+      <span className="text-[var(--color-primary-accent)] text-xl">{icon}</span>
+      <h3 className="text-lg font-semibold text-[var(--color-text-light)]">{title}</h3>
     </div>
     {children}
   </div>
 );
 
-// Helper Functions
-
+// Helper Functions (no style changes needed)
 const formatStatusLabel = (status) => {
   const labels = {
     received: "Pending",
@@ -414,4 +431,5 @@ const formatMonth = (monthString) => {
   return date.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
 };
 
-export default AdminStatistics;
+export default AdminStatistics
+;

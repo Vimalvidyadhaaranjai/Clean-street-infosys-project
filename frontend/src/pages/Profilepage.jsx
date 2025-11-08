@@ -1,14 +1,17 @@
+// src/pages/Profilepage.jsx - MODIFIED WITH NEW PALETTE
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import { FiUser, FiMail, FiMapPin, FiLock, FiCamera, FiEdit3, FiSave, FiShield, FiX, FiEye, FiEyeOff, FiLoader, FiCheckCircle, FiAlertCircle, FiUserCheck } from "react-icons/fi";
 
+// CHANGED: Dark theme status messages
 const FormMessage = ({ type, message }) => {
     if (!message) return null;
     const isError = type === 'error';
     return (
-        <div className={`p-3 rounded-md text-sm mb-4 flex items-center gap-2 ${isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}`}>
+        <div className={`p-3 rounded-md text-sm mb-4 flex items-center gap-2 ${isError ? 'bg-red-900/50 text-red-300 border border-red-700' : 'bg-green-900/50 text-green-300 border border-green-700'}`}>
             {isError ? <FiAlertCircle /> : <FiCheckCircle />}
             {message}
         </div>
@@ -50,7 +53,7 @@ export default function Profilepage() {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // Add size limit check (e.g., 5MB)
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
           setUploadStatus({ uploading: false, error: "Image size should be less than 5MB", success: "" });
           return;
       }
@@ -130,31 +133,37 @@ export default function Profilepage() {
 
   if (!user) {
      return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-            <FiLoader className="animate-spin text-4xl text-indigo-600"/>
+        // CHANGED: Background and spinner color
+        <div className="min-h-screen bg-[var(--color-dark-bg)] flex items-center justify-center">
+            <FiLoader className="animate-spin text-4xl text-[var(--color-primary-accent)]"/>
         </div>
       );
    }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col">
+    // CHANGED: Main background
+    <div className="min-h-screen bg-[var(--color-dark-bg)] flex flex-col">
       <Navbar />
       <main className="container mx-auto pt-10 pb-16 px-4 sm:px-6 lg:px-8 flex-grow">
 
         <div className="mb-8 animate-fade-in-down">
-          <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 tracking-tight">Account Settings</h1>
-          <p className="text-gray-600 mt-1 text-base">Manage your profile details and security.</p>
+          {/* CHANGED: Text colors */}
+          <h1 className="text-3xl lg:text-4xl font-bold text-[var(--color-text-light)] tracking-tight">Account Settings</h1>
+          <p className="text-[var(--color-text-light)]/70 mt-1 text-base">Manage your profile details and security.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
 
           <div className="lg:col-span-4 animate-fade-in-up animation-delay-200">
-            <div className="bg-white p-6 sm:p-8 rounded-xl shadow border border-gray-100 text-center flex flex-col items-center sticky top-28">
+            {/* CHANGED: Card bg, border, and text colors */}
+            <div className="bg-[var(--color-medium-bg)] p-6 sm:p-8 rounded-xl shadow-lg border border-[var(--color-light-bg)] text-center flex flex-col items-center sticky top-28">
               <div className="relative mb-4 group">
-                <div className="relative w-28 h-28 rounded-full p-1 bg-gradient-to-br from-blue-400 to-indigo-500 shadow-md">
+                {/* CHANGED: Gradient color */}
+                <div className="relative w-28 h-28 rounded-full p-1 bg-gradient-to-br from-[var(--color-primary-accent)] to-[var(--color-secondary-accent)] shadow-md">
                     {previewUrl ?
-                      <img src={previewUrl} alt={user.name} className="w-full h-full rounded-full object-cover border-4 border-white" /> :
-                      <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center text-4xl font-bold text-gray-500 border-4 border-white">{getInitials(user.name)}</div>
+                      <img src={previewUrl} alt={user.name} className="w-full h-full rounded-full object-cover border-4 border-[var(--color-medium-bg)]" /> :
+                      // CHANGED: Initials bg and text colors
+                      <div className="w-full h-full rounded-full bg-[var(--color-light-bg)] flex items-center justify-center text-4xl font-bold text-[var(--color-text-light)]/80 border-4 border-[var(--color-medium-bg)]">{getInitials(user.name)}</div>
                     }
                 </div>
                 <label htmlFor="profile-photo-input" className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -167,25 +176,30 @@ export default function Profilepage() {
                     {uploadStatus.error && <FormMessage type="error" message={uploadStatus.error} />}
                     {uploadStatus.success && <FormMessage type="success" message={uploadStatus.success} />}
                     {selectedFile && !uploadStatus.success && !uploadStatus.error && (
+                        // CHANGED: Button text color
                         <button
                             onClick={handleUploadPhoto}
                             disabled={uploadStatus.uploading}
-                            className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 disabled:opacity-50 transition-colors flex items-center justify-center gap-1 mt-1"
+                            className="text-xs font-semibold text-[var(--color-primary-accent)] hover:text-[var(--color-secondary-accent)] disabled:opacity-50 transition-colors flex items-center justify-center gap-1 mt-1"
                         >
                             {uploadStatus.uploading ? <><FiLoader className="animate-spin"/> Uploading...</> : "Save New Photo"}
                         </button>
                     )}
               </div>
-
-              <h2 className="text-xl font-semibold text-gray-800 mt-1 truncate w-full px-2">{user.name}</h2>
-              <p className="text-gray-500 text-sm mt-0.5 truncate w-full px-2">{user.email}</p>
-              <span className="mt-4 bg-indigo-50 text-indigo-700 text-xs font-medium px-3 py-1 rounded-full capitalize border border-indigo-200">{user.role || "user"}</span>
+              
+              {/* CHANGED: Text colors */}
+              <h2 className="text-xl font-semibold text-[var(--color-text-light)] mt-1 truncate w-full px-2">{user.name}</h2>
+              <p className="text-[var(--color-text-light)]/70 text-sm mt-0.5 truncate w-full px-2">{user.email}</p>
+              {/* CHANGED: Badge colors */}
+              <span className="mt-4 bg-[var(--color-primary-accent)]/20 text-[var(--color-primary-accent)] text-xs font-medium px-3 py-1 rounded-full capitalize border border-[var(--color-primary-accent)]/30">{user.role || "user"}</span>
             </div>
           </div>
 
           <div className="lg:col-span-8 animate-fade-in-up animation-delay-300">
-            <div className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
-              <div className="border-b border-gray-200 bg-gray-50/50">
+            {/* CHANGED: Card bg, border colors */}
+            <div className="bg-[var(--color-medium-bg)] rounded-xl shadow-lg border border-[var(--color-light-bg)] overflow-hidden">
+              {/* CHANGED: Tab bar bg, border colors */}
+              <div className="border-b border-[var(--color-light-bg)] bg-[var(--color-medium-bg)]">
                 <nav className="flex space-x-1 px-4 sm:px-6 pt-1">
                   <TabButton id="personal" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiUser />}>Personal Details</TabButton>
                   <TabButton id="security" activeTab={activeTab} setActiveTab={setActiveTab} icon={<FiShield />}>Security</TabButton>
@@ -196,11 +210,15 @@ export default function Profilepage() {
 
                 <div className={`transition-opacity duration-300 ease-in-out ${activeTab === 'personal' ? 'opacity-100' : 'opacity-0 absolute inset-0 p-6 sm:p-8 pointer-events-none'}`}>
                       <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-lg font-semibold text-gray-800">Your Information</h3>
+                        {/* CHANGED: Text color */}
+                        <h3 className="text-lg font-semibold text-[var(--color-text-light)]">Your Information</h3>
                         {!isEditing ?
-                          <button onClick={() => { setIsEditing(true); setSaveStatus({ saving: false, error: "", success: "" }); }} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-indigo-100 text-indigo-700 font-semibold text-xs hover:bg-indigo-200 transition-all duration-200 transform hover:scale-105"><FiEdit3 size={14}/> Edit</button> :
+                           // CHANGED: Edit button colors
+                          <button onClick={() => { setIsEditing(true); setSaveStatus({ saving: false, error: "", success: "" }); }} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[var(--color-primary-accent)]/20 text-[var(--color-primary-accent)] font-semibold text-xs hover:bg-[var(--color-primary-accent)]/30 transition-all duration-200 transform hover:scale-105"><FiEdit3 size={14}/> Edit</button> :
                           <div className="flex items-center gap-2">
-                              <button onClick={handleCancel} disabled={saveStatus.saving} className="px-3 py-1.5 rounded-md border border-gray-300 bg-white hover:bg-gray-100 font-semibold text-xs transition-colors disabled:opacity-50">Cancel</button>
+                              {/* CHANGED: Cancel button colors */}
+                              <button onClick={handleCancel} disabled={saveStatus.saving} className="px-3 py-1.5 rounded-md border border-[var(--color-light-bg)] bg-[var(--color-medium-bg)] hover:bg-[var(--color-light-bg)] text-[var(--color-text-light)] font-semibold text-xs transition-colors disabled:opacity-50">Cancel</button>
+                              {/* CHANGED: Save button colors (using green for save is ok) */}
                               <button onClick={handleSave} disabled={saveStatus.saving} className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md bg-green-600 text-white font-semibold text-xs hover:bg-green-700 disabled:opacity-60 transition-colors min-w-[70px]">
                                   {saveStatus.saving ? <FiLoader className="animate-spin"/> : <><FiSave size={14}/> Save</>}
                               </button>
@@ -219,7 +237,8 @@ export default function Profilepage() {
                   </div>
 
                   <div className={`transition-opacity duration-300 ease-in-out ${activeTab === 'security' ? 'opacity-100' : 'opacity-0 absolute inset-0 p-6 sm:p-8 pointer-events-none'}`}>
-                       <h3 className="text-lg font-semibold text-gray-800 mb-6">Change Password</h3>
+                       {/* CHANGED: Text color */}
+                       <h3 className="text-lg font-semibold text-[var(--color-text-light)] mb-6">Change Password</h3>
                        {passwordStatus.error && <FormMessage type="error" message={passwordStatus.error} />}
                        {passwordStatus.success && <FormMessage type="success" message={passwordStatus.success} />}
 
@@ -228,7 +247,8 @@ export default function Profilepage() {
                         <PasswordField label="New Password" icon={<FiLock />} name="newPassword" value={passwordForm.newPassword} onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))} isVisible={passwordVisibility.new} onToggleVisibility={() => togglePasswordVisibility('new')} required />
                         <PasswordField label="Confirm New Password" icon={<FiLock />} name="confirmPassword" value={passwordForm.confirmPassword} onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))} isVisible={passwordVisibility.confirm} onToggleVisibility={() => togglePasswordVisibility('confirm')} required />
                         <div className="flex justify-end pt-2">
-                          <button type="submit" disabled={passwordStatus.submitting} className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 disabled:opacity-60 transition-colors shadow-sm min-w-[150px]">
+                          {/* CHANGED: Button colors to yellow accent */}
+                          <button type="submit" disabled={passwordStatus.submitting} className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-gradient-to-r from-[var(--color-primary-accent)] to-[var(--color-secondary-accent)] text-[var(--color-text-dark)] font-semibold text-sm hover:from-[var(--color-secondary-accent)] disabled:opacity-60 transition-colors shadow-sm min-w-[150px]">
                             {passwordStatus.submitting ? <><FiLoader className="animate-spin"/> Updating...</> : "Update Password"}
                           </button>
                         </div>
@@ -244,14 +264,16 @@ export default function Profilepage() {
   );
 }
 
+// CHANGED: Tab button styling
 const TabButton = ({ id, activeTab, setActiveTab, icon, children }) => {
     const isActive = activeTab === id;
-    const label = children; // Store original children for logic if needed
+    const label = children;
     return (
         <button
             onClick={() => setActiveTab(id)}
-            className={`relative flex items-center gap-2 py-2.5 px-4 font-medium transition-colors duration-200 border-b-2 focus:outline-none focus-visible:bg-indigo-50/50 rounded-t text-sm sm:text-base
-                ${isActive ? "border-indigo-600 text-indigo-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}`}
+            // CHANGED: active and hover colors
+            className={`relative flex items-center gap-2 py-2.5 px-4 font-medium transition-colors duration-200 border-b-2 focus:outline-none focus-visible:bg-[var(--color-light-bg)]/50 rounded-t text-sm sm:text-base
+                ${isActive ? "border-[var(--color-primary-accent)] text-[var(--color-primary-accent)]" : "border-transparent text-[var(--color-text-light)]/60 hover:text-[var(--color-text-light)] hover:border-[var(--color-light-bg)]"}`}
         >
             {React.cloneElement(icon, { size: 18 })}
             <span className="hidden sm:inline">{children}</span>
@@ -260,41 +282,50 @@ const TabButton = ({ id, activeTab, setActiveTab, icon, children }) => {
     );
 };
 
+// CHANGED: InputField styling
 const InputField = ({ label, icon, name, value, onChange, isEditing, type = "text", readOnly = false, placeholder = "" }) => (
   <div>
-    <label htmlFor={name} className="block text-xs font-semibold text-gray-500 mb-1 tracking-wide uppercase">{label}</label>
+    {/* CHANGED: label text color */}
+    <label htmlFor={name} className="block text-xs font-semibold text-[var(--color-text-light)]/70 mb-1 tracking-wide uppercase">{label}</label>
     <div className="relative group">
-      <span className={`absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none transition-colors duration-200 ${isEditing && !readOnly ? 'group-focus-within:text-indigo-600' : ''}`}>
+      {/* CHANGED: icon color */}
+      <span className={`absolute inset-y-0 left-0 flex items-center pl-3.5 text-[var(--color-text-light)]/50 pointer-events-none transition-colors duration-200 ${isEditing && !readOnly ? 'group-focus-within:text-[var(--color-primary-accent)]' : ''}`}>
         {React.cloneElement(icon, { size: 18 })}
       </span>
       <input
         type={type}
         id={name} name={name} value={value || ""} onChange={isEditing ? onChange : undefined} readOnly={!isEditing || readOnly} placeholder={placeholder}
-        className={`w-full pl-10 pr-3 py-2.5 border rounded-md transition duration-200 ease-in-out text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent ${
+         // CHANGED: input colors (dark theme)
+        className={`w-full pl-10 pr-3 py-2.5 border rounded-md transition duration-200 ease-in-out text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-accent)] focus:border-transparent ${
             isEditing && !readOnly
-            ? "bg-white border-gray-300 text-gray-800 placeholder-gray-400"
-            : "bg-gray-100 border-gray-200 cursor-not-allowed text-gray-500"
+            ? "bg-[var(--color-dark-bg)] border-[var(--color-light-bg)] text-[var(--color-text-light)] placeholder-[var(--color-text-light)]/50"
+            : "bg-[var(--color-dark-bg)]/50 border-[var(--color-light-bg)]/50 cursor-not-allowed text-[var(--color-text-light)]/70"
         }`}
       />
     </div>
   </div>
 );
 
+// CHANGED: PasswordField styling
 const PasswordField = ({ label, icon, name, value, onChange, isVisible, onToggleVisibility, required }) => (
    <div>
-    <label htmlFor={name} className="block text-xs font-semibold text-gray-500 mb-1 tracking-wide uppercase">{label}</label>
+    {/* CHANGED: label text color */}
+    <label htmlFor={name} className="block text-xs font-semibold text-[var(--color-text-light)]/70 mb-1 tracking-wide uppercase">{label}</label>
     <div className="relative group">
-      <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none transition-colors duration-200 group-focus-within:text-indigo-600">
+      {/* CHANGED: icon colors */}
+      <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-[var(--color-text-light)]/50 pointer-events-none transition-colors duration-200 group-focus-within:text-[var(--color-primary-accent)]">
          {React.cloneElement(icon, { size: 18 })}
       </span>
       <input
         type={isVisible ? 'text' : 'password'}
         id={name} name={name} value={value || ""} onChange={onChange}
-        className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-md transition duration-200 ease-in-out text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent bg-white text-gray-800 placeholder-gray-400"
+        // CHANGED: input colors (dark theme)
+        className="w-full pl-10 pr-10 py-2.5 border border-[var(--color-light-bg)] rounded-md transition duration-200 ease-in-out text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-accent)] focus:border-transparent bg-[var(--color-dark-bg)] text-[var(--color-text-light)] placeholder-[var(--color-text-light)]/50"
         required={required}
         placeholder="••••••••"
       />
-      <button type="button" onClick={onToggleVisibility} className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none">
+      {/* CHANGED: icon colors */}
+      <button type="button" onClick={onToggleVisibility} className="absolute inset-y-0 right-0 flex items-center pr-3 text-[var(--color-text-light)]/50 hover:text-[var(--color-primary-accent)] focus:outline-none">
         {isVisible ? <FiEyeOff size={18}/> : <FiEye size={18}/>}
       </button>
     </div>

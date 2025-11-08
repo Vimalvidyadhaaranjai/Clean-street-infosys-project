@@ -1,3 +1,5 @@
+// src/App.jsx - NO CHANGES NEEDED
+
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/Login";
@@ -37,5 +39,4 @@ export default function App() {
 
     </>
     
-  );
-}
+  );}
