@@ -71,6 +71,11 @@ export default function Register() {
       <Toaster position="top-right" reverseOrder={false} /> 
       
       {/* Left Column - Image and Welcome Text (Already dark-themed) */}
+    <div className="min-h-screen  flex bg-gradient-to-br from-blue-50 via-indigo-50 to-white">
+      <Toaster position="top-right" reverseOrder={false} /> {/* <-- Add Toaster */}
+      {/* Left Column - Image and Welcome Text */}
+      {/* === IMAGE UPDATE: Changed to street1.png === */}
+      {/* === STYLE UPDATE: Refined overlay and text styles === */}
       <div className="hidden lg:flex w-1/2 bg-cover bg-center relative group overflow-hidden" style={{ backgroundImage: "url('/images/street1.png')" }}>
         <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-110" style={{ backgroundImage: "url('/images/street1.png')" }}></div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -93,6 +98,12 @@ export default function Register() {
             {/* CHANGED: text colors */}
             <h2 className="text-3xl font-bold text-[var(--color-secondary-accent)]">Create Your Account</h2>
             <p className="text-[var(--color-text-light)]/70 mt-2">Let's get you started!</p>
+      {/* === STYLE UPDATE: Centered form with card styling === */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 overflow-y-auto"> {/* Added overflow-y-auto */}
+        <div className="w-full max-w-lg bg-white p-8 sm:p-10 rounded-2xl shadow-xl border border-gray-100 animate-fade-in-up "> {/* Added my-8 for vertical spacing */}
+          <div className="text-center ">
+            <h2 className="text-3xl font-bold text-gray-800">Create Your Account</h2>
+            <p className="text-gray-500 mt-2">Let's get you started!</p>
           </div>
 
           <form className="space-y-5" onSubmit={handleSubmit}>
