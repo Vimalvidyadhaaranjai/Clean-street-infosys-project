@@ -161,8 +161,8 @@ const ViewComplaints = () => {
   }
 
   return (
-    // === MODIFIED: Set background to white/black based on theme ===
-    <div className="min-h-screen bg-theme-primary flex flex-col transition-colors duration-300">
+    // === MODIFIED: Set background to gradient like admin panel ===
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col transition-colors duration-300">
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12 flex-grow">
         <div className="text-center mb-12 animate-fade-in-down">

@@ -136,7 +136,7 @@ const backend_Url = import.meta.env.VITE_BACKEND_URL || "http://localhost:3002";
 
   return (
     // === STYLE UPDATE: Consistent gradient background ===
-    <div className="bg-theme-primary min-h-screen flex flex-col transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex flex-col transition-colors duration-300">
       <Navbar />
       {/* === STYLE UPDATE: Adjusted padding === */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 flex-grow">
