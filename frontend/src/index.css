@@ -275,8 +275,7 @@ button, a, [role="button"] {
 .input-theme:focus {
   border-color: var(--color-accent-primary) !important;
   outline: none;
-  ring: 2px;
-  ring-color: var(--color-accent-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
 }
 
 .input-theme::placeholder {
