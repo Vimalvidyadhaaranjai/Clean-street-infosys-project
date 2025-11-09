@@ -42,13 +42,13 @@
 .dark {
   /* Dark Mode Colors - CHANGE THESE TO UPDATE DARK MODE THEME */
   --color-bg-primary: #000000;
-  --color-bg-secondary: #001D3D;
-  --color-bg-tertiary: #003566;
+  --color-bg-secondary: #222121;
+  --color-bg-tertiary: #3a3a3a;
   --color-text-primary: #ffffff;
   --color-text-secondary: #d1d5db;
   --color-text-tertiary: #9ca3af;
-  --color-border: #003566;
-  --color-border-light: #004080;
+  --color-border: #454343;
+  --color-border-light: #555555;
   
   /* Dark Mode - Navbar & Footer */
   --color-nav-bg: rgba(0, 29, 61, 0.95);
@@ -69,7 +69,7 @@
   /* Dark Mode - Accents */
   --color-accent-primary: #FFC300;
   --color-accent-secondary: #4CC9F0;
-  --color-link: #4CC9F0;
+  --color-link: #ffffff;
   --color-link-hover: #4ADEDE;
   
   color-scheme: dark;

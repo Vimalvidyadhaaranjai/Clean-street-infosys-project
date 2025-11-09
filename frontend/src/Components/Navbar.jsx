@@ -72,7 +72,7 @@ const Navbar = () => {
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-20">
                         <Link to="/" onClick={closeMobileMenu} className="flex-shrink-0 transition-transform duration-300 ease-out hover:scale-105 group">
-                            <img className="h-24 w-auto transition-filter duration-300 group-hover:brightness-110" src="/images/logo.png" alt="Clean Street Logo" />
+                            <img className="h-16 w-auto transition-filter duration-300 group-hover:brightness-110" src="/images/logo.png" alt="Clean Street Logo" />
                         </Link>
 
                         <div className='flex justify-end'>
@@ -393,7 +393,7 @@ const AuthButton = ({ to, children, secondary = false, onClick, fullWidth = fals
             className={`px-5 py-2 rounded-md font-semibold text-sm transition-all duration-200 ease-out transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center ${fullWidth ? 'w-full' : ''}
                 ${isDarkMode
                     ? secondary
-                        ? 'bg-[#4CC9F0] text-black hover:bg-[#4ADEDE] border border-[#4CC9F0]/80 shadow-sm focus:ring-[#4CC9F0]'
+                        ? 'bg-[#ffffff] text-black hover:bg-[#004080] hover:text-white border border-[#ffffff]/80 shadow-sm focus:ring-[#4CC9F0]'
                         : 'bg-[#FFC300] text-black shadow hover:shadow-md hover:bg-[#FFD60A] focus:ring-[#FFC300]'
                     : secondary
                         ? 'bg-gray-100 text-gray-800 hover:bg-gray-200 border border-gray-200/80 shadow-sm focus:ring-indigo-500'

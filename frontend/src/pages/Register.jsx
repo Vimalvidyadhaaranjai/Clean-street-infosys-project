@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FiUser, FiMail, FiMapPin, FiLock, FiBriefcase, FiEye, FiEyeOff } from "react-icons/fi";
 import { Toaster, toast } from "react-hot-toast";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
   const [form, setForm] = useState({
     name: "",
     location: "",
@@ -75,7 +77,11 @@ export default function Register() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500"></div>
         <div className="relative z-10 flex flex-col justify-center items-center text-white p-16 text-center space-y-6">
           <Link to="/" className="block mb-6 transform transition-transform duration-300 hover:scale-105">
-            <img src="/images/white_logo.png" alt="Clean Street Logo" className="w-64 animate-fade-in-down" />
+            <img 
+              src={isDarkMode ? "/images/logo.png" : "/images/white_logo.png"} 
+              alt="Clean Street Logo" 
+              className={`w-64 animate-fade-in-down ${isDarkMode ? 'brightness-0 invert' : ''}`}
+            />
           </Link>
           <h1 className="text-4xl font-bold tracking-tight animate-fade-in-up animation-delay-200">Join the Movement</h1>
           <p className="text-lg text-gray-200 leading-relaxed animate-fade-in-up animation-delay-300">
