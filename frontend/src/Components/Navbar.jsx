@@ -1,6 +1,8 @@
+// src/Components/Navbar.jsx
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FiGrid, FiFilePlus, FiEye, FiUser, FiLogOut, FiShield, FiMenu, FiX, FiChevronDown, FiInfo, FiHelpCircle, FiSettings, FiSun, FiMoon } from "react-icons/fi"; // Added Info, HelpCircle, Settings, Sun, Moon
+// ADDED FiEye to this list
+import { FiGrid, FiFilePlus, FiEye, FiUser, FiLogOut, FiShield, FiMenu, FiX, FiChevronDown, FiInfo, FiHelpCircle, FiSettings, FiSun, FiMoon } from "react-icons/fi";
 import { useTheme } from '../context/ThemeContext';
 
 const Navbar = () => {
@@ -126,6 +128,8 @@ const Navbar = () => {
                                                 <DropdownLink to="/about" icon={<FiInfo />} onClick={() => setIsAboutDropdownOpen(false)}>About Page</DropdownLink>
                                                 <DropdownLink to="/how-it-works" icon={<FiHelpCircle />} onClick={() => setIsAboutDropdownOpen(false)}>How It Works</DropdownLink>
                                                 <DropdownLink to="/services" icon={<FiSettings />} onClick={() => setIsAboutDropdownOpen(false)}>Services</DropdownLink>
+                                                {/* === ADDED THIS LINE === */}
+                                                <DropdownLink to="/view-complaints" icon={<FiEye />} onClick={() => setIsAboutDropdownOpen(false)}>View Reports</DropdownLink>
                                             </div>
                                         </div>
                                     </>
@@ -187,7 +191,8 @@ const Navbar = () => {
                                 ) : (
                                     <div className="hidden lg:flex items-center gap-2">
                                         <AuthButton to="/login" secondary>Login</AuthButton>
-                                        <AuthButton to="/register">Register</AuthButton>
+                                        {/* === CHANGED "Register" to "Get Started" === */}
+                                        <AuthButton to="/register">Get Started</AuthButton>
                                     </div>
                                 )}
 
@@ -297,17 +302,21 @@ const Navbar = () => {
                                     <FiChevronDown size={18} className={`transition-transform duration-200 ${isMobileAboutOpen ? 'rotate-180' : ''}`} />
                                 </button>
 
-                                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isMobileAboutOpen ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                {/* === INCREASED max-h-48 to max-h-64 === */}
+                                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isMobileAboutOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'}`}>
                                     <div className="pl-8 py-1 space-y-1">
                                         <MobileNavLink to="/about" onClick={closeMobileMenu}><FiInfo /><span>About Page</span></MobileNavLink>
                                         <MobileNavLink to="/how-it-works" onClick={closeMobileMenu}><FiHelpCircle /><span>How It Works</span></MobileNavLink>
                                         <MobileNavLink to="/services" onClick={closeMobileMenu}><FiSettings /><span>Services</span></MobileNavLink>
+                                        {/* === ADDED THIS LINE === */}
+                                        <MobileNavLink to="/view-complaints" onClick={closeMobileMenu}><FiEye /><span>View Reports</span></MobileNavLink>
                                     </div>
                                 </div>
                             </div>
                             <div className={`pt-4 mt-4 border-t ${isDarkMode ? 'border-[#003566]' : 'border-gray-100'}`}>
                                 <MobileNavLink to="/login" onClick={closeMobileMenu}>Login</MobileNavLink>
-                                <MobileNavLink to="/register" onClick={closeMobileMenu}>Register</MobileNavLink>
+                                {/* === CHANGED "Register" to "Get Started" === */}
+                                <MobileNavLink to="/register" onClick={closeMobileMenu}>Get Started</MobileNavLink>
                             </div>
                         </>
                     )}

@@ -40,8 +40,9 @@ const Hero = () => {
                         Report street issues easily, track their resolution, and collaborate with your community for a better neighborhood. Your action matters.
                     </p>
 
-                     {/* Call to Action Button */}
-                     {/* === STYLE UPDATE: Refined button style, hover effect === */}
+                     {/* === === === === === === === === === === === === */}
+                     {/* === BUTTON REMOVED AS REQUESTED === */}
+                     {/*
                      <Link
                         to="/register"
                         className={`mt-10 inline-flex items-center gap-2.5 px-8 py-3 text-base font-semibold rounded-lg shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-opacity-50 animate-fade-in-up delay-400 ${
@@ -52,6 +53,9 @@ const Hero = () => {
                     >
                         Get Started <FiArrowRight className={`ml-1 ${isDarkMode ? 'text-black' : 'text-blue-200'}`} size={18} />
                     </Link>
+                    */}
+                    {/* === === === === === === === === === === === === */}
+
                 </div>
 
                 {/* Feature Cards Section */}
