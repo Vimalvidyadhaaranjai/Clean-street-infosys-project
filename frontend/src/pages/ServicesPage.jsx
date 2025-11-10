@@ -45,8 +45,8 @@ const ServicesPage = () => {
 };
 
 const ServiceItem = ({ icon, title, children }) => (
-    <div className="flex items-start gap-4 p-4 bg-gray-50/70 rounded-lg border border-gray-200/60">
-        <div className="flex-shrink-0 mt-1 text-2xl">
+    <div className="flex items-start gap-4 p-4 bg-black rounded-lg border border-gray-200/60">
+        <div className="flex-shrink-0 mt-1 text-yellow-500 text-2xl">
             {icon}
         </div>
         <div>

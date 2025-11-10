@@ -77,7 +77,7 @@ const Navbar = () => {
 
                         <div className='flex justify-end'>
                             {/* === CONDITIONAL NAVIGATION LINKS === */}
-                            <div className="hidden lg:flex items-center space-x-2 ">
+                            <div className="hidden lg:flex items-center space-x-2 mr-4">
                                 {user ? (
                                     // Logged-in Links
                                     <>
