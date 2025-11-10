@@ -17,20 +17,24 @@ const AboutPage = () => {
                         <p className="text-gray-600 mt-2 text-base">Connecting communities for a cleaner tomorrow.</p>
                     </header>
 
-                    <section className="space-y-6 text-gray-700 leading-relaxed">
-                        <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-                            <FiTarget className="text-blue-600" /> Our Mission
-                        </h2>
-                        <p>
-                            Clean Street is dedicated to empowering citizens to take an active role in maintaining and improving the cleanliness of their neighborhoods. We believe that by providing an easy-to-use platform for reporting and tracking local environmental issues, we can foster collaboration between residents, volunteers, and local authorities to create cleaner, healthier, and more vibrant communities.
-                        </p>
+                    <section className="space-y-6 text-gray-700 leading-relaxed px-4">
+                        <div className="bg-gray-50 rounded-lg p-6 border border-gray-200/60">
+                            <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2 mb-3">
+                                <FiTarget className="text-blue-600" /> Our Mission
+                            </h2>
+                            <p>
+                                Clean Street is dedicated to empowering citizens to take an active role in maintaining and improving the cleanliness of their neighborhoods. We believe that by providing an easy-to-use platform for reporting and tracking local environmental issues, we can foster collaboration between residents, volunteers, and local authorities to create cleaner, healthier, and more vibrant communities.
+                            </p>
+                        </div>
 
-                        <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-                            <FiUsers className="text-green-600" /> Who We Are
-                        </h2>
-                        <p>
-                            We are a community-focused initiative leveraging technology to address common urban challenges like garbage disposal, road damage, and infrastructure maintenance. Our platform connects people who care about their local environment with the resources and channels needed to make a tangible difference.
-                        </p>
+                        <div className="bg-gray-50 rounded-lg p-6 border border-gray-200/60">
+                            <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2 mb-3">
+                                <FiUsers className="text-green-600" /> Who We Are
+                            </h2>
+                            <p>
+                                We are a community-focused initiative leveraging technology to address common urban challenges like garbage disposal, road damage, and infrastructure maintenance. Our platform connects people who care about their local environment with the resources and channels needed to make a tangible difference.
+                            </p>
+                        </div>
                     </section>
                 </div>
             </main>

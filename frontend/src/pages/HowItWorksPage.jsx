@@ -17,8 +17,8 @@ const HowItWorksPage = () => {
                         <p className="text-gray-600 mt-2 text-base">Simple steps to make a big impact.</p>
                     </header>
 
-                    <section className="space-y-8 px-16 text-gray-700 leading-relaxed">
-                        <div className='bg-gray-300/15 rounded-2xl p-4'>
+                    <section className="space-y-6 px-16 text-gray-700 leading-relaxed">
+                        <div className='bg-gray-50 rounded-2xl p-6 border border-gray-200/60'>
                             <h2 className="text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2">
                                 <FiEdit3 className="text-blue-600" /> 1. Report an Issue
                             </h2>
@@ -26,7 +26,7 @@ const HowItWorksPage = () => {
                                 See a problem like overflowing bins, potholes, or broken streetlights? Use our simple reporting form. Pinpoint the location on the map, add a description, select the issue type and priority, and optionally upload a photo. Your detailed report helps volunteers and authorities act faster.
                             </p>
                         </div>
-                        <div className='bg-gray-300/15 rounded-2xl p-4'>
+                        <div className='bg-gray-50 rounded-2xl p-6 border border-gray-200/60'>
                             <h2 className="text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2">
                                 <FiEye className="text-purple-600" /> 2. Track Progress
                             </h2>
@@ -34,7 +34,7 @@ const HowItWorksPage = () => {
                                 Once submitted, you can track the status of your report (Pending, In Review, Resolved) directly from your personalized User Dashboard. You can also view reports submitted by others in the Community Reports section. Engage in discussions by adding comments to reports.
                             </p>
                         </div>
-                         <div className='bg-gray-300/15 rounded-2xl p-4'>
+                         <div className='bg-gray-50 rounded-2xl p-6 border border-gray-200/60'>
                             <h2 className="text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2">
                                 <FiTool className="text-orange-600" /> 3. Volunteer Action
                             </h2>
@@ -42,7 +42,7 @@ const HowItWorksPage = () => {
                                 Registered volunteers can view nearby pending issues on their Volunteer Dashboard. They can assign tasks to themselves, update the status as they work on resolving the issue (e.g., changing it to "In Progress" or "Resolved"), and help keep the community informed.
                             </p>
                         </div>
-                         <div className='bg-gray-300/15 rounded-2xl p-4'>
+                         <div className='bg-gray-50 rounded-2xl p-6 border border-gray-200/60'>
                             <h2 className="text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2">
                                 <FiUserCheck className="text-green-600" /> 4. Admin Oversight
                             </h2>
