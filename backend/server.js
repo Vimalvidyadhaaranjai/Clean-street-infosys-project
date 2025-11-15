@@ -20,7 +20,7 @@ const __dirname = path.dirname(__filename);
 const corsOptions = {
   origin: [
     "http://localhost:5173",
-    "https://infosys-spring-board-clean-p-roject.vercel.app"
+   "https://infosys-cleanstreet.vercel.app/"
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
