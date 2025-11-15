@@ -17,13 +17,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // --- Middleware ---
-app.use(cors({
+const corsOptions = {
   origin: [
     "http://localhost:5173",
     "https://infosys-spring-board-clean-p-roject.vercel.app"
   ],
-  credentials: true
-}));
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['set-cookie'],
+  maxAge: 600 // 10 minutes
+};
+app.set('trust proxy', 1);
+app.use(cors(corsOptions));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json());
 app.use(cookieParser());

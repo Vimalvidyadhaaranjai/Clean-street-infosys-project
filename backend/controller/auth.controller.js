@@ -11,12 +11,23 @@ const generateTokenAndSetCookie = (res, user) => {
     expiresIn: "1h",
   });
 
-  res.cookie("token", token, {
+  const cookieOptions = {
     httpOnly: true,
-    secure:NODE_ENV !== "development",
-    sameSite: "strict", 
     maxAge: 60 * 60 * 1000,
-  });
+    path: '/',
+  };
+
+  // Development settings
+  if (NODE_ENV === "development") {
+    cookieOptions.secure = false;
+    cookieOptions.sameSite = "lax";
+  } else {
+    // Production settings for cross-origin
+    cookieOptions.secure = true;
+    cookieOptions.sameSite = "none";
+  }
+
+  res.cookie("token", token, cookieOptions);
   return token;
 };
 
