@@ -44,10 +44,13 @@ const UserDashboard = () => {
       return;
     }
     const fetchDashboardData = async () => {
-      setLoading(true);
       try {
         const res = await fetch(`${backend_Url}/api/complaints/my-reports`, {
           credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
         });
         const data = await res.json();
         if (res.ok && data.success) {
@@ -79,8 +82,9 @@ const UserDashboard = () => {
           console.error("Error fetching admin logs:", error);
         }
       } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-        toast.error("Could not load dashboard data. Please try refreshing the page.");
+        console.error("Error:", error);
+        toast.error("Authentication failed. Please login again.");
+        navigate("/login");
       } finally {
         setLoading(false);
       }
